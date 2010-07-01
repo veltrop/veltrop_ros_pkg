@@ -1,8 +1,0 @@
----
-name: hmc6343_raw
-frequency: 200    # wait time in ms
-address: 0x32
-command: 0x50
-delay: 1          # in ms
-data_size: 6      # in bytes
-
