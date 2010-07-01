@@ -1,0 +1,21 @@
+<package>
+  <description brief="veltrobot_movement">
+
+     Controls the movment of a robot using servos.
+     Servo positons are sent as joint_states.  Poses and motions
+     are defined by motion files.
+
+  </description>
+  <author>Taylor Veltrop</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-rt</url>
+
+  <depend package="roscpp"/>
+  <depend package="tinyxml"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  
+</package>
+
+

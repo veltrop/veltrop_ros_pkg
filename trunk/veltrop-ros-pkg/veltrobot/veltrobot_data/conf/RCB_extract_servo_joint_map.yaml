@@ -1,0 +1,28 @@
+# This file maps servo ID numbers from RCB files used in Kondo's Heart2heart software
+# to the joint names that are used in ROS.
+# This is only used to import from Kondo RCB to our own pose/motion format.
+
+_2: shoulder_left_pitch
+_3: shoulder_left_roll
+_5: shoulder_left_yaw
+_4: elbow_left_roll
+
+_10: hip_left_yaw
+_11: hip_left_roll
+_12: hip_left_pitch
+_13: knee_left_pitch
+_14: ankle_left_pitch
+_15: ankle_left_roll
+
+_6: shoulder_right_pitch
+_7: shoulder_right_roll
+_9: shoulder_right_yaw
+_8: elbow_right_roll
+
+_16: hip_right_yaw
+_17: hip_right_roll
+_18: hip_right_pitch
+_19: knee_right_pitch
+_20: ankle_right_pitch
+_21: ankle_right_roll
+

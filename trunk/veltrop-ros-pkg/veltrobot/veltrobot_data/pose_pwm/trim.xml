@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+
+<pose name="trim">
+	<joint_positions duration="0" units="pwm_offset">
+		<joint name="shoulder_left_pitch"  position="-356.92272" />
+		<joint name="shoulder_left_roll"  position="-796.92228" />
+		<joint name="elbow_left_roll"  position="-33.84612" />
+		<joint name="shoulder_left_yaw"  position="0.0" />
+		<joint name="shoulder_right_pitch"  position="363.07656" />
+		<joint name="shoulder_right_roll"  position="790.76844" />
+		<joint name="elbow_right_roll"  position="-30.7692" />
+		<joint name="shoulder_right_yaw"  position="0.0" />
+		<joint name="hip_left_yaw"  position="61.5384" />
+		<joint name="hip_left_roll"  position="-30.7692" />
+		<joint name="hip_left_pitch"  position="-6.15384" />
+		<joint name="knee_left_pitch"  position="344.61504" />
+		<joint name="ankle_left_pitch"  position="-187.69212" />
+		<joint name="ankle_left_roll"  position="0.0" />
+		<joint name="hip_right_yaw"  position="27.69228" />
+		<joint name="hip_right_roll"  position="-9.23076" />
+		<joint name="hip_right_pitch"  position="-12.30768" />
+		<joint name="knee_right_pitch"  position="-350.76888" />
+		<joint name="ankle_right_pitch"  position="175.38444" />
+		<joint name="ankle_right_roll"  position="-43.07688" />
+	</joint_positions>
+</pose>
+

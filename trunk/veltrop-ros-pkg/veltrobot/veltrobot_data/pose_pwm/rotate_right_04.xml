@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+
+<pose name="rotate_right_04">
+	<joint_positions duration="150" units="pwm_offset">
+		<joint name="shoulder_left_pitch"  position="0.0" />
+		<joint name="shoulder_left_roll"  position="184.6152" />
+		<joint name="elbow_left_roll"  position="0.0" />
+		<joint name="shoulder_left_yaw"  position="0.0" />
+		<joint name="shoulder_right_pitch"  position="0.0" />
+		<joint name="shoulder_right_roll"  position="-184.6152" />
+		<joint name="elbow_right_roll"  position="0.0" />
+		<joint name="shoulder_right_yaw"  position="0.0" />
+		<joint name="hip_left_yaw"  position="184.6152" />
+		<joint name="hip_left_roll"  position="0.0" />
+		<joint name="hip_left_pitch"  position="138.4614" />
+		<joint name="knee_left_pitch"  position="-246.1536" />
+		<joint name="ankle_left_pitch"  position="-123.0768" />
+		<joint name="ankle_left_roll"  position="0.0" />
+		<joint name="hip_right_yaw"  position="-184.6152" />
+		<joint name="hip_right_roll"  position="0.0" />
+		<joint name="hip_right_pitch"  position="-153.846" />
+		<joint name="knee_right_pitch"  position="276.9228" />
+		<joint name="ankle_right_pitch"  position="138.4614" />
+		<joint name="ankle_right_roll"  position="0.0" />
+	</joint_positions>
+</pose>
+
