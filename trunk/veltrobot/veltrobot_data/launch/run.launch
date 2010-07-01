@@ -1,0 +1,30 @@
+<launch>
+  <!-- <node pkg="veltrobot_data" type="veltrobot_superuser_setup.py" 
+        name="veltrobot_superuser_setup" /> -->
+  <!-- <node pkg="veltrobot_data" type="veltrobot_ps3joy_launch.py"
+        name="veltrobot_ps3joy_launch" /> -->
+  <!-- <node pkg="ps3joy" type="ps3joy.py" name="ps3joy" /> -->
+
+  <include file="$(find veltrobot_data)/launch/model.launch" />
+  <include file="$(find veltrobot_data)/launch/sensors.launch" />
+ 
+  <param name="gyro_pitch_conf"
+    command="cat $(find veltrobot_data)/conf/gyro_pitch.yaml" />
+  <param name="gyro_roll_conf"
+    command="cat $(find veltrobot_data)/conf/gyro_roll.yaml" />
+  <node pkg="roboard_servos" type="joint_state_controlled"
+        name="joint_state_controlled">
+    <param name="servo_fps" value="400" /> 
+  </node>
+
+  <node pkg="veltrobot_movement" type="control_movement"
+    name="movement_controller" />
+
+  <node respawn="true" pkg="ps3joy" type="ps3_joy_node" name="ps3_joy" >
+    <param name="dev" type="string" value="/dev/input/js0" />
+    <param name="deadzone" value="0.12" /> 
+  </node>  
+  <node pkg="veltrobot_teleop" type="teleop_joy" name="teleop_joy" />
+  <node pkg="veltrobot_teleop" type="teleop_kb" name="teleop_kb" />
+</launch>
+

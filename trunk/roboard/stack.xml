@@ -1,0 +1,12 @@
+<stack>
+  <description brief="roboard">
+  Contains packages to control servos and read sensors of the 
+  Roboard.  Also includes the RoBoIO library for the Roboard.
+  <author>Maintained by Taylor Veltrop</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-ros-pkg</url>
+  <depend stack="ros" />
+
+</stack>
+
