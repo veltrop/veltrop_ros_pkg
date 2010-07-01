@@ -1,0 +1,32 @@
+<package>
+  <description brief="veltrobot_sensors">
+
+     Contains nodes to abstract raw data from sensors.
+     Also contains stereo video capture nodes.
+
+  </description>
+  <author>Taylor Veltrop</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-ros-pkg</url>
+  
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="image_transport"/>
+  <depend package="opencv2"/>
+  <depend package="cv_bridge"/>
+  
+  <!-- <depend package="uvc_cam"/> -->
+  
+  <!-- experimental -->
+  <!-- <depend package="usb_cam"/> 
+       <rosdep name="libswscale"/>
+       <rosdep name="libavcodec"/> -->
+  
+  <export>
+    <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp" lflags="-L${prefix}/lib"/>
+  </export>
+
+</package>
+

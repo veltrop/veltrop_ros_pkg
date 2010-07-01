@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+
+<motion name="init" first_phase="init">
+    <phases>
+        <phase name="init" next_phase="" duration="" abort_safe="true">
+            <pose name="init" />
+        </phase>
+    </phases>
+</motion>  
+
