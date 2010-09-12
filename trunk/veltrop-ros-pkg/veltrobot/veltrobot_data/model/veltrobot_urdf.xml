@@ -4,7 +4,9 @@
     <!-- <property name="M_PI"      value="3.14159265359" /> -->
     <!-- <property name="M_HALFPI"  value="1.57079632679" /> -->
     <!-- <property name="M_13PI_18" value="2.26892802759" /> -->
+    
     <!-- Torso -->
+    <link name="/world" />
     <link name="torso">
         <visual>
             <origin xyz="-0.0125 0 -0.0325" rpy="0 0 0" />
@@ -16,12 +18,42 @@
             </material>
         </visual>
     </link>
-    <joint name="world_joint" type="floating">
+    <!-- <link name="base_yaw_link" />
+    <link name="base_pitch_link" />
+    <link name="base_roll_link" />
+    
+    <joint name="base_yaw" type="revolute">
         <servo channel="-1" type="none" trim="0" />
         <parent link="/world" />
+        <child link="base_yaw_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="100" velocity="1000" lower="0" upper="6.28318530718" />
+    </joint>
+    <joint name="base_pitch" type="revolute">
+        <servo channel="-1" type="none" trim="0" />
+        <parent link="base_yaw_link" />
+        <child link="base_pitch_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <axis xyz="0 -1 0" />
+        <limit effort="100" velocity="1000" lower="-3.14159265359" upper="3.14159265359" />
+    </joint>
+     <joint name="base_roll" type="revolute">
+        <servo channel="-1" type="none" trim="0" />
+        <parent link="base_pitch_link" />
+        <child link="base_roll_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        <limit effort="100" velocity="1000" lower="-3.14159265359" upper="3.14159265359" />
+    </joint> -->
+    <joint name="base" type="fixed">
+        <servo channel="-1" type="none" trim="0" />
+        <parent link="/world" /> 
+        <!-- <parent link="base_roll_link" /> -->
         <child link="torso" />
         <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>
+    
     <!-- head -->
     <link name="neck_zy">
         <visual>
@@ -47,12 +79,12 @@
     </link>
     <link name="stereo_camera">
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="0 0 0" rpy="-1.57079632679 0 -1.57079632679" />
             <geometry>
-                <box size="0.025 0.025 0.025" />
+                <box size="0.02 0.03 0.05" />
             </geometry>
-            <material name="green">
-                <color rgba="0 1 0 1" />
+            <material name="red">
+                <color rgba="1 0 0 1" />
             </material>
         </visual>
     </link>
@@ -69,7 +101,7 @@
         <parent link="neck_zy" />
         <child link="head_y" />
         <origin xyz="0 0 0.03" rpy="0 0 0" />
-        <axis xyz="0 1 0" />
+        <axis xyz="0 -1 0" />
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="stereo_camera_fixed" type="fixed">
@@ -132,7 +164,7 @@
         <limit effort="100" velocity="1000" lower="-2.26892802759" upper="2.26892802759" />
     </joint>
     <joint name="shoulder_left_roll" type="revolute">
-        <servo channel="22" type="RCSERVO_KONDO_KRS78X" trim="-780" />
+        <servo channel="22" type="RCSERVO_KONDO_KRS78X" trim="-770" />
         <parent link="shoulder_left_yx" />
         <child link="arm_left_upper_xz" />
         <origin xyz="0 0.025 0" rpy="0 0 0" />
@@ -140,7 +172,7 @@
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="shoulder_left_yaw" type="revolute">
-        <servo channel="23" type="RCSERVO_KONDO_KRS78X" trim="-35" />
+        <servo channel="23" type="RCSERVO_KONDO_KRS78X" trim="-45" />
         <parent link="arm_left_upper_xz" />
         <child link="arm_left_elbow_zx" />
         <origin xyz="0 0 -0.085" rpy="0 0 0" />
@@ -201,7 +233,7 @@
         </visual>
     </link>
     <joint name="shoulder_right_pitch" type="revolute">
-        <servo channel="4" type="RCSERVO_KONDO_KRS78X" trim="363" />
+        <servo channel="4" type="RCSERVO_KONDO_KRS78X" trim="-685" />
         <parent link="torso" />
         <child link="shoulder_right_yx" />
         <origin xyz="0 -0.055 0.0" rpy="0 0 0" />
@@ -209,7 +241,8 @@
         <limit effort="100" velocity="1000" lower="-2.26892802759" upper="2.26892802759" />
     </joint>
     <joint name="shoulder_right_roll" type="revolute">
-        <servo channel="10" type="RCSERVO_KONDO_KRS78X" trim="770" />
+        <!-- <servo channel="10" type="RCSERVO_KONDO_KRS78X" trim="770" /> -->
+        <servo channel="11" type="RCSERVO_KONDO_KRS78X" trim="745" />
         <parent link="shoulder_right_yx" />
         <child link="arm_right_upper_xz" />
         <origin xyz="0 -0.025 0" rpy="0 0 0" />
@@ -217,7 +250,8 @@
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="shoulder_right_yaw" type="revolute">
-        <servo channel="11" type="RCSERVO_KONDO_KRS78X" trim="0" />
+        <!-- <servo channel="11" type="RCSERVO_KONDO_KRS78X" trim="0" /> -->
+        <servo channel="10" type="RCSERVO_KONDO_KRS78X" trim="125" />
         <parent link="arm_right_upper_xz" />
         <child link="arm_right_elbow_zx" />
         <origin xyz="0 0 -0.085" rpy="0 0 0" />
@@ -300,7 +334,7 @@
         </visual>
     </link>
     <joint name="hip_left_yaw" type="revolute">
-        <servo channel="2" type="RCSERVO_KONDO_KRS78X" trim="45" />
+        <servo channel="2" type="RCSERVO_KONDO_KRS78X" trim="62" />
         <parent link="torso" />
         <child link="hip_left_upper_zx" />
         <origin xyz="-0.025 0.02 -0.065" rpy="0 0 0" />
@@ -308,7 +342,7 @@
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="hip_left_roll" type="revolute">
-        <servo channel="21" type="RCSERVO_KONDO_KRS78X" trim="-40" />
+        <servo channel="21" type="RCSERVO_KONDO_KRS78X" trim="-31" />
         <parent link="hip_left_upper_zx" />
         <child link="hip_left_lower_xy" />
         <origin xyz="0 0.015 -0.025" rpy="0 0 0" />
@@ -324,7 +358,7 @@
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="knee_left_pitch" type="revolute">
-        <servo channel="17" type="RCSERVO_KONDO_KRS78X" trim="300" />
+        <servo channel="17" type="RCSERVO_KONDO_KRS78X" trim="310" />
         <parent link="leg_left_upper_yy" />
         <child link="leg_left_lower_yy" />
         <origin xyz="0 0 -0.06" rpy="0 0 0" />
@@ -332,7 +366,7 @@
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="ankle_left_pitch" type="revolute">
-        <servo channel="19" type="RCSERVO_KONDO_KRS78X" trim="-205" />
+        <servo channel="19" type="RCSERVO_KONDO_KRS78X" trim="-200" />
         <parent link="leg_left_lower_yy" />
         <child link="ankle_left_yx" />
         <origin xyz="0.02 0 -0.055" rpy="0 0 0" />
@@ -340,7 +374,7 @@
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="ankle_left_roll" type="revolute">
-        <servo channel="20" type="RCSERVO_KONDO_KRS78X" trim="-10" />
+        <servo channel="20" type="RCSERVO_KONDO_KRS78X" trim="0" />
         <parent link="ankle_left_yx" />
         <child link="foot_left_x" />
         <origin xyz="0 -0.015 -0.045" rpy="0 0 0" />
@@ -415,7 +449,7 @@
         </visual>
     </link>
     <joint name="hip_right_yaw" type="revolute">
-        <servo channel="3" type="RCSERVO_KONDO_KRS78X" trim="-5" />
+        <servo channel="3" type="RCSERVO_KONDO_KRS78X" trim="28" />
         <parent link="torso" />
         <child link="hip_right_upper_zx" />
         <origin xyz="-0.025 -0.02 -0.065" rpy="0 0 0" />
@@ -423,7 +457,7 @@
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="hip_right_roll" type="revolute">
-        <servo channel="9" type="RCSERVO_KONDO_KRS78X" trim="-20" />
+        <servo channel="9" type="RCSERVO_KONDO_KRS78X" trim="-15" />
         <parent link="hip_right_upper_zx" />
         <child link="hip_right_lower_xy" />
         <origin xyz="0 -0.015 -0.025" rpy="0 0 0" />
@@ -439,7 +473,7 @@
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="knee_right_pitch" type="revolute">
-        <servo channel="5" type="RCSERVO_KONDO_KRS78X" trim="-351" />
+        <servo channel="5" type="RCSERVO_KONDO_KRS78X" trim="-361" />
         <parent link="leg_right_upper_yy" />
         <child link="leg_right_lower_yy" />
         <origin xyz="0 0 -0.06" rpy="0 0 0" />
@@ -455,7 +489,7 @@
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="ankle_right_roll" type="revolute">
-        <servo channel="8" type="RCSERVO_KONDO_KRS78X" trim="-50" />
+        <servo channel="8" type="RCSERVO_KONDO_KRS78X" trim="-43" />
         <parent link="ankle_right_yx" />
         <child link="foot_right_x" />
         <origin xyz="0 0.015 -0.045" rpy="0 0 0" />

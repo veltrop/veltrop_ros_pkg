@@ -60,7 +60,7 @@ public:
         
         //wxString label = wxString::Format(_("CH%d"), servo.channel_);
         wxString label(servo.joint_name_.c_str(), wxConvUTF8);
-        new_row.label_ = new wxStaticText(this, -1, label, wxPoint(0, 0), wxSize(50, -1),
+        new_row.label_ = new wxStaticText(this, -1, label, wxPoint(0, 0), wxSize(150, -1),
                                           wxALIGN_LEFT | wxST_NO_AUTORESIZE);  
         int pwm_range = (servo.max_pwm_ - servo.min_pwm_) / 2;                                 
         new_row.pwm_slider_ = new wxSlider(this, ID_Slider, servo.trim_pwm_, 
@@ -238,7 +238,7 @@ public:
     ros::init(argc, local_argv_, "trim_gui");
     n_.reset(new ros::NodeHandle);
   
-    TrimFrame *frame = new TrimFrame(_("Adjust Trim"), wxPoint(0, 0), wxSize(500, 200));
+    TrimFrame *frame = new TrimFrame(_("Adjust Trim"), wxPoint(0, 0), wxSize(600, 200));
                        
     frame->Show(true);
     SetTopWindow(frame);

@@ -24,22 +24,35 @@ public:
       it.first() >> paramater;
       if (paramater == "name")
         it.second() >> topic_name_;
-      else if (paramater == "sleep")
+      else if (paramater == "frequency")
       {
-        float ms;
-        it.second() >> ms;
-        freq_ = ros::Duration(ms / 1000.0f);
+        //float ms;
+        //it.second() >> ms;
+        //float freq;
+        int freq;
+        it.second() >> freq;
+        //freq_ = ros::Duration(ms / 1000.0f);
+        freq_ = ros::Duration(1.0 / (float)freq);
       }
       else if (paramater == "address")
-        it.second() >> address_;
+      {
+        unsigned int address;
+        it.second() >> address;
+        address_ = address;
+      }
       else if (paramater == "command")
-        it.second() >> command_;
+      {
+        unsigned int command;
+        it.second() >> command;
+        command_ = command;
+      }
       else if (paramater == "delay")
         it.second() >> delay_;
       else if (paramater == "data_size")
         it.second() >> data_size_;                                      
     }  
-    std::string poo = "this" + address_;
+    //ROS_ERROR("%f, %i, %i, %X, %X", freq_.toSec(), data_size_, delay_, address_, command_);
+    
     pub_ = n.advertise<std_msgs::UInt8MultiArray>(topic_name_, 1);   
   
     poll_timer_ = n.createTimer(freq_, &GenericSensorI2C::pollCB, this);
@@ -57,6 +70,8 @@ private:
 
   void pollCB(const ros::TimerEvent& e)
   {  
+    //ROS_ERROR("%f, %i, %i, %i, %i", freq_.toSec(), data_size_, delay_, address_, command_);
+    
     std_msgs::UInt8MultiArray msg;
     
     i2c0master_StartN(address_>>1, I2C_WRITE, 1); 
@@ -69,6 +84,7 @@ private:
     msg.data.resize(data_size_);
     for (unsigned int i=0; i < data_size_; i++)
       msg.data[i] = i2c0master_ReadN(); 
+      //msg.data[i] = 0;
     std_msgs::MultiArrayDimension dim;
     dim.label="X";
     dim.size=msg.data.size();
@@ -95,7 +111,9 @@ public:
       yaml_parser.GetNextDocument(sensor_info);
       if (sensor_info.size()) 
       {
-        sensors_.push_back(GenericSensorI2C(n_, sensor_info));
+        GenericSensorI2C* new_sensor = new GenericSensorI2C(n_, sensor_info);
+        sensors_.push_back(new_sensor);
+        //sensors_.push_back(GenericSensorI2C(n_, sensor_info));
       }
     } while(sensor_info.size());
   }
@@ -117,7 +135,7 @@ public:
 private:
   ros::NodeHandle               n_;
   ros::NodeHandle               np_;
-  std::vector<GenericSensorI2C> sensors_;
+  std::vector<GenericSensorI2C*> sensors_;
 };
 
 } // namespace roboard_sensors
