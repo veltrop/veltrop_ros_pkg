@@ -2,22 +2,22 @@
 
 <motion name="rotate_left" first_phase="rotate_left_02">
     <phases>
-        <phase name="rotate_left_02" next_phase="rotate_left_03" duration="" abort_safe="true">
+        <phase name="rotate_left_02" next_phase="rotate_left_03" duration="" abort_safe="false">
             <pose name="rotate_left_02" />
         </phase>
-        <phase name="rotate_left_03" next_phase="rotate_left_04" duration="" abort_safe="true">
+        <phase name="rotate_left_03" next_phase="rotate_left_04" duration="" abort_safe="false">
             <pose name="rotate_left_03" />
         </phase>
-        <phase name="rotate_left_04" next_phase="rotate_left_05" duration="" abort_safe="true">
+        <phase name="rotate_left_04" next_phase="rotate_left_05" duration="" abort_safe="false">
             <pose name="rotate_left_04" />
         </phase>
-        <phase name="rotate_left_05" next_phase="rotate_left_06" duration="" abort_safe="true">
+        <phase name="rotate_left_05" next_phase="rotate_left_06" duration="" abort_safe="false">
             <pose name="rotate_left_05" />
         </phase>
-        <phase name="rotate_left_06" next_phase="rotate_left_07" duration="" abort_safe="true">
+        <phase name="rotate_left_06" next_phase="rotate_left_07" duration="" abort_safe="false">
             <pose name="rotate_left_06" />
         </phase>
-        <phase name="rotate_left_07" next_phase="rotate_left_08" duration="" abort_safe="true">
+        <phase name="rotate_left_07" next_phase="rotate_left_08" duration="" abort_safe="false">
             <pose name="rotate_left_07" />
         </phase>
         <phase name="rotate_left_08" next_phase="rotate_left_02" duration="" abort_safe="true">

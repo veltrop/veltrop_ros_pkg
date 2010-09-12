@@ -14,6 +14,7 @@ public:
   ControlMovement()
   : current_motion_("")
   , current_phase_("")
+  , requested_motion_("")
   {
     // Load Motion and Pose Libraries
     std::string pose_path, default_pose_path, motion_path, default_motion_path;
@@ -50,6 +51,7 @@ private:
   ros::Timer      phase_timer_;
   std::string     current_motion_;
   std::string     current_phase_;
+  std::string     requested_motion_;
 
   void motionNameCB(const std_msgs::StringConstPtr& msg)
   {
@@ -61,7 +63,7 @@ private:
       return;
     current_motion_ = requested_motion;
     current_phase_ = motions_[current_motion_].first_phase_;
-    phaseCB(ros::TimerEvent());
+    phaseCB(ros::TimerEvent());    
   }
   
   void poseNameCB(const std_msgs::StringConstPtr& msg)
@@ -77,7 +79,15 @@ private:
   void phaseCB(const ros::TimerEvent& e)
   {
     //ROS_INFO("phaseCB triggered");
-    //if (motions_[current_motion_].phases.find(current_phase) == 
+    
+    // play motion to safety before trying new request
+    /*if (current_motion_ != requested_motion_ &&
+        motions_[current_motion_].phases_[current_phase_].abort_safe_)
+    {
+      current_motion_ = requested_motion_;
+      current_phase_ = motions_[current_motion_].first_phase_;
+    }*/
+    
     MotionPhase& phase = motions_[current_motion_].phases_[current_phase_];
     float duration = -1;
     if (phase.poses_.size())

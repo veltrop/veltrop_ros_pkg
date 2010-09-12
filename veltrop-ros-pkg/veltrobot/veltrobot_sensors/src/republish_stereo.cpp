@@ -1,7 +1,7 @@
-//#include <opencv/cv.h>
 #include <iostream>
-#include <opencv/cvwimage.h>
-#include <opencv/highgui.h>
+//#include <opencv/cv.h>
+//#include <opencv/cvwimage.h>
+//#include <opencv/highgui.h>
 #include <ros/ros.h>
 #include <cv_bridge/CvBridge.h>
 #include <sensor_msgs/Image.h>
@@ -49,12 +49,12 @@ yuyv16_to_rgb24(int width, int height, const unsigned char *src, unsigned char *
          SAT(g);
          SAT(b);
 
-         //*d++ = b;
-         //*d++ = g;
-         //*d++ = r;
-         *d++ = r;
-         *d++ = g;
          *d++ = b;
+         *d++ = g;
+         *d++ = r;
+         //*d++ = r;
+         //*d++ = g;
+         //*d++ = b;
         
          r = y2 + cr;
          b = y2 + cb;
@@ -63,12 +63,12 @@ yuyv16_to_rgb24(int width, int height, const unsigned char *src, unsigned char *
          SAT(g);
          SAT(b);
 
-         //*d++ = b;
-         //*d++ = g;
-         //*d++ = r;
-         *d++ = r;
-         *d++ = g;
          *d++ = b;
+         *d++ = g;
+         *d++ = r;
+         //*d++ = r;
+         //*d++ = g;
+         //*d++ = b;
       }
    }
 }
@@ -403,7 +403,8 @@ private:
     right_image->header.frame_id = right_info_.header.frame_id;
     left_image->header.stamp = right_image->header.stamp = msg->header.stamp;
     left_image->header.seq = right_image->header.seq = msg->header.seq;
-    left_image->encoding = right_image->encoding = sensor_msgs::image_encodings::RGB8;
+    //left_image->encoding = right_image->encoding = sensor_msgs::image_encodings::RGB8;
+    left_image->encoding = right_image->encoding = sensor_msgs::image_encodings::BGR8;
     left_image->height = right_image->height = msg->left_image.height;
     left_image->width = right_image->width = msg->left_image.width;
     left_image->step = right_image->step = 3 * msg->left_image.width;    
@@ -421,7 +422,7 @@ private:
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "republish_stereo");
-  cvInitSystem(argc, argv);
+  //cvInitSystem(argc, argv);
   //cvStartWindowThread();
   
   //cvNamedWindow("left");

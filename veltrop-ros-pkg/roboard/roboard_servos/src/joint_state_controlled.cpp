@@ -25,6 +25,8 @@ public:
     , do_mix_(false)
     , roboio_ok_(false)
     , running_(false)
+    //, force_mix_(false)
+    //, reset_after_mix_(false)
   {
     pthread_mutex_init (&playframe_mutex_, NULL);
     pthread_mutex_init (&mixframe_mutex_, NULL);
@@ -47,9 +49,9 @@ public:
                                          / (int)2;
     }
     
-    np_.param<int>("servo_fps", servo_fps_, 0); 
-    if (!servo_fps_)
-      n_.param<int>("servo_fps", servo_fps_, 100); 
+    np_.param<int>("servo_fps", servo_fps_, 100); 
+    np_.param<bool>("force_mix", force_mix_, false);     
+    np_.param<bool>("reset_after_mix", reset_after_mix_, false);     
     
     // Load Gyro Compensation configuration
     gyro_pitch_compensation_.loadFromParamServer("gyro_pitch_conf");
@@ -126,6 +128,8 @@ private:
   unsigned long   playframe_[32];
   long            mixframe_[32]; 
   bool            running_;
+  bool            force_mix_;
+  bool            reset_after_mix_;
   pthread_mutex_t playframe_mutex_;
   pthread_mutex_t mixframe_mutex_;
   GyroCompensatonList gyro_pitch_compensation_;
@@ -142,13 +146,14 @@ private:
     while (that->running_)
     {
       ros::spinOnce();
-      if (that->do_mix_) 
+      if (that->do_mix_ || that->force_mix_) 
       {
         pthread_mutex_lock(&that->mixframe_mutex_);
         pthread_mutex_lock(&that->playframe_mutex_);
         rcservo_PlayActionMix(that->mixframe_);
         pthread_mutex_unlock(&that->playframe_mutex_);
-        memset(that->mixframe_, 0, sizeof(long) * 32);
+        if (that->reset_after_mix_)
+          memset(that->mixframe_, 0, sizeof(long) * 32);
         that->do_mix_ = false;
         pthread_mutex_unlock(&that->mixframe_mutex_);
       }

@@ -10,6 +10,12 @@ import sys
 import os.path
 import yaml
 from optparse import OptionParser
+import roslib.packages
+
+# Servo value in RCB file is a positive/negative offset from an externally defined home position.
+# The value stored in the RCB file is the value seen in the Heart2Heart GUI + 16384
+
+# Max/Mins:
 
 # PWM  min | center | max               =  700     | 1500 | 2300
 # RCB  min | center | max for above PWM = -260     | 0    | 260
@@ -18,6 +24,8 @@ from optparse import OptionParser
 # 4024 min | center | max in degrees    = -130     | 0    | 130
 # 4024 min | center | max in radians    = -13PI/18 | 0    | 13PI/18
 
+# Scaling: 
+
 # Scale RCB value of 788  to Degrees offset =  (90)          / 260 = 0.346153846154
 # Scale RCB value of 788  to Radians offset =  (90PI / 180)  / 260 = 0.006041524334
 # Scale RCB value of 788  to PWM     offset =  (800)         / 260 = 3.07692307692
@@ -25,7 +33,10 @@ from optparse import OptionParser
 # Scale RCB value of 4024 to Radians offset =  (130PI / 180) / 260 = 0.00872664626
 # Scale RCB value of 4024 to PWM     offset =  (800)         / 260 = 3.07692307692
 
+# PWM scale defailt:
 #default="3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692,3.07692",
+# Radian scale default:
+#default="0.00604,0.00873,0.00604,0.00604,0.00604,0.00873,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604",
 
 # set up command line options, defaults
 usage = "usage: %prog [options] INPUTFILE.RCB"
@@ -45,11 +56,11 @@ parser.add_option("-u", "--units", dest="units", default="radians_offset", type=
 parser.add_option("-t", "--timescale", dest="timescale", default=15.0, type="float",
                   help="multiply input time by TIMESCALE [default:%default]")                  
 parser.add_option("-n", "--namebase", dest="namebase", type="string",
-                  help="set pose name to NAMEBASE_POS, POS is input position block"
-                  " [default:INPUTFILE_POS]")                                   
+                  help="set pose name to [NAMEBASE + name of pose from RCB]"
+                  " [default:input file name + name of pose]")                                   
 parser.add_option("-o", "--outputbase", dest="outputbase", type="string",
-                  help="write output to OUTPUTBASE_POS.XML, POS is input position block"
-                  " [default:NAMEBASE_POS.xml]")
+                  help="write output file to alternate [OUTPUTBASE + name of pose from RCB.xml]"
+                  " [default:name base + name of pose.xml]")
 (options, args) = parser.parse_args()
 
 if len(args) != 1:
@@ -58,8 +69,8 @@ if len(args) != 1:
 scales = options.scale.split(",")
 
 # conf file for mapping
-# TODO: use rospy to find the package name etc
-servo_joint_map_filename = os.environ.get("ROS_ROOT") + "/../pkgs/veltrop-ros-pkg/veltrobot/veltrobot_data/conf/RCB_extract_servo_joint_map.yaml"
+#servo_joint_map_filename = os.environ.get("ROS_ROOT") + "/../pkgs/veltrop-ros-pkg/veltrobot/veltrobot_data/conf/RCB_extract_servo_joint_map.yaml"
+servo_joint_map_filename = roslib.packages.get_pkg_dir('veltrobot_data') + "/conf/RCB_extract_servo_joint_map.yaml"
 servo_joint_map = yaml.load(file(servo_joint_map_filename, 'r'))
 
 # prepare input file

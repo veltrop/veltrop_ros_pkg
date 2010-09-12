@@ -2,6 +2,10 @@
 
 <pose name="init">
 	<joint_positions duration="450" units="radians_offset">
+    <joint name="base_yaw"  position="0.0" />
+    <joint name="base_pitch"  position="0.0" />
+    <joint name="base_roll"  position="0.0" />
+    <joint name="base"  position="0.0" />
     <joint name="stereo_camera_fixed"  position="0.0" />
     <joint name="neck_pitch"  position="0.0" />
     <joint name="neck_yaw"  position="0.0" />

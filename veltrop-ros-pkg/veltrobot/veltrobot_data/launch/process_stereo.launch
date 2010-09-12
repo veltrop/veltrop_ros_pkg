@@ -1,20 +1,27 @@
 <launch>
   <node pkg="veltrobot_sensors" type="republish_stereo" name="republish_stereo">
     <param name="calibration" command="cat $(find veltrobot_data)/conf/ost.txt" />
+    <param name="left_frame_id" value="/stereo_camera" />
+    <param name="right_frame_id" value="/stereo_camera" />
   </node>
 
   <node ns="stereo" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc">
-    <!-- 9  31 15 0  64 15 10  100 4 -->
+    <!-- default: 9  31 15 0  64 15 10  100 4 -->
     <!-- 21 63 21 0 128 10 100 100 4 -->
     <!-- 21 63 21 4 128 15 10  500 4 -->
-    <param name="prefilter_size" value="21" />
-    <param name="prefilter_cap" value="63" />
+    <!-- 21 63 21 2 128 15 100 350 4 -->
+    
+    <!-- close head (15 cm and better w/ hands: 15, 31, 21, 2, 128, 1, 1, 250, 5 -->
+    <param name="prefilter_size" value="15" />
+    <param name="prefilter_cap" value="31" />
     <param name="correlation_window_size" value="21" />
     <param name="min_disparity" value="2" />
     <param name="disparity_range" value="128" />
-    <param name="uniqueness_ratio" value="15" />
-    <param name="texture_threshold" value="100" />
-    <param name="speckle_size" value="350" />
-    <param name="speckle_range" value="4" />
+    <param name="uniqueness_ratio" value="1" />
+    <param name="texture_threshold" value="1" />
+    <param name="speckle_size" value="270" />
+    <param name="speckle_range" value="5" />
+    
+    <!-- close minoru (20 cm): 15, 31, 21 or 35, 128, 128, 1, 1, 250, 5 -->
   </node>
 </launch>

@@ -5,19 +5,19 @@
         <phase name="walk_forward_cog_to_right_foot_start" next_phase="walk_forward_lift_left_foot" duration="" abort_safe="true">
             <pose name="walk_forward_cog_to_right_foot_start" />
         </phase>
-        <phase name="walk_forward_lift_left_foot" next_phase="walk_forward_step_left_foot" duration="" abort_safe="true">
+        <phase name="walk_forward_lift_left_foot" next_phase="walk_forward_step_left_foot" duration="" abort_safe="false">
             <pose name="walk_forward_lift_left_foot" />
         </phase>
-        <phase name="walk_forward_step_left_foot" next_phase="walk_forward_cog_to_left_foot" duration="" abort_safe="true">
+        <phase name="walk_forward_step_left_foot" next_phase="walk_forward_cog_to_left_foot" duration="" abort_safe="false">
             <pose name="walk_forward_step_left_foot" />
         </phase>
         <phase name="walk_forward_cog_to_left_foot" next_phase="walk_forward_lift_right_foot" duration="" abort_safe="true">
             <pose name="walk_forward_cog_to_left_foot" />
         </phase>
-        <phase name="walk_forward_lift_right_foot" next_phase="walk_forward_step_right_foot" duration="" abort_safe="true">
+        <phase name="walk_forward_lift_right_foot" next_phase="walk_forward_step_right_foot" duration="" abort_safe="false">
             <pose name="walk_forward_lift_right_foot" />
         </phase>
-        <phase name="walk_forward_step_right_foot" next_phase="walk_forward_cog_to_right_foot" duration="" abort_safe="true">
+        <phase name="walk_forward_step_right_foot" next_phase="walk_forward_cog_to_right_foot" duration="" abort_safe="false">
             <pose name="walk_forward_step_right_foot" />
         </phase>
         <phase name="walk_forward_cog_to_right_foot" next_phase="walk_forward_lift_left_foot" duration="" abort_safe="true">
@@ -26,3 +26,4 @@
     </phases>
 </motion>  
 
+<!-- TODO: motions need an "abort_path" feature: the actions to take when aborting -->

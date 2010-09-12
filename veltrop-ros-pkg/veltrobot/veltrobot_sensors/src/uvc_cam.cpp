@@ -35,11 +35,11 @@ Cam::Cam(const char *_device, mode_t _mode, int _width, int _height, int _fps,
   if (!(cap.capabilities & V4L2_CAP_STREAMING))
     throw std::runtime_error(device + " does not support streaming");
   // enumerate formats
+  int ret;
   v4l2_fmtdesc f;
   memset(&f, 0, sizeof(f));
   f.index = 0;
   f.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  int ret;
   while ((ret = ioctl(fd, VIDIOC_ENUM_FMT, &f)) == 0)
   {
     printf("pixfmt %d = '%4s' desc = '%s'\n",
@@ -98,6 +98,7 @@ Cam::Cam(const char *_device, mode_t _mode, int _width, int _height, int _fps,
   fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   fmt.fmt.pix.width = width;
   fmt.fmt.pix.height = height;
+  //fmt.fmt.pix.pixelformat = 'S' | ('9' << 8) | ('2' << 16) | ('0' << 24);
   if (mode == MODE_RGB || mode == MODE_YUYV) // we'll convert later
     fmt.fmt.pix.pixelformat = 'Y' | ('U' << 8) | ('Y' << 16) | ('V' << 24);
   else

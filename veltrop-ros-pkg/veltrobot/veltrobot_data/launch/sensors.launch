@@ -3,13 +3,15 @@
     <param name="i2c_sensors_conf"
       command="cat $(find veltrobot_data)/conf/i2c_sensors.yaml" />
   </node> -->
+  <!-- <node pkg="veltrobot_sensors" type="tilt_heading" name="tilt_heading" >
+  </node> -->
   <node pkg="roboard_sensors" type="poll_ad" name="poll_ad_sensors" >
     <param name="ch0name" value="foot_distir_right"/>
     <param name="ch1name" value="foot_distir_left"/>
     <param name="ch2name" value="gyro_roll"/>
-    <param name="ch2calib" value="24"/>
+    <param name="ch2calib" value="23"/>
     <param name="ch3name" value="gyro_pitch"/>
-    <param name="ch3calib" value="49"/>
+    <param name="ch3calib" value="47"/>
     <param name="frequency" type="double" value="200" />
   </node>  
 </launch>
