@@ -3,7 +3,7 @@
 
   <include file="$(find veltrobot_data)/launch/teleop.launch" />
   
-  <!-- <include file="$(find veltrobot_data)/launch/sensors.launch" /> -->
+  <include file="$(find veltrobot_data)/launch/sensors.launch" />
  
  
   <param name="gyro_pitch_conf"
@@ -13,9 +13,9 @@
     
   <node pkg="roboard_servos" type="joint_state_controlled"
         name="joint_state_controlled">
-    <param name="servo_fps" value="400" /> 
+    <param name="servo_fps" value="200" /> 
     <param name="force_mix" value="true" />
-    <param name="reset_after_mix" value="false" />
+    <param name="reset_after_mix" value="true" />
   </node>
 
   <node pkg="veltrobot_movement" type="control_movement"
