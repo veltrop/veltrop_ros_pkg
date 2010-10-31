@@ -9,7 +9,7 @@
   <author>Taylor Veltrop</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-rt</url>
+  <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-ros-pkg</url>
 
   <depend package="roscpp"/>
   <depend package="tinyxml"/>
