@@ -1,0 +1,12 @@
+---
+name: hip_left_roll
+modifier10: -9
+---
+name: ankle_left_roll
+modifier10: 12
+---
+name: hip_right_roll
+modifier10: -9
+---
+name: ankle_right_roll
+modifier10: 12
