@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+
+<pose name="walk_forward_cog_to_left_foot">
+	<joint_positions duration="375" units="pwm_offset">
+		<joint name="shoulder_left_pitch"  position="-153.846" />
+		<joint name="shoulder_left_roll"  position="61.5384" />
+		<joint name="elbow_left_roll"  position="0.0" />
+		<joint name="shoulder_left_yaw"  position="0.0" />
+		<joint name="shoulder_right_pitch"  position="-153.846" />
+		<joint name="shoulder_right_roll"  position="-61.5384" />
+		<joint name="elbow_right_roll"  position="0.0" />
+		<joint name="shoulder_right_yaw"  position="0.0" />
+		<joint name="hip_left_yaw"  position="0.0" />
+		<joint name="hip_left_roll"  position="0.0" />
+		<joint name="hip_left_pitch"  position="338.4612" />
+		<joint name="knee_left_pitch"  position="-461.538" />
+		<joint name="ankle_left_pitch"  position="-184.6152" />
+		<joint name="ankle_left_roll"  position="-46.1538" />
+		<joint name="hip_right_yaw"  position="0.0" />
+		<joint name="hip_right_roll"  position="-30.7692" />
+		<joint name="hip_right_pitch"  position="-169.2306" />
+		<joint name="knee_right_pitch"  position="461.538" />
+		<joint name="ankle_right_pitch"  position="338.4612" />
+		<joint name="ankle_right_roll"  position="-92.3076" />
+	</joint_positions>
+</pose>
+

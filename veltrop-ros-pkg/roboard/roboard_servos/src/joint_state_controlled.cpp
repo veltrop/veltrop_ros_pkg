@@ -38,7 +38,6 @@ public:
       
     // Setup an initial pose
     memset(mixframe_, 0, sizeof(long) * 32);
-    memset(commandframe_, 0, sizeof(long) * 32);
     memset(playframe_, 0, sizeof(unsigned long) * 32);
     ServoLibrary::iterator j = servos_.begin();
     for (; j != servos_.end(); ++j)
@@ -71,8 +70,6 @@ public:
                                     &JointStateControlled::setPitchCompensationCB, this);  
     set_roll_compensation_sub_ = n_.subscribe("/set_roll_compensation", 20,      
                                     &JointStateControlled::setRollCompensationCB, this);  
-    receive_servo_command_sub_ = n_.subscribe("/servo_command", 1,
-                                           &JointStateControlled::receiveServoCommandCB, this);
   }
   
   void spin() 
@@ -124,14 +121,12 @@ private:
   ros::Subscriber receive_gyro_roll_sub_;
   ros::Subscriber set_pitch_compensation_sub_;
   ros::Subscriber set_roll_compensation_sub_;
-  ros::Subscriber receive_servo_command_sub_;
   ServoLibrary    servos_;
   bool            do_mix_;
   bool            roboio_ok_;
   int             servo_fps_;
   unsigned long   playframe_[32];
   long            mixframe_[32]; 
-  long            commandframe_[32];
   bool            running_;
   bool            force_mix_;
   bool            reset_after_mix_;
@@ -168,7 +163,7 @@ private:
         rcservo_PlayAction();
         pthread_mutex_unlock(&that->playframe_mutex_);
       }
-      loop_rate.sleep();  // TODO: Maybe I don't need this!
+      loop_rate.sleep();
     }
     
     return NULL;
@@ -247,32 +242,6 @@ private:
     gyro_roll_compensation_.setGyroCompensation(msg->joint_name, msg->modifier10);
     pthread_mutex_unlock(&mixframe_mutex_);
   }  
-  
-  void receiveServoCommandCB(const std_msgs::Int16ConstPtr& msg)
-  {
-    long cmd;
-    switch (msg->data)
-    {
-      case 1:
-        cmd = RCSERVO_MIXWIDTH_CMD1;
-        break;
-      case 2:
-        cmd = RCSERVO_MIXWIDTH_CMD2;
-        break;
-      case 3:
-        cmd = RCSERVO_MIXWIDTH_CMD3;
-        break;    
-      default:
-        return;
-    }
-    
-    for (size_t i=0; i < 32; i++)
-      commandframe_[i] = cmd;
-    
-    pthread_mutex_lock(&playframe_mutex_);
-    rcservo_PlayActionMix(commandframe_);
-    pthread_mutex_unlock(&playframe_mutex_);
-  }
   
   void executeJointState(const sensor_msgs::JointStateConstPtr& msg)
   {
