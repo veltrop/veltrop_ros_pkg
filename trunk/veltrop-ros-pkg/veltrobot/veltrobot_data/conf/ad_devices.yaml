@@ -1,0 +1,43 @@
+devices:
+
+  - address: 0
+    raw_calibration: 0
+    name: right_rear_distance
+    driver: 2Y0A21
+
+  - address: 1
+    raw_calibration: 0
+    name: right_front_distance
+    driver: 2D120X
+  
+  - address: 2
+    raw_calibration: 0
+    name: right_side_distance
+    driver: 2Y0A21
+  
+  - address: 3
+    raw_calibration: 0
+    name: left_rear_distance
+    driver: 2Y0A21
+  
+  - address: 4
+    raw_calibration: 0
+    name: left_front_distance
+    driver: 2D120X
+  
+  - address: 5
+    raw_calibration: 0
+    name: left_side_distance
+    driver: 2Y0A21
+  
+  - address: 6
+    raw_calibration: -26
+    name: gyro_pitch
+    driver: KRG3
+  
+  - address: 7
+    raw_calibration: -13
+    name: gyro_roll
+    driver: KRG3
+  
+  

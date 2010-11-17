@@ -12,9 +12,11 @@
   <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-ros-pkg</url>
 
   <depend package="roscpp"/>
-  <depend package="yaml_cpp"/>
   <depend package="std_msgs"/>
   <depend package="roboard_roboio"/>
+  
+  <!-- graveyard -->
+  <!-- <depend package="yaml_cpp"/> -->
   
 </package>
 

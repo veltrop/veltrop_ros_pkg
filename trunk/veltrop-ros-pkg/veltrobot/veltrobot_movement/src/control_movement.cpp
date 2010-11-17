@@ -2,8 +2,8 @@
 #include <ros/package.h>
 #include <std_msgs/String.h>
 #include <sensor_msgs/JointState.h>
-#include "pose.h"
-#include "motion.h"
+#include <veltrobot_movement/pose.h>
+#include <veltrobot_movement/motion.h>
 
 namespace veltrobot_movement
 {

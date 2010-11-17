@@ -14,9 +14,11 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 # variables.
 #list(APPEND CPACK_SOURCE_IGNORE_FILES /core/experimental)
 
-rosbuild_make_distribution(0.1.0)
+rosbuild_make_distribution(0.2.0)
 
 add_subdirectory(veltrobot_data)
 add_subdirectory(veltrobot_movement)
+add_subdirectory(veltrobot_msgs)
 add_subdirectory(veltrobot_sensors)
 add_subdirectory(veltrobot_teleop)
+add_subdirectory(veltrobot_gui)

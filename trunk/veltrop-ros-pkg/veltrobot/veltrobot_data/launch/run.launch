@@ -1,24 +1,22 @@
 <launch>
+	<include file="$(find veltrobot_data)/launch/sensors.launch" />
   <include file="$(find veltrobot_data)/launch/model.launch" />
-
   <include file="$(find veltrobot_data)/launch/teleop.launch" />
-  
-  <include file="$(find veltrobot_data)/launch/sensors.launch" />
- 
- 
-  <param name="gyro_pitch_conf"
-    command="cat $(find veltrobot_data)/conf/gyro_pitch.yaml" />
-  <param name="gyro_roll_conf"
-    command="cat $(find veltrobot_data)/conf/gyro_roll.yaml" />
     
   <node pkg="roboard_servos" type="joint_state_controlled"
         name="joint_state_controlled">
     <param name="servo_fps" value="200" /> 
     <param name="force_mix" value="true" />
-    <param name="reset_after_mix" value="true" />
+    <param name="reset_after_mix" value="false" />
   </node>
 
   <node pkg="veltrobot_movement" type="control_movement"
     name="movement_controller" />
-
+    
+	<node pkg="veltrobot_movement" type="balance_movement"
+    name="balance_controller" >
+    <param name="processing_fps" value="100" /> 
+    <param name="movement_fps" value="200" />
+  	<rosparam command="load" file="$(find veltrobot_data)/conf/gyro_balancing.yaml" />
+  </node>
 </launch>

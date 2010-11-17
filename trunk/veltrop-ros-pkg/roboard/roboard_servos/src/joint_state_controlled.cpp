@@ -8,11 +8,10 @@
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int16.h>
-#include <roboard_servos/SetGyroCompensation.h>
+#include <veltrobot_msgs/CapturePose.h>
 #include <sensor_msgs/JointState.h>
 #include <roboard.h>
 #include "servo.h"
-#include "gyro_compensation.h"
 
 namespace roboard_servos
 {
@@ -25,8 +24,6 @@ public:
     , do_mix_(false)
     , roboio_ok_(false)
     , running_(false)
-    //, force_mix_(false)
-    //, reset_after_mix_(false)
   {
     pthread_mutex_init (&playframe_mutex_, NULL);
     pthread_mutex_init (&mixframe_mutex_, NULL);
@@ -54,25 +51,17 @@ public:
     np_.param<bool>("force_mix", force_mix_, false);     
     np_.param<bool>("reset_after_mix", reset_after_mix_, false);     
     
-    // Load Gyro Compensation configuration
-    gyro_pitch_compensation_.loadFromParamServer("gyro_pitch_conf");
-    gyro_roll_compensation_.loadFromParamServer("gyro_roll_conf");
-    
     // Prepare our subscription callbacks
     update_trim_sub_ = n_.subscribe("/trim_updated", 10, 
                                     &JointStateControlled::updateTrimCB, this);   
     joint_state_sub_ = n_.subscribe("/joint_states", 10, 
                                     &JointStateControlled::jointStateCB, this);  
-    receive_gyro_pitch_sub_ = n_.subscribe("/gyro_pitch", 1,
-                                    &JointStateControlled::receiveGyroPitchCB, this);
-    receive_gyro_roll_sub_  = n_.subscribe("/gyro_roll", 1,
-                                    &JointStateControlled::receiveGyroRollCB, this);  
-    set_pitch_compensation_sub_ = n_.subscribe("/set_pitch_compensation", 20,      
-                                    &JointStateControlled::setPitchCompensationCB, this);  
-    set_roll_compensation_sub_ = n_.subscribe("/set_roll_compensation", 20,      
-                                    &JointStateControlled::setRollCompensationCB, this);  
+		balance_joint_state_sub_ = n_.subscribe("/balancing_joint_states", 1, 
+                                    &JointStateControlled::balancingJointStateCB, this); 
     receive_servo_command_sub_ = n_.subscribe("/servo_command", 1,
                                            &JointStateControlled::receiveServoCommandCB, this);
+    
+    capture_pose_srv_ = n_.advertiseService("capture_pose", &JointStateControlled::capturePoseCB, this);
   }
   
   void spin() 
@@ -93,23 +82,7 @@ public:
     }
     
     ros::spin();
-    //ros::Rate loop_rate(servo_fps_); 
-    //while (ros::ok())
-    //{
-    //  ros::spinOnce();
-    //  if (do_mix_) 
-    //  {
-    //    rcservo_PlayActionMix(mixframe_);
-    //    for (int i=0; i < 32; i++)    
-    //      mixframe_[i] = 0;
-    //    do_mix_ = false;
-    //  }
-    //  else
-    //  {
-    //    rcservo_PlayAction();
-    //  }
-    //  loop_rate.sleep();
-    //}
+
     running_ = false;
     pthread_join(controlThread_, NULL);//(void **)&rv);
     rcservo_Close();
@@ -120,11 +93,9 @@ private:
   ros::NodeHandle np_;
   ros::Subscriber update_trim_sub_;
   ros::Subscriber joint_state_sub_;
-  ros::Subscriber receive_gyro_pitch_sub_;
-  ros::Subscriber receive_gyro_roll_sub_;
-  ros::Subscriber set_pitch_compensation_sub_;
-  ros::Subscriber set_roll_compensation_sub_;
+  ros::Subscriber balance_joint_state_sub_;
   ros::Subscriber receive_servo_command_sub_;
+  ros::ServiceServer capture_pose_srv_;
   ServoLibrary    servos_;
   bool            do_mix_;
   bool            roboio_ok_;
@@ -137,8 +108,6 @@ private:
   bool            reset_after_mix_;
   pthread_mutex_t playframe_mutex_;
   pthread_mutex_t mixframe_mutex_;
-  GyroCompensatonList gyro_pitch_compensation_;
-  GyroCompensatonList gyro_roll_compensation_;
   
   static void* playActionThread(void *ptr)
   {
@@ -150,7 +119,6 @@ private:
     ros::Rate loop_rate(that->servo_fps_); 
     while (that->running_)
     {
-      ros::spinOnce();
       if (that->do_mix_ || that->force_mix_) 
       {
         pthread_mutex_lock(&that->mixframe_mutex_);
@@ -168,7 +136,7 @@ private:
         rcservo_PlayAction();
         pthread_mutex_unlock(&that->playframe_mutex_);
       }
-      loop_rate.sleep();  // TODO: Maybe I don't need this!
+      loop_rate.sleep();
     }
     
     return NULL;
@@ -208,51 +176,43 @@ private:
     executeJointState(msg);
   }
   
-  void processGyroCB(const std_msgs::Int16ConstPtr& msg,
-                     const GyroCompensatonList& gyro_compensation)
+  void balancingJointStateCB(const sensor_msgs::JointStateConstPtr& msg)
   {
-    do_mix_ = true;
-    for (size_t i=0; i < gyro_compensation.size(); i++)
+    if (!msg->name.size())
+      return;
+      
+    pthread_mutex_lock(&mixframe_mutex_);
+    
+		// todo? velocity? duration?
+    
+    for (size_t i=0; i < msg->name.size(); i++)
     {
-      int ch = servos_[gyro_compensation[i].joint_name_].channel_-1;
-      if (ch >= 0 && ch <= 31)
-        mixframe_[ch] = msg->data * gyro_compensation[i].modifier10_ / 10;    
-    } 
+      Servo& servo = servos_[msg->name[i]];
+      if (servo.channel_ < 1 || servo.channel_ > 32)
+        continue;
+      float rot_range = servo.max_rot_ - servo.min_rot_;
+      float pwm_range = servo.max_pwm_ - servo.min_pwm_; 
+      float pwm_per_rot = pwm_range / rot_range;
+      float f_pwm_val = (float)msg->position[i] * pwm_per_rot;
+      int i_pwm_val = (int)round(f_pwm_val);    
+     
+      mixframe_[servo.channel_-1] = i_pwm_val;
+    }
+    
+    do_mix_ = true;
+    
+    pthread_mutex_unlock(&mixframe_mutex_);   
   }
-  
-  void receiveGyroPitchCB(const std_msgs::Int16ConstPtr& msg)
-  {
-    pthread_mutex_lock(&mixframe_mutex_);
-    processGyroCB(msg, gyro_pitch_compensation_);
-    pthread_mutex_unlock(&mixframe_mutex_);
-  }
-  
-  void receiveGyroRollCB(const std_msgs::Int16ConstPtr& msg)
-  {
-    pthread_mutex_lock(&mixframe_mutex_);
-    processGyroCB(msg, gyro_roll_compensation_);  
-    pthread_mutex_unlock(&mixframe_mutex_);
-  }
-  
-  void setPitchCompensationCB(const roboard_servos::SetGyroCompensationConstPtr& msg)
-  {
-    pthread_mutex_lock(&mixframe_mutex_);
-    gyro_pitch_compensation_.setGyroCompensation(msg->joint_name, msg->modifier10);
-    pthread_mutex_unlock(&mixframe_mutex_);
-  }
-  
-  void setRollCompensationCB(const roboard_servos::SetGyroCompensationConstPtr& msg)
-  {
-    pthread_mutex_lock(&mixframe_mutex_);
-    gyro_roll_compensation_.setGyroCompensation(msg->joint_name, msg->modifier10);
-    pthread_mutex_unlock(&mixframe_mutex_);
-  }  
   
   void receiveServoCommandCB(const std_msgs::Int16ConstPtr& msg)
   {
     long cmd;
+    // cmd = msg->data 
     switch (msg->data)
     {
+      case 0:
+        cmd = RCSERVO_CMD_POWEROFF;
+        break;
       case 1:
         cmd = RCSERVO_MIXWIDTH_CMD1;
         break;
@@ -272,6 +232,43 @@ private:
     pthread_mutex_lock(&playframe_mutex_);
     rcservo_PlayActionMix(commandframe_);
     pthread_mutex_unlock(&playframe_mutex_);
+  }
+  
+  bool capturePoseCB(veltrobot_msgs::CapturePose::Request  &req,
+                     veltrobot_msgs::CapturePose::Response &res )
+  {
+    unsigned long width[32];
+    pthread_mutex_lock(&playframe_mutex_);
+    rcservo_EnterCaptureMode();
+    
+    rcservo_ReadPositions(servos_.getUsedChannels(), RCSERVO_CMD_POWEROFF, width);
+    
+    rcservo_EnterPlayMode();
+    pthread_mutex_unlock(&playframe_mutex_);
+    
+    for (size_t i=0; i < req.requestedJointNames.size(); i++)
+    {    
+      Servo& servo = servos_[req.requestedJointNames[i]];
+      if (servo.channel_ < 1 || servo.channel_ > 32)
+        continue;
+      
+      int pwm_center = (servo.max_pwm_ + servo.min_pwm_) / 2;
+      int pwm_offset = (int)width[servo.channel_-1] - pwm_center - servo.trim_pwm_;
+      
+      float rot_range = servo.max_rot_ - servo.min_rot_;
+      float pwm_range = servo.max_pwm_ - servo.min_pwm_;      
+      float pwm_per_rot = pwm_range / rot_range;
+     
+      float radian_offset = (float)pwm_offset / pwm_per_rot;
+      
+      res.jointNames.push_back(req.requestedJointNames[i]);
+      res.jointPositions.push_back(radian_offset);
+    }
+    
+    if (res.jointPositions.size() == 0)
+      return false;
+    
+    return true;
   }
   
   void executeJointState(const sensor_msgs::JointStateConstPtr& msg)

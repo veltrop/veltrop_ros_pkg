@@ -2,7 +2,7 @@
 #include <dirent.h>
 #include <ros/ros.h>
 //#include <string>
-#include "pose.h"
+#include <veltrobot_movement/pose.h>
 #include <tinyxml/tinyxml.h>
 
 namespace veltrobot_movement
