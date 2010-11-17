@@ -1,20 +1,11 @@
-<launch>
-  <!-- <node pkg="roboard_sensors" type="poll_i2c" name="poll_i2c_sensors" >
-    <param name="i2c_sensors_conf"
-      command="cat $(find veltrobot_data)/conf/i2c_sensors.yaml" />
-  </node> -->
-  <!-- <node pkg="veltrobot_sensors" type="tilt_heading" name="tilt_heading" >
-  </node> -->
-  <node pkg="roboard_sensors" type="poll_ad" name="poll_ad_sensors" >
-    <param name="ch0name" value="foot_distir_right"/>
-    <param name="ch1name" value="foot_distir_left"/>
-    <param name="ch2name" value="gyro_roll"/>
-    <param name="ch2calib" value="23"/>
-    <param name="ch3name" value="gyro_pitch"/>
-    <param name="ch3calib" value="47"/>
-    <param name="frequency" type="double" value="200" />
-  </node>  
+<launch>  
+  <node pkg="roboard_sensors" type="i2c_device_manager_node" name="i2c_device_manager" >
+  	<param name="spin_rate" value="10000" />
+  	<rosparam command="load" file="$(find veltrobot_data)/conf/i2c_devices.yaml" />
+  </node>
+  <node pkg="roboard_sensors" type="poll_ad" name="poll_ad" >
+  	<param name="fps" value="50" /> 
+  	<rosparam command="load" file="$(find veltrobot_data)/conf/ad_devices.yaml" />
+    <param name="publish_raw" value="false" />
+  </node>   
 </launch>
-
-<!-- <rosparam file="$(find veltrobot_data)/conf/i2c_sensors.yaml"
-      command="load" /> -->

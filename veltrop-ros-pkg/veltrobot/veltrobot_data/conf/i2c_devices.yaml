@@ -1,0 +1,11 @@
+devices:
+
+  - name: HMC6343
+    driver: HMC6343
+    base_address: 50
+    pole_frequency: 10.0
+    
+  - name: SRF08
+    driver: SRF08
+    base_address: 224
+    pole_frequency: 10.0

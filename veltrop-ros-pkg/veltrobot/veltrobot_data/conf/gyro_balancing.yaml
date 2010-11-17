@@ -1,0 +1,29 @@
+pitch:
+
+  - joint_name: knee_left_pitch
+    multiplier: 6.6
+
+  - joint_name: ankle_left_pitch
+    multiplier: 9.6
+    
+  - joint_name: knee_right_pitch
+    multiplier: -6.6
+
+  - joint_name: ankle_right_pitch
+    multiplier: -9.6        
+    
+roll:
+
+  - joint_name: hip_left_roll
+    multiplier: -5.4
+
+  - joint_name: ankle_left_roll
+    multiplier: 7.2
+    
+  - joint_name: hip_right_roll
+    multiplier: -5.4
+
+  - joint_name: ankle_right_roll
+    multiplier: -7.2   
+    
+    

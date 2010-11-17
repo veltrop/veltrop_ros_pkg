@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 //#include <string>
 //#include <tinyxml/tinyxml.h>
-#include "motion.h"
+#include <veltrobot_movement/motion.h>
 
 namespace veltrobot_movement
 {
