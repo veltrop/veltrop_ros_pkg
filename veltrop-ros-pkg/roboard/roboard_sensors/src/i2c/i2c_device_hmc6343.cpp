@@ -10,7 +10,8 @@ I2CDeviceHMC6343::I2CDeviceHMC6343(XmlRpc::XmlRpcValue& device_info)
  : I2CDevice(device_info)
 {
 	ros::NodeHandle n;
-	pub_ = n.advertise<std_msgs::Int16MultiArray>(device_name_ + "/raw", 1);
+  if (publish_raw_)
+		raw_pub_ = n.advertise<std_msgs::Int16MultiArray>(device_name_ + "/raw", 1);
 }
 
 void I2CDeviceHMC6343::pollCB(const ros::TimerEvent& e)
@@ -28,10 +29,7 @@ void I2CDeviceHMC6343::pollCB(const ros::TimerEvent& e)
   
   lockI2C(); 
   {
-    i2c0master_StartN( 0x33>>1, I2C_WRITE, 1 ); // (+ 1)
-    i2c0master_SetRestartN( I2C_READ, 6 ); 
-    i2c0master_WriteN(6); 
-    
+		i2c0master_StartN( 0x33>>1, I2C_READ, 6 );
     msb1 = i2c0master_ReadN(); 
     lsb1 = i2c0master_ReadN(); 
     msb2 = i2c0master_ReadN(); 
@@ -41,25 +39,12 @@ void I2CDeviceHMC6343::pollCB(const ros::TimerEvent& e)
   }
   unlockI2C();
   
-  int head = 0;
-  if (msb1 & 0x0080) // 128 (2's compliment negative)
-    head |= (msb1<<8 & 0xFFFFFF00) | (lsb1 & 0xFFFF00FF);
-  else
-    head |= (msb1<<8 & 0x0000FF00) | (lsb1 & 0x000000FF);
-  
-  int pitch = 0;
-  if (msb2 & 0x0080) // 128 (2's compliment negative)
-    pitch |= (msb2<<8 & 0xFFFFFF00) | (lsb2 & 0xFFFF00FF);
-  else
-    pitch |= (msb2<<8 & 0x0000FF00) | (lsb2 & 0x000000FF);
-  
-  int roll = 0;
-  if (msb3 & 0x0080) // 128 (2's compliment negative)
-    roll |= (msb3<<8 & 0xFFFFFF00) | (lsb3 & 0xFFFF00FF);
-  else
-    roll |= (msb3<<8 & 0x0000FF00) | (lsb3 & 0x000000FF);
+  short head = msb1<<8 | lsb1;
+  short pitch = msb2<<8 | lsb2;
+	short roll = msb3<<8 | lsb3;
   
   //ROS_INFO_STREAM( (float)head/10.0f << " " << (float)pitch/10.0f << " " << (float)roll/10.0f );
+  
 	std_msgs::Int16MultiArray msg;
   msg.data.resize(3);
   msg.data[0] = head;
@@ -70,7 +55,7 @@ void I2CDeviceHMC6343::pollCB(const ros::TimerEvent& e)
   dim.size=msg.data.size();
   dim.stride=msg.data.size();
   msg.layout.dim.push_back(dim);
-  pub_.publish(msg);
+  raw_pub_.publish(msg);
 }
 
 }

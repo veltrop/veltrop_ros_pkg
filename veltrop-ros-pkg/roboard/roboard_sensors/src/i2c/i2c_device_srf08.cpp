@@ -9,7 +9,8 @@ I2CDeviceSRF08::I2CDeviceSRF08(XmlRpc::XmlRpcValue& device_info)
  : I2CDevice(device_info)
 {
 	ros::NodeHandle n;
-	pub_ = n.advertise<std_msgs::UInt16>(device_name_ + "/raw", 1);
+  if (publish_raw_)
+		raw_pub_ = n.advertise<std_msgs::UInt16>(device_name_ + "/raw", 1);
 }
 
 void I2CDeviceSRF08::pollCB(const ros::TimerEvent& e)
@@ -32,16 +33,17 @@ void I2CDeviceSRF08::pollCB(const ros::TimerEvent& e)
     i2c0master_StartN(0xe0>>1, I2C_WRITE, 1);         
     i2c0master_SetRestartN(I2C_READ, 2); 
     
-    i2c0master_WriteN(2);            //set 1st SRF range register 
-    b1 = i2c0master_ReadN();    //read echo high byte 
-    b2 = i2c0master_ReadN();    //read echo low byte 
+    i2c0master_WriteN(2);       //set 1st SRF range register 
+    b1 = i2c0master_ReadN();    //read 1st echo high byte 
+    b2 = i2c0master_ReadN();    //read 1st echo low byte 
   }
   unlockI2C();
   
   //ROS_INFO_STREAM ( b1*256 + b2 );
  	std_msgs::UInt16 msg;
-  msg.data = b1*256 + b2;
-  pub_.publish(msg); 
+  //msg.data = b1*256 + b2;
+  msg.data = b1<<8 | b2;
+  raw_pub_.publish(msg); 
 }
 
 }

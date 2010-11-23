@@ -1,11 +1,19 @@
 devices:
 
-  - name: HMC6343
+  - name: orientation
     driver: HMC6343
     base_address: 50
     pole_frequency: 10.0
+    publis_raw: true
     
-  - name: SRF08
+  - name: head_sonar
     driver: SRF08
     base_address: 224
     pole_frequency: 10.0
+    publis_raw: true
+
+  - name: gyro
+    driver: ITG3200
+    base_address: 210
+    pole_frequency: 100.0
+    publis_raw: true

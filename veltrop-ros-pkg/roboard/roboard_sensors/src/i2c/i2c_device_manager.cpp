@@ -3,6 +3,7 @@
 #include "i2c_device_manager.h"
 #include "i2c_device_hmc6343.h"
 #include "i2c_device_srf08.h"
+#include "i2c_device_itg3200.h"
 
 namespace roboard_sensors
 {
@@ -39,8 +40,8 @@ void I2CDeviceManager::spin()
 	ros::Rate loop_rate(freq_);
 	while (ros::ok())
   {
+  	loop_rate.sleep();	// initial delay before callbacks happen.
   	ros::spinOnce();
-  	loop_rate.sleep();
   }
 }
 
@@ -78,6 +79,8 @@ void I2CDeviceManager::loadDevices()
       new_device = new I2CDeviceHMC6343(all_devices[i]);
     else if (all_devices[i]["driver"] == "SRF08")
       new_device = new I2CDeviceSRF08(all_devices[i]);
+    else if (all_devices[i]["driver"] == "ITG3200")
+      new_device = new I2CDeviceITG3200(all_devices[i]);
     else
     {
       ROS_WARN("Unknown driver");
