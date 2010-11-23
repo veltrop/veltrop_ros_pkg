@@ -14,8 +14,6 @@ class I2CDeviceSRF08 : public I2CDevice
     
   protected:
   	virtual void pollCB(const ros::TimerEvent& e);
-    
-    ros::Publisher   pub_;
 };
 
 }

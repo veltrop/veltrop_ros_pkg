@@ -7,7 +7,10 @@ bool I2CDevice::initialized_ = false;
 pthread_mutex_t I2CDevice::i2c_mutex_;
 
 I2CDevice::I2CDevice(XmlRpc::XmlRpcValue& device_info)
+: publish_raw_(true)
 {
+  ros::NodeHandle n;
+
 	if (!initialized_)
   {
   	initialized_ = true;
@@ -24,10 +27,12 @@ I2CDevice::I2CDevice(XmlRpc::XmlRpcValue& device_info)
     else if (device_info["pole_frequency"].getType() == XmlRpc::XmlRpcValue::TypeDouble)
     	poll_frequency_ = double(device_info["pole_frequency"]);
     
-    ros::NodeHandle n;
     ros::Duration freq(1.0 / poll_frequency_);
     poll_timer_ = n.createTimer(freq, &I2CDevice::pollCB, this);
   }
+  
+  if (device_info.hasMember("publish_raw"))
+  	publish_raw_ = device_info["publish_raw"];
 }
 
 I2CDevice::~I2CDevice()
@@ -35,7 +40,7 @@ I2CDevice::~I2CDevice()
 
 }
 
-void I2CDevice::lockI2C()
+/*void I2CDevice::lockI2C()
 {
 	pthread_mutex_lock(&i2c_mutex_);
 }
@@ -43,7 +48,7 @@ void I2CDevice::lockI2C()
 void I2CDevice::unlockI2C()
 {
 	pthread_mutex_unlock(&i2c_mutex_);
-}
+}*/
 
 void I2CDevice::pollCB(const ros::TimerEvent& e)
 {
