@@ -1,5 +1,6 @@
+#include <string>
 #include <roboard.h>
-#include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Int16MultiArray.h>
 #include <std_msgs/MultiArrayDimension.h>
 #include "i2c_device_itg3200.h"
 
@@ -11,7 +12,17 @@ I2CDeviceITG3200::I2CDeviceITG3200(XmlRpc::XmlRpcValue& device_info)
 {  
 	ros::NodeHandle n;
   if (publish_raw_)
-		raw_pub_ = n.advertise<std_msgs::Float32MultiArray>(device_name_ + "/raw", 1);
+		raw_pub_ = n.advertise<std_msgs::Int16MultiArray>(device_name_ + "/raw", 1);
+
+	std::string x_pub_string("x");	
+  if (device_info.hasMember("x_topic"))
+  	x_pub_string = (std::string)device_info["x_topic"];
+  x_pub_ = n.advertise<std_msgs::Float32>(device_name_ + "/" + x_pub_string, 1);
+  
+  std::string y_pub_string("y");	
+  if (device_info.hasMember("y_topic"))
+  	y_pub_string = (std::string)device_info["y_topic"];  
+  y_pub_ = n.advertise<std_msgs::Float32>(device_name_ + "/" + y_pub_string, 1);
 
   init();
 }
@@ -20,6 +31,8 @@ void I2CDeviceITG3200::init()
 {
 	lockI2C();
   {
+  	i2c0_SetSpeed(I2CMODE_AUTO, speed_);
+    
     i2c0master_StartN(0x69,I2C_WRITE,2);
     i2c0master_WriteN(0x3E); 
     i2c0master_WriteN(0x80);  // Reset to defaults
@@ -47,21 +60,24 @@ void I2CDeviceITG3200::init()
     i2c0master_StartN(0x69,I2C_WRITE,2);
     i2c0master_WriteN(0x3E); 
     //i2c0master_WriteN(0x03); // use z gyro as clock reference
-    //i2c0master_WriteN(0x0B); // use z gyro as clock reference, sleep z
-    i2c0master_WriteN(0x09); // use x gyro as clock reference, sleep z
+    i2c0master_WriteN(0x0B); // use z gyro as clock reference, sleep z
+    //i2c0master_WriteN(0x09); // use x gyro as clock reference, sleep z
   }
   unlockI2C();
 }
 
 void I2CDeviceITG3200::pollCB(const ros::TimerEvent& e)
 {
-  char msb1, lsb1, msb2, lsb2; // msb3, lsb3; 
-  
   lockI2C();
-  {  
-    i2c0master_StartN(0x69, I2C_WRITE, 1);
-    i2c0master_SetRestartN(I2C_READ, 4);
-    i2c0master_WriteN(0x1D); //Read from X register 
+  { 
+  	i2c0_SetSpeed(I2CMODE_AUTO, speed_);
+     
+    if (!i2c0master_StartN(0x69, I2C_WRITE, 1))
+    	ROS_ERROR_STREAM("ITG3200 i2c0master_StartN " << roboio_GetErrMsg());
+    if (!i2c0master_SetRestartN(I2C_READ, 4))
+    	ROS_ERROR_STREAM("ITG3200 i2c0master_SetRestartN " << roboio_GetErrMsg());
+    if (!i2c0master_WriteN(0x1D)) //Read from X register
+    	ROS_ERROR_STREAM("ITG3200 i2c0master_WriteN " << roboio_GetErrMsg()); 
     
     msb1 = i2c0master_ReadN(); 
     lsb1 = i2c0master_ReadN(); 
@@ -72,24 +88,32 @@ void I2CDeviceITG3200::pollCB(const ros::TimerEvent& e)
   }
   unlockI2C();
   
-  short x = msb1<<8 | lsb1;  
-  short y = msb2<<8 | lsb2;
+  x = msb1<<8 | lsb1;  
+  y = msb2<<8 | lsb2;
   //short z = msb3<<8 | lsb3;
       
   //ROS_INFO_STREAM( (float)x/10.0f << " " << (float)y/10.0f << " " << (z)roll/10.0f );
-	std_msgs::Float32MultiArray msg;
-  msg.data.resize(2);
-  //msg.data.resize(3);
-  msg.data[0] = (float)x/14.375f;
-  msg.data[1] = (float)y/14.375f;
-  //msg.data[2] = (float)z/14.375f;
-  std_msgs::MultiArrayDimension dim;
-  dim.label="X,Y";
-  //dim.label="X,Y,Z";
-  dim.size=msg.data.size();
-  dim.stride=msg.data.size();
-  msg.layout.dim.push_back(dim);
-  raw_pub_.publish(msg);
+	if (publish_raw_)
+  {
+    std_msgs::Int16MultiArray msg;
+    msg.data.resize(2);
+    //msg.data.resize(3);
+    msg.data[0] = x;
+    msg.data[1] = y;
+    //msg.data[2] = z;
+    std_msgs::MultiArrayDimension dim;
+    dim.label="X,Y";
+    //dim.label="X,Y,Z";
+    dim.size=msg.data.size();
+    dim.stride=msg.data.size();
+    msg.layout.dim.push_back(dim);
+    raw_pub_.publish(msg);
+  }
+  
+  x_msg.data = (float)x/14.375f;
+  y_msg.data = (float)y/14.375f;
+  x_pub_.publish(x_msg);
+  y_pub_.publish(y_msg);
 }
 
 }

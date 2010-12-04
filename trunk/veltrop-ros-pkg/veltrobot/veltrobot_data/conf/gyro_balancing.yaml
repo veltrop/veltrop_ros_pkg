@@ -15,13 +15,13 @@ pitch:
 roll:
 
   - joint_name: hip_left_roll
-    multiplier: -5.4
+    multiplier: 5.4
 
   - joint_name: ankle_left_roll
-    multiplier: 7.2
+    multiplier: -7.2
     
   - joint_name: hip_right_roll
-    multiplier: -5.4
+    multiplier: 5.4
 
   - joint_name: ankle_right_roll
     multiplier: -7.2   

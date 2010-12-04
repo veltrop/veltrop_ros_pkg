@@ -22,7 +22,7 @@ I2CDeviceManager::I2CDeviceManager()
     exit(-1);
   } 
 
-  i2c0_SetSpeed(I2CMODE_STANDARD, 100000); 
+  i2c0_SetSpeed(I2CMODE_AUTO, 100000L); 
   
   loadDevices();
 }

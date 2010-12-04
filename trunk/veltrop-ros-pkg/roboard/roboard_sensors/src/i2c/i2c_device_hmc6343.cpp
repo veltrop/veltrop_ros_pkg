@@ -20,6 +20,8 @@ void I2CDeviceHMC6343::pollCB(const ros::TimerEvent& e)
   
   lockI2C();
   {
+  	i2c0_SetSpeed(I2CMODE_AUTO, speed_);
+    
     i2c0master_StartN(0x32>>1, I2C_WRITE, 1); 
     i2c0master_WriteN(0x50);  // request data
   }
@@ -29,6 +31,8 @@ void I2CDeviceHMC6343::pollCB(const ros::TimerEvent& e)
   
   lockI2C(); 
   {
+  	i2c0_SetSpeed(I2CMODE_AUTO, speed_);
+    
 		i2c0master_StartN( 0x33>>1, I2C_READ, 6 );
     msb1 = i2c0master_ReadN(); 
     lsb1 = i2c0master_ReadN(); 
@@ -44,18 +48,20 @@ void I2CDeviceHMC6343::pollCB(const ros::TimerEvent& e)
 	short roll = msb3<<8 | lsb3;
   
   //ROS_INFO_STREAM( (float)head/10.0f << " " << (float)pitch/10.0f << " " << (float)roll/10.0f );
-  
-	std_msgs::Int16MultiArray msg;
-  msg.data.resize(3);
-  msg.data[0] = head;
-  msg.data[1] = pitch;
-  msg.data[2] = roll; 
-  std_msgs::MultiArrayDimension dim;
-  dim.label="Head,Pitch,Roll";
-  dim.size=msg.data.size();
-  dim.stride=msg.data.size();
-  msg.layout.dim.push_back(dim);
-  raw_pub_.publish(msg);
+  if (publish_raw_)
+  {
+    std_msgs::Int16MultiArray msg;
+    msg.data.resize(3);
+    msg.data[0] = head;
+    msg.data[1] = pitch;
+    msg.data[2] = roll; 
+    std_msgs::MultiArrayDimension dim;
+    dim.label="Head,Pitch,Roll";
+    dim.size=msg.data.size();
+    dim.stride=msg.data.size();
+    msg.layout.dim.push_back(dim);
+    raw_pub_.publish(msg);
+  }
 }
 
 }
