@@ -6,6 +6,7 @@
 
 #include <pthread.h>
 #include <ros/ros.h>
+#include <std_msgs/Empty.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int16.h>
 #include <veltrobot_msgs/CapturePose.h>
@@ -28,28 +29,7 @@ public:
     pthread_mutex_init (&playframe_mutex_, NULL);
     pthread_mutex_init (&mixframe_mutex_, NULL);
            
-    // Get servo configuration as it relates to the robot description                         
-    //servos_.openURDFparam();
-    if (servos_.getUsedPWMChannels() == 0)
-      ROS_WARN("No PWM servo channels used");   
-      
-    // Setup an initial pose
-    memset(mixframe_, 0, sizeof(long) * 32);
-    memset(commandframe_, 0, sizeof(long) * 32);
-    memset(playframe_, 0, sizeof(unsigned long) * 32);
-    ServoLibrary::iterator j = servos_.begin();
-    for (; j != servos_.end(); ++j)
-    {
-      Servo& servo = j->second;
-      if (servo.channel_ >= 1)
-        playframe_[servo.channel_ - 1] = (int)servo.trim_pwm_ +
-                                         ((int)servo.max_pwm_ + (int)servo.min_pwm_)
-                                         / (int)2;
-    }
-    
-    np_.param<int>("servo_fps", servo_fps_, 100); 
-    np_.param<bool>("force_mix", force_mix_, false);     
-    np_.param<bool>("reset_after_mix", reset_after_mix_, false);     
+		loadConfig();
     
     // Prepare our subscription callbacks
     //update_trim_sub_ = n_.subscribe("/trim_updated", 10, 
@@ -60,7 +40,8 @@ public:
                                     &JointStateControlled::balancingJointStateCB, this); 
     receive_servo_command_sub_ = n_.subscribe("/servo_command", 1,
                                            &JointStateControlled::receiveServoCommandCB, this);
-    
+		update_config_sub_ = n.subscribe("/update_config", 1, 
+                                    &JointStateControlled::receiveUpdateConfigCB, this);    
     capture_pose_srv_ = n_.advertiseService("capture_pose", &JointStateControlled::capturePoseCB, this);
   }
   
@@ -95,6 +76,7 @@ private:
   ros::Subscriber joint_state_sub_;
   ros::Subscriber balance_joint_state_sub_;
   ros::Subscriber receive_servo_command_sub_;
+  ros::Subscriber update_config_sub_;
   ros::ServiceServer capture_pose_srv_;
   ServoLibrary    servos_;
   bool            do_mix_;
@@ -167,6 +149,36 @@ private:
   //{
   //  servos_.openURDFparam();
   //}
+  
+  void loadConfig()
+  {
+    servos_.loadServos();
+    if (servos_.getUsedPWMChannels() == 0)
+      ROS_WARN("No PWM servo channels used");   
+      
+    // Setup an initial pose
+    memset(mixframe_, 0, sizeof(long) * 32);
+    memset(commandframe_, 0, sizeof(long) * 32);
+    memset(playframe_, 0, sizeof(unsigned long) * 32);
+    ServoLibrary::iterator j = servos_.begin();
+    for (; j != servos_.end(); ++j)
+    {
+      Servo& servo = j->second;
+      if (servo.channel_ >= 1)
+        playframe_[servo.channel_ - 1] = (int)servo.trim_pwm_ +
+                                         ((int)servo.max_pwm_ + (int)servo.min_pwm_)
+                                         / (int)2;
+    }
+    
+    np_.param<int>("servo_fps", servo_fps_, 100); 
+    np_.param<bool>("force_mix", force_mix_, false);     
+    np_.param<bool>("reset_after_mix", reset_after_mix_, false);       
+  }
+  
+  void receiveUpdateConfigCB(const std_msgs::EmptyConstPtr& msg)
+  { 
+  	loadConfig();
+  }
   
   void jointStateCB(const sensor_msgs::JointStateConstPtr& msg)
   {

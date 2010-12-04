@@ -75,7 +75,7 @@ ServoLibrary::ServoLibrary()
              //, URDF_("")
              , used_pwm_channels_(0)
 {
-	loadServos();
+	//loadServos();
 }
             
             
