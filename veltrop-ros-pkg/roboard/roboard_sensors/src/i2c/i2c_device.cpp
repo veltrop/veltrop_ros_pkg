@@ -8,6 +8,7 @@ pthread_mutex_t I2CDevice::i2c_mutex_;
 
 I2CDevice::I2CDevice(XmlRpc::XmlRpcValue& device_info)
 : publish_raw_(true)
+, speed_(100000L)
 {
   ros::NodeHandle n;
 
@@ -33,6 +34,9 @@ I2CDevice::I2CDevice(XmlRpc::XmlRpcValue& device_info)
   
   if (device_info.hasMember("publish_raw"))
   	publish_raw_ = device_info["publish_raw"];
+    
+	if (device_info.hasMember("speed"))
+  	speed_ = (int)device_info["speed"];    
 }
 
 I2CDevice::~I2CDevice()

@@ -82,9 +82,9 @@ public:
     // Prepare joint state publisher
     joint_states_pub_ = n.advertise<sensor_msgs::JointState>("/balancing_joint_states", 1);
   
-    gyro_pitch_sub_ = n.subscribe("/gyro_pitch", 1, 
+    gyro_pitch_sub_ = n.subscribe("/gyro/pitch", 1, 
                                     &BalanceMovement::receiveGyroPitchCB, this);  
-    gyro_roll_sub_ = n.subscribe("/gyro_roll", 1, 
+    gyro_roll_sub_ = n.subscribe("/gyro/roll", 1, 
                                     &BalanceMovement::receiveGyroRollCB, this);                                
   }
   
@@ -95,6 +95,8 @@ public:
     while (ros::ok())
     {
     	ros::spinOnce();
+      // TODO: better logic of to publish or not.
+      //       services to enable/disable balancing, set balancing style
     	joint_states_pub_.publish(js_);
     	loop_rate.sleep();
     }
@@ -107,10 +109,11 @@ private:
   std::vector <JointMultiplier> pitch_multipliers_;
 	std::vector <JointMultiplier> roll_multipliers_;
   sensor_msgs::JointState js_; 
-  ros::Timer transmit_timer_;
+  //ros::Timer transmit_timer_;
   float processing_freq_;
   float movement_freq_;
   
+  // NOTE: disabled becuase using ros::timer's is too CPU intensive on Roboard...
   /*void transmitCB(const ros::TimerEvent& e)
   {
   	// TODO: post process: prune joints below a threshold

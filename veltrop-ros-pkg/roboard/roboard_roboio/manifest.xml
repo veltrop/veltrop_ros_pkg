@@ -2,7 +2,7 @@
 <description brief="Support library for the Roboard.">
 This library allows hardware access to the Roboard.
 </description>
-<author>DMP Electronics, Inc. ROS inclusion by Taylor Veltrop.</author>
+<author>DMP Electronics, Inc. ROS inclusion and patch by Taylor Veltrop.</author>
 <license>BSD</license>
 <review status="3rdparty unreviewed" notes=""/>
 <url>http://www.roboard.com</url>

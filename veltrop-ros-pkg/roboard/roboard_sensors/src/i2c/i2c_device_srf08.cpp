@@ -19,6 +19,8 @@ void I2CDeviceSRF08::pollCB(const ros::TimerEvent& e)
   
   lockI2C();
   {
+  	i2c0_SetSpeed(I2CMODE_AUTO, speed_);
+    
     i2c0master_StartN(0xe0>>1, I2C_WRITE, 2);        
     
     i2c0master_WriteN(0);       //set SRF command register 
@@ -30,6 +32,8 @@ void I2CDeviceSRF08::pollCB(const ros::TimerEvent& e)
   
   lockI2C();
   {
+  	i2c0_SetSpeed(I2CMODE_AUTO, speed_);
+    
     i2c0master_StartN(0xe0>>1, I2C_WRITE, 1);         
     i2c0master_SetRestartN(I2C_READ, 2); 
     
@@ -39,11 +43,14 @@ void I2CDeviceSRF08::pollCB(const ros::TimerEvent& e)
   }
   unlockI2C();
   
-  //ROS_INFO_STREAM ( b1*256 + b2 );
- 	std_msgs::UInt16 msg;
-  //msg.data = b1*256 + b2;
-  msg.data = b1<<8 | b2;
-  raw_pub_.publish(msg); 
+  if (publish_raw_)
+  {
+    //ROS_INFO_STREAM ( b1*256 + b2 );
+    std_msgs::UInt16 msg;
+    //msg.data = b1*256 + b2;
+    msg.data = b1<<8 | b2;
+    raw_pub_.publish(msg); 
+  }
 }
 
 }

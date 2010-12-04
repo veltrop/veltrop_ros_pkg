@@ -28,6 +28,7 @@ class I2CDevice
     double poll_frequency_;
     ros::Timer poll_timer_;
     bool publish_raw_;
+    long speed_;
     
   	ros::Publisher   raw_pub_;
     

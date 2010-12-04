@@ -5,6 +5,7 @@
     
   <node pkg="roboard_servos" type="joint_state_controlled"
         name="joint_state_controlled">
+    <rosparam command="load" file="$(find veltrobot_data)/conf/servos.yaml" />
     <param name="servo_fps" value="200" /> 
     <param name="force_mix" value="true" />
     <param name="reset_after_mix" value="false" />

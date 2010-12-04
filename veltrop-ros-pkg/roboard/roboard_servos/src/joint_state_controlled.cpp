@@ -29,9 +29,9 @@ public:
     pthread_mutex_init (&mixframe_mutex_, NULL);
            
     // Get servo configuration as it relates to the robot description                         
-    servos_.openURDFparam();
-    if (servos_.getUsedChannels() == 0)
-      ROS_ERROR("Robot Description contains no servo channels");   
+    //servos_.openURDFparam();
+    if (servos_.getUsedPWMChannels() == 0)
+      ROS_WARN("No PWM servo channels used");   
       
     // Setup an initial pose
     memset(mixframe_, 0, sizeof(long) * 32);
@@ -52,8 +52,8 @@ public:
     np_.param<bool>("reset_after_mix", reset_after_mix_, false);     
     
     // Prepare our subscription callbacks
-    update_trim_sub_ = n_.subscribe("/trim_updated", 10, 
-                                    &JointStateControlled::updateTrimCB, this);   
+    //update_trim_sub_ = n_.subscribe("/trim_updated", 10, 
+    //                                &JointStateControlled::updateTrimCB, this);   
     joint_state_sub_ = n_.subscribe("/joint_states", 10, 
                                     &JointStateControlled::jointStateCB, this);  
 		balance_joint_state_sub_ = n_.subscribe("/balancing_joint_states", 1, 
@@ -91,7 +91,7 @@ public:
 private:
   ros::NodeHandle n_;
   ros::NodeHandle np_;
-  ros::Subscriber update_trim_sub_;
+  //ros::Subscriber update_trim_sub_;
   ros::Subscriber joint_state_sub_;
   ros::Subscriber balance_joint_state_sub_;
   ros::Subscriber receive_servo_command_sub_;
@@ -153,7 +153,7 @@ private:
         rcservo_SetServo(servo.channel_, servo.type_);
     }
             
-    if (rcservo_Initialize(servos_.getUsedChannels()) == true)
+    if (rcservo_Initialize(servos_.getUsedPWMChannels()) == true)
     {
       rcservo_EnableMPOS();
       rcservo_SetFPS(servo_fps_); 
@@ -163,10 +163,10 @@ private:
       ROS_ERROR("RoBoIO: %s", roboio_GetErrMsg());
   }
   
-  void updateTrimCB(const std_msgs::BoolConstPtr& msg)
-  {
-    servos_.openURDFparam();
-  }
+  //void updateTrimCB(const std_msgs::BoolConstPtr& msg)
+  //{
+  //  servos_.openURDFparam();
+  //}
   
   void jointStateCB(const sensor_msgs::JointStateConstPtr& msg)
   {
@@ -241,7 +241,7 @@ private:
     pthread_mutex_lock(&playframe_mutex_);
     rcservo_EnterCaptureMode();
     
-    rcservo_ReadPositions(servos_.getUsedChannels(), RCSERVO_CMD_POWEROFF, width);
+    rcservo_ReadPositions(servos_.getUsedPWMChannels(), RCSERVO_CMD_POWEROFF, width);
     
     rcservo_EnterPlayMode();
     pthread_mutex_unlock(&playframe_mutex_);
