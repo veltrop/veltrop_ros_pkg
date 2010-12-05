@@ -59,8 +59,8 @@ private:
     std::string requested_motion = msg->data;
     //if (motions_.find(requested_motion) == motions_.end())
     //  return;
-    if (requested_motion == current_motion_)
-      return;
+    //if (requested_motion == current_motion_)
+    //  return;
     current_motion_ = requested_motion;
     current_phase_ = motions_[current_motion_].first_phase_;
     phaseCB(ros::TimerEvent());    

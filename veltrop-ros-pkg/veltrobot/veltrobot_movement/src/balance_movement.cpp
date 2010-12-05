@@ -97,6 +97,7 @@ private:
   {
   	ros::NodeHandle np("~");	
     XmlRpc::XmlRpcValue all_joints;
+    roll_multipliers_.clear();
 
 		np.getParam(name, all_joints);
   	if (all_joints.getType() != XmlRpc::XmlRpcValue::TypeArray)
