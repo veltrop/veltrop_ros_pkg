@@ -1,5 +1,5 @@
 <launch>
-	<include file="$(find veltrobot_data)/launch/sensors.launch" />
+	<!--<include file="$(find veltrobot_data)/launch/sensors.launch" /> -->
   <include file="$(find veltrobot_data)/launch/model.launch" />
   <include file="$(find veltrobot_data)/launch/teleop.launch" />
     
@@ -14,10 +14,10 @@
   <node pkg="veltrobot_movement" type="control_movement"
     name="movement_controller" />
     
-	<node pkg="veltrobot_movement" type="balance_movement"
+	<!--<node pkg="veltrobot_movement" type="balance_movement"
     name="balance_controller" >
     <param name="processing_fps" value="100" /> 
     <param name="movement_fps" value="200" />
   	<rosparam command="load" file="$(find veltrobot_data)/conf/gyro_balancing.yaml" />
-  </node>
+  </node>-->
 </launch>

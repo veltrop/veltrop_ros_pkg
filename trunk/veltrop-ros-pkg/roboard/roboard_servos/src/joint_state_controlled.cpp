@@ -40,7 +40,7 @@ public:
                                     &JointStateControlled::balancingJointStateCB, this); 
     receive_servo_command_sub_ = n_.subscribe("/servo_command", 1,
                                            &JointStateControlled::receiveServoCommandCB, this);
-		update_config_sub_ = n.subscribe("/update_config", 1, 
+		update_config_sub_ = n_.subscribe("/update_config", 1, 
                                     &JointStateControlled::receiveUpdateConfigCB, this);    
     capture_pose_srv_ = n_.advertiseService("capture_pose", &JointStateControlled::capturePoseCB, this);
   }
