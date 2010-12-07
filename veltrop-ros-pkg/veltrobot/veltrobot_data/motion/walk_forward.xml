@@ -26,4 +26,4 @@
     </phases>
 </motion>  
 
-<!-- TODO: motions need an "abort_path" feature: the actions to take when aborting -->
+<!-- TODO: motions need an "on_abort_phase" feature: the actions to take when aborting -->

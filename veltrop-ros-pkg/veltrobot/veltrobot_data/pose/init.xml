@@ -27,8 +27,8 @@
 		<joint name="hip_right_roll"  position="0.0" />
 		<joint name="hip_right_pitch"  position="0.0" />
 		<joint name="knee_right_pitch"  position="0.0" />
-		<joint name="ankle_right_pitch"  position="0.0" />
 		<joint name="ankle_right_roll"  position="0.0" />
+		<joint name="ankle_right_pitch"  position="0.0" />
 	</joint_positions>
 </pose>
 

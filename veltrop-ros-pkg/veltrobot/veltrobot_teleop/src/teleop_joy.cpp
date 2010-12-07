@@ -31,18 +31,34 @@ private:
   {
     std_msgs::String mot;
     mot.data = "";
+    static bool prev_button = false;
     
     if (!joy->buttons[4] && !joy->buttons[5] && 
-        !joy->buttons[6] && !joy->buttons[7])
+        !joy->buttons[6] && !joy->buttons[7] && prev_button)
+    {
       mot.data = "stand_squat";
+      prev_button = false;
+    }
     else if (joy->buttons[7])
+    {
       mot.data = "rotate_left";
+      prev_button = true;
+    }
     else if (joy->buttons[5])
+		{
       mot.data = "rotate_right";
+      prev_button = true;
+    }
     else if (joy->buttons[4])
+		{
       mot.data = "walk_forward";
+      prev_button = true;
+    }
     else if (joy->buttons[6])
-      mot.data = "walk_backward";
+    {
+    	mot.data = "walk_backward";
+      prev_button = true;
+    }
                       
     if (joy->buttons[1])
     {    
