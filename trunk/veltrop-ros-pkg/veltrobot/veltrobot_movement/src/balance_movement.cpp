@@ -63,7 +63,7 @@ private:
   float processing_freq_;
   float movement_freq_;
   
-  // NOTE: disabled becuase using ros::timer's is too CPU intensive on Roboard...
+  // NOTE: disabled becuase using ros::timer's and ros::spin() is too CPU intensive on Roboard...
   /*void transmitCB(const ros::TimerEvent& e)
   {
   	// TODO: post process: prune joints below a threshold
@@ -82,6 +82,9 @@ private:
     	ROS_WARN("No roll devices");  
       
     // TODO: this could be completely dynamic if we set up an array of axis...
+    js_.name.clear();
+    js_.position.clear();
+    js_.velocity.clear();
    	loadAxisConfig("roll", roll_multipliers_);
     loadAxisConfig("pitch", pitch_multipliers_);
     
@@ -97,7 +100,7 @@ private:
   {
   	ros::NodeHandle np("~");	
     XmlRpc::XmlRpcValue all_joints;
-    roll_multipliers_.clear();
+    multipliers.clear();
 
 		np.getParam(name, all_joints);
   	if (all_joints.getType() != XmlRpc::XmlRpcValue::TypeArray)
@@ -131,7 +134,7 @@ private:
       float duration = 1.0f / movement_freq_;
       float offset = pi_sec * duration;
       js_.position[j] = multipliers[i].multiplier * offset;
-      js_.velocity[j] = duration * 1000.0f;
+      js_.velocity[j] = duration;
     }
   }
 

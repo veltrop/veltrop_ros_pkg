@@ -1,4 +1,5 @@
 #include <string>
+#include <math.h>
 #include <roboard.h>
 #include <std_msgs/Int16MultiArray.h>
 #include <std_msgs/MultiArrayDimension.h>
@@ -9,10 +10,17 @@ namespace roboard_sensors
 
 I2CDeviceITG3200::I2CDeviceITG3200(XmlRpc::XmlRpcValue& device_info)
  : I2CDevice(device_info)
+ , x_calib_(0)
+ , y_calib_(0)
+ , x_deadzone_(0)
+ , y_deadzone_(0)
 {  
 	ros::NodeHandle n;
   if (publish_raw_)
+  {
 		raw_pub_ = n.advertise<std_msgs::Int16MultiArray>(device_name_ + "/raw", 1);
+    raw_calib_pub_ = n.advertise<std_msgs::Int16MultiArray>(device_name_ + "/raw_calib", 1);
+  }
 
 	std::string x_pub_string("x");	
   if (device_info.hasMember("x_topic"))
@@ -23,6 +31,15 @@ I2CDeviceITG3200::I2CDeviceITG3200(XmlRpc::XmlRpcValue& device_info)
   if (device_info.hasMember("y_topic"))
   	y_pub_string = (std::string)device_info["y_topic"];  
   y_pub_ = n.advertise<std_msgs::Float32>(device_name_ + "/" + y_pub_string, 1);
+
+	if (device_info.hasMember("x_calib"))
+  	x_calib_ = (int)device_info["x_calib"];
+  if (device_info.hasMember("y_calib"))
+  	y_calib_ = (int)device_info["y_calib"];
+  if (device_info.hasMember("x_deadzone"))
+  	x_deadzone_ = (int)device_info["x_deadzone"];
+  if (device_info.hasMember("y_deadzone"))
+  	y_deadzone_ = (int)device_info["y_deadzone"];
 
   init();
 }
@@ -41,7 +58,10 @@ void I2CDeviceITG3200::init()
     
     i2c0master_StartN(0x69,I2C_WRITE,2);
     i2c0master_WriteN(0x15); 
-    i2c0master_WriteN(0x09);  // sample divider to 10			(100 fps)
+    short divider = 1000 / short(poll_frequency_);
+    i2c0master_WriteN(divider);
+    //i2c0master_WriteN(0x17);  // sample divider to 23			(42 fps)
+		//i2c0master_WriteN(0x09);  // sample divider to 10			(100 fps)
     //i2c0master_WriteN(0xC8);  // sample divider to 200
     //i2c0master_WriteN(0x64);  // sample divider to 100
     
@@ -49,11 +69,14 @@ void I2CDeviceITG3200::init()
     
     i2c0master_StartN(0x69,I2C_WRITE,2);
     i2c0master_WriteN(0x16);  
-    //i2c0master_WriteN(0x18); // DLPF_CFG = 0, FS_SEL = 3 
-    //i2c0master_WriteN(0x1E); // DLPF_CFG = 6, FS_SEL = 3 
-    //i2c0master_WriteN(0x1D); // DLPF_CFG = 5, FS_SEL = 3  
-    //i2c0master_WriteN(0x1A); // DLPF_CFG = 2, FS_SEL = 3 
-    i2c0master_WriteN(0x1B); // DLPF_CFG = 3, FS_SEL = 3 
+    //i2c0master_WriteN(0x1F); // DLPF_CFG = 7 (?,?), FS_SEL = 3 
+    //i2c0master_WriteN(0x1E); // DLPF_CFG = 6 (5hz,1khz), FS_SEL = 3 
+    //i2c0master_WriteN(0x1D); // DLPF_CFG = 5 (10hz,1khz), FS_SEL = 3  
+    //i2c0master_WriteN(0x1C); // DLPF_CFG = 4 (20hz,1khz), FS_SEL = 3
+    i2c0master_WriteN(0x1B); // DLPF_CFG = 3 (42hz,1khz), FS_SEL = 3
+    //i2c0master_WriteN(0x1A);   // DLPF_CFG = 2 (98hz,1khz), FS_SEL = 3 
+    //i2c0master_WriteN(0x19); // DLPF_CFG = 1 (188hz,1khz), FS_SEL = 3 
+    //i2c0master_WriteN(0x18); // DLPF_CFG = 0 (256hz,8khz), FS_SEL = 3     
     
     usleep(1000);
 
@@ -108,10 +131,14 @@ void I2CDeviceITG3200::pollCB(const ros::TimerEvent& e)
     dim.stride=msg.data.size();
     msg.layout.dim.push_back(dim);
     raw_pub_.publish(msg);
+    
+    msg.data[0] = x + x_calib_;
+    msg.data[1] = y + y_calib_;    
+    raw_calib_pub_.publish(msg);
   }
   
-  x_msg.data = (float)x/14.375f;
-  y_msg.data = (float)y/14.375f;
+  (abs(x + x_calib_) > x_deadzone_) ? x_msg.data = (float)(x + x_calib_)/14.375f : x_msg.data = 0;	    
+	(abs(y + y_calib_) > y_deadzone_) ? y_msg.data = (float)(y + y_calib_)/14.375f : y_msg.data = 0;
   x_pub_.publish(x_msg);
   y_pub_.publish(y_msg);
 }

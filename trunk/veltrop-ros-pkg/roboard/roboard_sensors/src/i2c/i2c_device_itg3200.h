@@ -21,12 +21,15 @@ class I2CDeviceITG3200 : public I2CDevice
     
     ros::Publisher x_pub_;
     ros::Publisher y_pub_;
-    
+    ros::Publisher raw_calib_pub_;
     
     std_msgs::Float32 x_msg;
     std_msgs::Float32 y_msg;
     char msb1, lsb1, msb2, lsb2; // msb3, lsb3; 
     short x, y;
+    
+    short x_calib_, y_calib_;
+    short x_deadzone_, y_deadzone_;
 };
 
 }

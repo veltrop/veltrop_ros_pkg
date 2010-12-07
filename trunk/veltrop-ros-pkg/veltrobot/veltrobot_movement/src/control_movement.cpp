@@ -14,6 +14,7 @@ public:
   ControlMovement()
   : current_motion_("")
   , current_phase_("")
+	, prev_phase_("")
   , requested_motion_("")
   {
     // Load Motion and Pose Libraries
@@ -51,18 +52,21 @@ private:
   ros::Timer      phase_timer_;
   std::string     current_motion_;
   std::string     current_phase_;
+  std::string     prev_phase_;
   std::string     requested_motion_;
 
   void motionNameCB(const std_msgs::StringConstPtr& msg)
   {
-    ROS_INFO("Requested motion [%s]", msg->data.c_str());
-    std::string requested_motion = msg->data;
+    //ROS_INFO("Requested motion [%s]", msg->data.c_str());
+    requested_motion_ = msg->data;
     //if (motions_.find(requested_motion) == motions_.end())
     //  return;
-    //if (requested_motion == current_motion_)
-    //  return;
-    current_motion_ = requested_motion;
-    current_phase_ = motions_[current_motion_].first_phase_;
+    if (requested_motion_ == current_motion_)
+      return;
+      
+    //current_motion_ = requested_motion;
+    //current_phase_ = motions_[current_motion_].first_phase_;
+    
     phaseCB(ros::TimerEvent());    
   }
   
@@ -80,22 +84,30 @@ private:
   {
     //ROS_INFO("phaseCB triggered");
     
-    // play motion to safety before trying new request
-    /*if (current_motion_ != requested_motion_ &&
-        motions_[current_motion_].phases_[current_phase_].abort_safe_)
+    // switch to new motion if safe
+    if (current_motion_ != requested_motion_ &&
+        motions_[current_motion_].phases_[prev_phase_].abort_safe_)
     {
       current_motion_ = requested_motion_;
       current_phase_ = motions_[current_motion_].first_phase_;
-    }*/
+      prev_phase_ = "";
+    }
     
+    // execute the current phase
     MotionPhase& phase = motions_[current_motion_].phases_[current_phase_];
     float duration = -1;
     if (phase.poses_.size())
       duration = applyPoseToJointState(phase.poses_[0], phase.duration_);
+      
+    // advance phase
+    prev_phase_ = current_phase_;
     current_phase_ = phase.next_phase_;
+    
+    // trigger the next phase
     if (current_phase_ != "" && duration != -1)
       phase_timer_ = n_.createTimer(ros::Duration(duration / 1000.0f),
                                     &ControlMovement::phaseCB, this, true);
+                                                                      
     //else
       // apply the idle motion
   }
