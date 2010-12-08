@@ -10,7 +10,7 @@
 //#include <veltrobot_sensors/PairYUYVImages.h>
 #include <image_transport/image_transport.h>
 //#include <uvc_cam/uvc_cam.h>
-#include "uvc_cam.h"
+#include "../uvc_cam.h"
 
 // YUYV to RGB conversion
 // There's many methods to this, and much ado about the color range...
