@@ -11,11 +11,13 @@
     <!-- 21 63 21 4 128 15 10  500 4 -->
     <!-- 21 63 21 2 128 15 100 350 4 -->
     
+    <!-- 640x480 -->
     <!-- close head (15 cm and better w/ hands): 15, 31, 21, 2, 128, 1, 1, 250, 5 -->
     <!-- working well (Lem):  15 31 21 2 128 1 1 270 5 -->
     <!-- newest best: 15 31 21 2 128 4 1 1000 5 (can lower the specke_size?) -->
+    <!-- 15 31 21 2 128 4 1 750 5 -->
     
-    <param name="prefilter_size" value="15" />
+    <!--<param name="prefilter_size" value="15" />
     <param name="prefilter_cap" value="31" />
     <param name="correlation_window_size" value="21" />
     <param name="min_disparity" value="2" />
@@ -23,6 +25,17 @@
     <param name="uniqueness_ratio" value="4" />
     <param name="texture_threshold" value="1" />
     <param name="speckle_size" value="750" />
+    <param name="speckle_range" value="5" /> -->
+    
+    <!-- 200x150 -->
+    <param name="prefilter_size" value="15" />
+    <param name="prefilter_cap" value="31" />
+    <param name="correlation_window_size" value="21" />
+    <param name="min_disparity" value="2" />
+    <param name="disparity_range" value="64" />
+    <param name="uniqueness_ratio" value="4" />
+    <param name="texture_threshold" value="1" />
+    <param name="speckle_size" value="420" />
     <param name="speckle_range" value="5" />
     
     <!-- close minoru (20 cm): 15, 31, 21 or 35, 128, 128, 1, 1, 250, 5 -->
