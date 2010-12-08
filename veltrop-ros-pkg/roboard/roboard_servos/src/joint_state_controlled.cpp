@@ -17,6 +17,8 @@
 namespace roboard_servos
 {
 
+// TODO: handling for PWM and serial
+
 class JointStateControlled
 {
 public:

@@ -6,11 +6,11 @@
     <param name="width" value="640" />
     <param name="height" value="480" />
     <param name="device" value="/dev/video0" />
-    <param name="standard_str" value="DEFAULT" />
+    <param name="standard_str" value="NTSC" />
     <param name="topic" value="/left_image_raw" />
   </node>
 
-  <node pkg="veltrobot_sensors" type="test_video" name="right">    
+  <!--<node pkg="veltrobot_sensors" type="test_video" name="right">    
     <param name="buffers" value="1" />
     <param name="fps" value="1" />
     <param name="width" value="640" />
@@ -18,8 +18,9 @@
     <param name="device" value="/dev/video1" />
     <param name="standard_str" value="DEFAULT" />
     <param name="topic" value="/right_image_raw" />
-  </node>
+  </node> -->
 
 
 </launch>
 
+<!-- DEFAULT NTSC -->
