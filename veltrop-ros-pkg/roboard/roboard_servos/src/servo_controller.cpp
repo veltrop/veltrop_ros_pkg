@@ -19,10 +19,10 @@ namespace roboard_servos
 
 // TODO: handling for PWM and serial
 
-class JointStateControlled
+class ServoController
 {
 public:
-  JointStateControlled()
+  ServoController()
     : np_("~")
     , do_mix_(false)
     , roboio_ok_(false)
@@ -35,16 +35,20 @@ public:
     
     // Prepare our subscription callbacks
     //update_trim_sub_ = n_.subscribe("/trim_updated", 10, 
-    //                                &JointStateControlled::updateTrimCB, this);   
+    //                                &ServoController::updateTrimCB, this);   
     joint_state_sub_ = n_.subscribe("/joint_states", 10, 
-                                    &JointStateControlled::jointStateCB, this);  
+                                    &ServoController::jointStateCB, this);  
 		balance_joint_state_sub_ = n_.subscribe("/balancing_joint_states", 1, 
-                                    &JointStateControlled::balancingJointStateCB, this); 
+                                    &ServoController::balancingJointStateCB, this); 
     receive_servo_command_sub_ = n_.subscribe("/servo_command", 1,
-                                           &JointStateControlled::receiveServoCommandCB, this);
+                                           &ServoController::receiveServoCommandCB, this);
+		receive_playmode_command_sub_ = n_.subscribe("/servo_playmode", 1,
+                                           &ServoController::receiveServoPlaymodeCB, this);                                           
+		receive_capturemode_command_sub_ = n_.subscribe("/servo_capturemode", 1,
+                                           &ServoController::receiveServoCapturemodeCB, this);                                           
 		update_config_sub_ = n_.subscribe("/update_config", 1, 
-                                    &JointStateControlled::receiveUpdateConfigCB, this);    
-    capture_pose_srv_ = n_.advertiseService("capture_pose", &JointStateControlled::capturePoseCB, this);
+                                    &ServoController::receiveUpdateConfigCB, this);    
+    capture_pose_srv_ = n_.advertiseService("/capture_pose", &ServoController::capturePoseCB, this);
   }
   
   void spin() 
@@ -78,6 +82,8 @@ private:
   ros::Subscriber joint_state_sub_;
   ros::Subscriber balance_joint_state_sub_;
   ros::Subscriber receive_servo_command_sub_;
+  ros::Subscriber receive_servo_playmode_sub_;
+  ros::Subscriber receive_servo_capturemode_sub_;
   ros::Subscriber update_config_sub_;
   ros::ServiceServer capture_pose_srv_;
   ServoLibrary    servos_;
@@ -95,7 +101,7 @@ private:
   
   static void* playActionThread(void *ptr)
   {
-    JointStateControlled* that = (JointStateControlled*)ptr;
+    ServoController* that = (ServoController*)ptr;
 
     if (!that->roboio_ok_)
       return NULL;
@@ -219,38 +225,52 @@ private:
   }
   
   void receiveServoCommandCB(const std_msgs::Int16ConstPtr& msg)
-  {
+  {    
     long cmd;
-    // cmd = msg->data 
     switch (msg->data)
     {
       case 0:
-        cmd = RCSERVO_CMD_POWEROFF;
+        cmd = RCSERVO_MIXWIDTH_POWEROFF;
+        rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD_POWEROFF);
         break;
       case 1:
         cmd = RCSERVO_MIXWIDTH_CMD1;
+        rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD1);
         break;
       case 2:
         cmd = RCSERVO_MIXWIDTH_CMD2;
+        rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD2);
         break;
       case 3:
         cmd = RCSERVO_MIXWIDTH_CMD3;
+        rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD3);
         break;    
       default:
         return;
     }
     
     for (size_t i=0; i < 32; i++)
-      commandframe_[i] = cmd;
+    	commandframe_[i] = cmd;
     
     pthread_mutex_lock(&playframe_mutex_);
-    rcservo_PlayActionMix(commandframe_);
+    	rcservo_PlayActionMix(commandframe_);
     pthread_mutex_unlock(&playframe_mutex_);
+  }
+
+  void receiveServoPlaymodeCB(const std_msgs::EmptyConstPtr& msg)
+  { 
+  	rcservo_EnterPlayMode();
+  }
+    
+  void receiveServoCapturemodeCB(const std_msgs::EmptyConstPtr& msg)
+  { 
+  	rcservo_EnterCaptureMode();
   }
   
   bool capturePoseCB(veltrobot_msgs::CapturePose::Request  &req,
                      veltrobot_msgs::CapturePose::Response &res )
   {
+  	//ROS_INFO("Capture pose requested.");
     unsigned long width[32];
     pthread_mutex_lock(&playframe_mutex_);
     rcservo_EnterCaptureMode();
@@ -280,7 +300,10 @@ private:
     }
     
     if (res.jointPositions.size() == 0)
+    {
+    	ROS_WARN("No joints captured.");
       return false;
+    }
     
     return true;
   }
@@ -329,17 +352,18 @@ private:
 int main(int argc, char** argv)
 {
   // Keep the kernel from swapping us out
-  if (mlockall(MCL_CURRENT | MCL_FUTURE) < 0) {
-    perror("mlockall() failed");
-    return -1;
-  }
+  //if (mlockall(MCL_CURRENT | MCL_FUTURE) < 0) {
+  //  perror("mlockall() failed");
+  //  return -1;
+  //}
   
+  // Root permissions
   //if (iopl(3) != 0)
   //  perror("iopl() failed");
   
-  ros::init(argc, argv, "joint_state_controlled");
+  ros::init(argc, argv, "servo_controller");
   
-  roboard_servos::JointStateControlled this_node;
+  roboard_servos::ServoController this_node;
   this_node.spin();
 }
 
