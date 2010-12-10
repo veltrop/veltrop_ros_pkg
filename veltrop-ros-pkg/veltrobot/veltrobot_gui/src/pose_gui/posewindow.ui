@@ -14,10 +14,10 @@
    <string>Edit Pose</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="pushButton_add">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>280</x>
       <y>10</y>
       <width>21</width>
       <height>21</height>
@@ -27,7 +27,7 @@
      <string>+</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="pushButton_rest">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -40,7 +40,7 @@
      <string>Rest</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="pushButton_capture">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -99,6 +99,19 @@
       <number>0</number>
      </property>
     </layout>
+   </widget>
+   <widget class="QPushButton" name="pushButton_apply">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>10</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Apply</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

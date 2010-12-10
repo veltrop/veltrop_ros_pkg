@@ -15,6 +15,8 @@ public:
     explicit JointWidget(float position, const std::string& name, QWidget *parent = 0);
     ~JointWidget();
 
+    void setPosition(float position);
+
 private:
     Ui::JointWidget *ui;
 };
