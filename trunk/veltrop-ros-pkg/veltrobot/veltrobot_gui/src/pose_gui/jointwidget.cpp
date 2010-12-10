@@ -17,3 +17,8 @@ JointWidget::~JointWidget()
 {
     delete ui;
 }
+
+void JointWidget::setPosition(float position)
+{
+  ui->doubleSpinBox_position->setValue(position);
+}
