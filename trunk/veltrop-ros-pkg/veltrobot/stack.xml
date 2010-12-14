@@ -10,9 +10,9 @@
   <depend stack="common_msgs" /> <!-- sensor_msgs -->
   <depend stack="image_common" /> <!-- image_transport -->
   <depend stack="joystick_drivers" /> <!-- joy, ps3joy -->
-  <depend stack="roboard" /> <!-- roboard_sensors, roboard_servos -->
   <depend stack="robot_model" /> <!-- robot_state_publisher -->
   <depend stack="ros" /> <!-- std_msgs, roscpp -->
   <depend stack="vision_opencv" /> <!-- opencv2, cv_bridge -->
+  <depend stack="ni" /> <!-- openni -->
 
 </stack>
