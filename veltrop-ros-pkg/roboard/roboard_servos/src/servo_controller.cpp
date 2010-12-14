@@ -11,13 +11,12 @@
 #include <std_msgs/Int16.h>
 #include <veltrobot_msgs/CapturePose.h>
 #include <sensor_msgs/JointState.h>
+#include <roboard_servos/com4_ics.h>
 #include <roboard.h>
 #include "servo.h"
 
 namespace roboard_servos
 {
-
-// TODO: handling for PWM and serial
 
 class ServoController
 {
@@ -25,11 +24,11 @@ public:
   ServoController()
     : np_("~")
     , do_mix_(false)
-    , roboio_ok_(false)
     , running_(false)
   {
     pthread_mutex_init (&playframe_mutex_, NULL);
     pthread_mutex_init (&mixframe_mutex_, NULL);
+    pthread_mutex_init (&com4_mutex_, NULL);
            
 		loadConfig();
     
@@ -53,11 +52,24 @@ public:
   
   void spin() 
   {
-    running_ = true;
     initRCservo();
-    if (roboio_ok_)
-      rcservo_EnterPlayMode(); 
+    rcservo_EnterPlayMode(); 
       
+    com4_ics_init();
+    ServoLibrary::iterator i;
+    for(i = servos_.begin(); i != servos_.end(); ++i)
+    {
+      //std::string& joint_name = i->first;
+      Servo& servo = i->second;
+      if (servo.bus_ == Servo::COM4)
+      {
+        usleep(1);
+        com4_ics_pos(servo.channel_, 8193);
+      }
+    }
+    
+    running_ = true;
+            
     static pthread_t controlThread_;
     static pthread_attr_t controlThreadAttr_;
 
@@ -73,6 +85,18 @@ public:
     running_ = false;
     pthread_join(controlThread_, NULL);//(void **)&rv);
     rcservo_Close();
+    
+    for(i = servos_.begin(); i != servos_.end(); ++i)
+    {
+      //std::string& joint_name = i->first;
+      Servo& servo = i->second;
+      if (servo.bus_ == Servo::COM4)
+      {
+        com4_ics_pos(servo.channel_, 0);
+        usleep(1);
+      }
+    } 
+    com4_ics_close();
   }
   
 private:
@@ -88,7 +112,6 @@ private:
   ros::ServiceServer capture_pose_srv_;
   ServoLibrary    servos_;
   bool            do_mix_;
-  bool            roboio_ok_;
   int             servo_fps_;
   unsigned long   playframe_[32];
   long            mixframe_[32]; 
@@ -98,13 +121,11 @@ private:
   bool            reset_after_mix_;
   pthread_mutex_t playframe_mutex_;
   pthread_mutex_t mixframe_mutex_;
+  pthread_mutex_t com4_mutex_;
   
   static void* playActionThread(void *ptr)
   {
     ServoController* that = (ServoController*)ptr;
-
-    if (!that->roboio_ok_)
-      return NULL;
     
     ros::Rate loop_rate(that->servo_fps_); 
     while (that->running_)
@@ -147,7 +168,6 @@ private:
     {
       rcservo_EnableMPOS();
       rcservo_SetFPS(servo_fps_); 
-      roboio_ok_ = true;
     } 
     else
       ROS_ERROR("RoBoIO: %s", roboio_GetErrMsg());
@@ -226,22 +246,27 @@ private:
   
   void receiveServoCommandCB(const std_msgs::Int16ConstPtr& msg)
   {    
-    long cmd;
+    long cmd = 0;
+    unsigned short pos = 0;
     switch (msg->data)
     {
       case 0:
+      	pos = 0;
         cmd = RCSERVO_MIXWIDTH_POWEROFF;
         rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD_POWEROFF);
         break;
       case 1:
+      	pos = 16383;
         cmd = RCSERVO_MIXWIDTH_CMD1;
         rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD1);
         break;
       case 2:
+      	pos = 16383;
         cmd = RCSERVO_MIXWIDTH_CMD2;
         rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD2);
         break;
       case 3:
+      	pos = 16383;
         cmd = RCSERVO_MIXWIDTH_CMD3;
         rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD3);
         break;    
@@ -255,6 +280,20 @@ private:
     pthread_mutex_lock(&playframe_mutex_);
     	rcservo_PlayActionMix(commandframe_);
     pthread_mutex_unlock(&playframe_mutex_);
+          
+    pthread_mutex_lock(&com4_mutex_);     
+      ServoLibrary::iterator i = servos_.begin();
+      for(; i != servos_.end(); ++i)
+      {
+        //std::string& joint_name = i->first;
+        Servo& servo = i->second;
+        if (servo.bus_ == Servo::COM4)
+        {
+          com4_ics_pos(servo.channel_, pos);
+          usleep(1);
+        }
+      }   	
+    pthread_mutex_unlock(&com4_mutex_);
   }
 
   void receiveServoPlaymodeCB(const std_msgs::EmptyConstPtr& msg)
@@ -320,30 +359,45 @@ private:
     else
       duration = 300;
     
+    std::map<int, unsigned short> icsframe;
     for (size_t i=0; i < msg->name.size(); i++)
     {
       Servo& servo = servos_[msg->name[i]];
       if (servo.channel_ < 1 || servo.channel_ > 32)
         continue;
+
       float rot_range = servo.max_rot_ - servo.min_rot_;
       float pwm_range = servo.max_pwm_ - servo.min_pwm_; 
       int   pwm_center = (servo.max_pwm_ + servo.min_pwm_) / 2;
       float pwm_per_rot = pwm_range / rot_range;
       float f_pwm_val = (float)msg->position[i] * pwm_per_rot;
       unsigned int i_pwm_val = (int)round(f_pwm_val) + (int)servo.trim_pwm_ + (int)pwm_center;    
-      playframe_[servo.channel_-1] = i_pwm_val;
+      
+      if (servo.bus_ == Servo::COM4)
+      	icsframe[servo.channel_] = i_pwm_val;
+      else 
+      	playframe_[servo.channel_-1] = i_pwm_val;
     }
 
-    if (roboio_ok_)
-    {
-      // OPTIONAL?: wait for previous movement to finish:
-      //  while (rcservo_PlayAction() != RCSERVO_PLAYEND) { }
-      //  or rcservo_MoveTo(playframe_, duration);
-      pthread_mutex_lock(&playframe_mutex_);
-      rcservo_SetAction(playframe_, duration);
-      pthread_mutex_unlock(&playframe_mutex_);
-      
-    }
+    // OPTIONAL?: wait for previous movement to finish:
+    //  while (rcservo_PlayAction() != RCSERVO_PLAYEND) { }
+    //  or rcservo_MoveTo(playframe_, duration);
+    pthread_mutex_lock(&playframe_mutex_);
+    	rcservo_SetAction(playframe_, duration);
+    pthread_mutex_unlock(&playframe_mutex_);
+
+		// TODO: no concept of duration here, could use the speed parameters, 
+    //       or could write a separate thread that interpolates for the serial
+    pthread_mutex_lock(&com4_mutex_);     
+      std::map<int, unsigned short>::iterator i = icsframe.begin();
+      for(; i != icsframe.end(); ++i)
+      {
+        int channel = i->first;
+        unsigned short pos = i->second;
+        com4_ics_pos(channel, pos);
+        usleep(1);
+      }   	
+    pthread_mutex_unlock(&com4_mutex_);
   }  
 };
 

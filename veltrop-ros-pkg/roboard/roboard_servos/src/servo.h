@@ -11,6 +11,8 @@
 #define HALFPI 1.57079632679f
 #endif
 
+#define KONDO_ROS3030 0
+
 namespace roboard_servos
 {
 

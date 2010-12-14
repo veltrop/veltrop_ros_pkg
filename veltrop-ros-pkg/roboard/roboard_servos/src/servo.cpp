@@ -45,6 +45,8 @@ Servo::Servo(XmlRpc::XmlRpcValue& servo_info)
       type_ = RCSERVO_KONDO_KRS78X;
     else if (type_string == "RCSERVO_HITEC_HSR8498")
       type_ = RCSERVO_HITEC_HSR8498;
+    else if (type_string == "KONDO_ROS3030")
+    	type_ = KONDO_ROS3030;
     else
       type_ = RCSERVO_SERVO_DEFAULT; 
   }   
