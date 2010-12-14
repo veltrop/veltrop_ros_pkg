@@ -23,7 +23,7 @@
   <node pkg="veltrobot_sensors" type="acquire_stereo" name="acquire_stereo">    
     <param name="stereo_name" value="stereo_yuyv" />    
     <param name="buffers" value="2" />
-    <param name="fps" value="30" />
+    <param name="fps" value="4" />
     <param name="width" value="200" />
     <param name="height" value="150" />
     <param name="left_device" value="/dev/video0" />
