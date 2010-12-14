@@ -16,7 +16,7 @@ I2CDeviceHMC6343::I2CDeviceHMC6343(XmlRpc::XmlRpcValue& device_info)
 
 void I2CDeviceHMC6343::pollCB(const ros::TimerEvent& e)
 {
-  char msb1, lsb1, msb2, lsb2, msb3, lsb3;
+  unsigned char msb1, lsb1, msb2, lsb2, msb3, lsb3;
   
   lockI2C();
   {
@@ -43,7 +43,7 @@ void I2CDeviceHMC6343::pollCB(const ros::TimerEvent& e)
   }
   unlockI2C();
   
-  short head = msb1<<8 | lsb1;
+  unsigned short head = msb1<<8 | lsb1;
   short pitch = msb2<<8 | lsb2;
 	short roll = msb3<<8 | lsb3;
   
