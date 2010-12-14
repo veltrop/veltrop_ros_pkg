@@ -1,16 +1,24 @@
 servos:
 
-#  - joint_name: neck_yaw
-#    channel: 15
-#    type: RCSERVO_KONDO_KRS78X
-#    trim: 0
-#    bus: PWM
+  - joint_name: neck_yaw
+    channel: 3
+    type: KONDO_ROS3030
+    trim: 0
+    bus: COM4
+    min_pwm: 1
+    max_pwm: 16382
+    min_rotation: -1.0471975512
+    max_rotation: 1.0471975512       
 
-#  - joint_name: neck_pitch
-#    channel: 16
-#    type: RCSERVO_KONDO_KRS78X
-#    trim: 0
-#    bus: PWM
+  - joint_name: neck_pitch
+    channel: 4
+    type: KONDO_ROS3030
+    trim: 0
+    bus: COM4
+    min_pwm: 1
+    max_pwm: 16382 
+    min_rotation: -1.0471975512
+    max_rotation: 1.0471975512       
 
   - joint_name: shoulder_left_pitch
     channel: 1
