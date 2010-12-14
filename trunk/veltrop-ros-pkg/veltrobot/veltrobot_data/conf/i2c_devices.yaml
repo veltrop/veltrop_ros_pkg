@@ -7,19 +7,19 @@ devices:
     publish_raw: true
     speed: 100000
     
-  - name: head_sonar
-    driver: SRF08
-    base_address: 224
-    pole_frequency: 1.0
-    publish_raw: true
-    speed: 400000
+#  - name: head_sonar
+#    driver: SRF08
+#    base_address: 224
+#    pole_frequency: 0.1
+#    publish_raw: true
+#    speed: 400000
 
   - name: gyro
     driver: ITG3200
     base_address: 210
     pole_frequency: 60.0
     publish_raw: false
-    speed: 400000
+    speed: 250000
     x_topic: roll
     y_topic: pitch
     x_calib: -32
