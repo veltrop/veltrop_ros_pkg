@@ -42,10 +42,10 @@ public:
                                     &ServoController::balancingJointStateCB, this); 
     receive_servo_command_sub_ = n_.subscribe("/servo_command", 1,
                                            &ServoController::receiveServoCommandCB, this);
-		receive_playmode_command_sub_ = n_.subscribe("/servo_playmode", 1,
-                                           &ServoController::receiveServoPlaymodeCB, this);                                           
-		receive_capturemode_command_sub_ = n_.subscribe("/servo_capturemode", 1,
-                                           &ServoController::receiveServoCapturemodeCB, this);                                           
+		//receive_playmode_command_sub_ = n_.subscribe("/servo_playmode", 1,
+    //                                       &ServoController::receiveServoPlaymodeCB, this);                                           
+		//receive_capturemode_command_sub_ = n_.subscribe("/servo_capturemode", 1,
+    //                                       &ServoController::receiveServoCapturemodeCB, this);                                           
 		update_config_sub_ = n_.subscribe("/update_config", 1, 
                                     &ServoController::receiveUpdateConfigCB, this);    
     capture_pose_srv_ = n_.advertiseService("/capture_pose", &ServoController::capturePoseCB, this);

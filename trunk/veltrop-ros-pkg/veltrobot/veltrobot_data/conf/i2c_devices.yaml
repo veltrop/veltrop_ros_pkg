@@ -19,11 +19,11 @@ devices:
     base_address: 210
     pole_frequency: 60.0
     publish_raw: false
-    speed: 250000
+    speed: 300000
     x_topic: roll
     y_topic: pitch
-    x_calib: -32
-    y_calib: -18
-    x_deadzone: 2
-    y_deadzone: 2
+    x_calib: -41
+    y_calib: -32
+    x_deadzone: 3
+    y_deadzone: 3
     

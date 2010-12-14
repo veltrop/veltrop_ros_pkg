@@ -2,8 +2,8 @@
 
 import os
 
-os.system("sudo chown root:root ~/veltrop-ros-pkg/roboard/roboard_servos/bin/joint_state_controlled > /dev/null 2>&1")
-os.system("sudo chmod +s ~/veltrop-ros-pkg/roboard/roboard_servos/bin/joint_state_controlled > /dev/null 2>&1")
+os.system("sudo chown root:root ~/veltrop-ros-pkg/roboard/roboard_servos/bin/servo_controller > /dev/null 2>&1")
+os.system("sudo chmod +s ~/veltrop-ros-pkg/roboard/roboard_servos/bin/servo_controller > /dev/null 2>&1")
 os.system("sudo chown root:root ~/veltrop-ros-pkg/roboard/roboard_sensors/bin/poll_ad > /dev/null 2>&1")
 os.system("sudo chmod +s ~/veltrop-ros-pkg/roboard/roboard_sensors/bin/poll_ad > /dev/null 2>&1")
 os.system("sudo chown root:root ~/veltrop-ros-pkg/roboard/roboard_sensors/bin/poll_i2c > /dev/null 2>&1")
