@@ -1,8 +1,8 @@
 <package>
   <description brief="veltrobot_teleop">
 
-     Control robots implemented as a veltrobot with the keyboard
-     or a PS3 controller.
+     Control robots with the keyboard, Sony PS3 six axis controller, or 
+     Microsoft XBox Kinect.
 
   </description>
   <author>Taylor Veltrop</author>
@@ -15,6 +15,8 @@
   <depend package="joy"/>
   <depend package="openni"/>
   <depend package="nite"/> 
+  <depend package="tf"/> 
+  <depend package="kdl"/> 
 
 </package>
 
