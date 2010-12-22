@@ -1,0 +1,15 @@
+<launch>
+  <node pkg="veltrobot_teleop" type="teleop_kinect" name="teleop_kinect"
+        output="screen" >
+		<!--remap from="camera" to="openni" /-->
+    <rosparam command="load" file="$(find openni_camera)/info/openni_params.yaml" />
+  </node>
+  
+  <include file="$(find openni_camera)/launch/kinect_frames.launch"/>
+  
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base" args="0 0 0 0 0 0  /world /torso 100" /> -->
+  
+</launch>
+
+
+<!-- args="/home/space/test/20101216-184313.oni" -->

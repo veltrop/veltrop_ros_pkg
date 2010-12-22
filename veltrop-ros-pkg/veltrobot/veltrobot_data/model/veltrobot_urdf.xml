@@ -140,9 +140,9 @@
     </link>
     <link name="arm_left_lower_x">
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="0 0 -0.0325" rpy="0 0 0" />
             <geometry>
-                <box size="0.025 0.025 0.025" />
+                <box size="0.025 0.025 0.085" />
             </geometry>
             <material name="green">
                 <color rgba="0 1 0 1" />
@@ -217,9 +217,9 @@
     </link>
     <link name="arm_right_lower_x">
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="0 0 -0.0325" rpy="0 0 0" />
             <geometry>
-                <box size="0.025 0.025 0.025" />
+                <box size="0.025 0.025 0.085" />
             </geometry>
             <material name="green">
                 <color rgba="0 1 0 1" />
