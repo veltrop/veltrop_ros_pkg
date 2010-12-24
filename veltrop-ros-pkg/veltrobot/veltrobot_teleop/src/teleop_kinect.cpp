@@ -210,6 +210,8 @@ namespace veltrobot_teleop
           js.position.push_back(right_shoulder_angle_yaw);
           js.velocity.push_back(10);         
                               
+          
+          /*
           js.name.push_back("neck_pitch");
           js.position.push_back(0);
           js.velocity.push_back(10);
@@ -253,7 +255,7 @@ namespace veltrobot_teleop
           js.name.push_back("ankle_right_roll");
           js.position.push_back(0);
           js.velocity.push_back(10);                
-                    
+          */          
 
 //    <joint name="base_yaw"  position="0.0" />
 //    <joint name="base_pitch"  position="0.0" />
