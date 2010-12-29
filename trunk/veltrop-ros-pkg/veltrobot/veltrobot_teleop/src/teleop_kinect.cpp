@@ -98,81 +98,127 @@ namespace veltrobot_teleop
           publishTransform(kinect_controller, user, XN_SKEL_RIGHT_HIP,      frame_id, "right_hip");
           publishTransform(kinect_controller, user, XN_SKEL_RIGHT_KNEE,     frame_id, "right_knee");
           publishTransform(kinect_controller, user, XN_SKEL_RIGHT_FOOT,     frame_id, "right_foot");  
-      		// 1? publish transform of two joints relative to openni_depth frame
-          // 2? request transform between two joints own frames 
       		
-          // 1 get points of three joints
-          // 2 do many specific calculations relating that geometry to my own
-          //   robots geometry
+          // two ways to go about this...
+          // 1 calculated approach
+          // 1.1? publish transform of two joints relative to openni_depth frame
+          // 1.2? request transform between two joints own frames 
+      		// 2 [nearly] direct aproach
+          // 2.1 get points of three joints
+          // 2.2 do many specific calculations relating that geometry to my own
+          //     robots geometry
 
 					// get joint positions
-					XnSkeletonJointPosition joint_position;
-        	UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_NECK, joint_position);
-          KDL::Vector neck(joint_position.position.X, joint_position.position.Y, joint_position.position.Z);
-        	UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_HAND, joint_position);
-        	KDL::Vector left_hand(joint_position.position.X, joint_position.position.Y, joint_position.position.Z);
-        	UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_ELBOW, joint_position);
-        	KDL::Vector left_elbow(joint_position.position.X, joint_position.position.Y, joint_position.position.Z);        
-         	UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_SHOULDER, joint_position);
-        	KDL::Vector left_shoulder(joint_position.position.X, joint_position.position.Y, joint_position.position.Z);        	        	
-          UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_HAND, joint_position);
-        	KDL::Vector right_hand(joint_position.position.X, joint_position.position.Y, joint_position.position.Z);
-          UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_ELBOW, joint_position);
-        	KDL::Vector right_elbow(joint_position.position.X, joint_position.position.Y, joint_position.position.Z);        
-         	UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_SHOULDER, joint_position);
-        	KDL::Vector right_shoulder(joint_position.position.X, joint_position.position.Y, joint_position.position.Z);
-        	
-            
-          
+					XnSkeletonJointPosition joint_position_neck;
+        	UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_NECK, joint_position_neck);
+          KDL::Vector neck(joint_position_neck.position.X, joint_position_neck.position.Y, joint_position_neck.position.Z);
+        	XnSkeletonJointPosition joint_position_left_hand;
+          UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_HAND, joint_position_left_hand);
+        	KDL::Vector left_hand(joint_position_left_hand.position.X, joint_position_left_hand.position.Y, joint_position_left_hand.position.Z);
+        	XnSkeletonJointPosition joint_position_left_elbow;
+          UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_ELBOW, joint_position_left_elbow);
+        	KDL::Vector left_elbow(joint_position_left_elbow.position.X, joint_position_left_elbow.position.Y, joint_position_left_elbow.position.Z);        
+         	XnSkeletonJointPosition joint_position_left_shoulder;
+          UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_SHOULDER, joint_position_left_shoulder);
+        	KDL::Vector left_shoulder(joint_position_left_shoulder.position.X, joint_position_left_shoulder.position.Y, joint_position_left_shoulder.position.Z);        	        	
+          XnSkeletonJointPosition joint_position_right_hand;
+          UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_HAND, joint_position_right_hand);
+        	KDL::Vector right_hand(joint_position_right_hand.position.X, joint_position_right_hand.position.Y, joint_position_right_hand.position.Z);
+          XnSkeletonJointPosition joint_position_right_elbow;
+          UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_ELBOW, joint_position_right_elbow);
+        	KDL::Vector right_elbow(joint_position_right_elbow.position.X, joint_position_right_elbow.position.Y, joint_position_right_elbow.position.Z);        
+         	XnSkeletonJointPosition joint_position_right_shoulder;
+          UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_SHOULDER, joint_position_right_shoulder);
+        	KDL::Vector right_shoulder(joint_position_right_shoulder.position.X, joint_position_right_shoulder.position.Y, joint_position_right_shoulder.position.Z);
+        	          
           // left elbow roll
           KDL::Vector left_elbow_hand(left_hand - left_elbow);
         	KDL::Vector left_elbow_shoulder(left_shoulder - left_elbow);
           left_elbow_hand.Normalize();
           left_elbow_shoulder.Normalize();
-          double left_elbow_angle_roll = acos(KDL::dot(left_elbow_hand, left_elbow_shoulder));
-          left_elbow_angle_roll = left_elbow_angle_roll - PI;
+          static double left_elbow_angle_roll = 0;
+          if (joint_position_left_hand.fConfidence >= 0.5 && 
+          		joint_position_left_elbow.fConfidence >= 0.5 && 
+              joint_position_left_shoulder.fConfidence >= 0.5)
+          {
+          	left_elbow_angle_roll = acos(KDL::dot(left_elbow_hand, left_elbow_shoulder));
+          	left_elbow_angle_roll = left_elbow_angle_roll - PI;
+          }
           
           // right elbow roll
         	KDL::Vector right_elbow_hand(right_hand - right_elbow);
         	KDL::Vector right_elbow_shoulder(right_shoulder - right_elbow);
           right_elbow_hand.Normalize();
           right_elbow_shoulder.Normalize();
-          double right_elbow_angle_roll = acos(KDL::dot(right_elbow_hand, right_elbow_shoulder));
-        	right_elbow_angle_roll = -(right_elbow_angle_roll - PI);  
+          static double right_elbow_angle_roll = 0;
+          if (joint_position_right_hand.fConfidence >= 0.5 && 
+          		joint_position_right_elbow.fConfidence >= 0.5 && 
+              joint_position_right_shoulder.fConfidence >= 0.5)
+          {          
+          	right_elbow_angle_roll = acos(KDL::dot(right_elbow_hand, right_elbow_shoulder));
+        		right_elbow_angle_roll = -(right_elbow_angle_roll - PI);
+          }  
                   
           // left shoulder roll
           KDL::Vector left_shoulder_elbow(left_elbow - left_shoulder);
         	KDL::Vector left_shoulder_neck(neck - left_shoulder);
           left_shoulder_elbow.Normalize();
           left_shoulder_neck.Normalize();
-          double left_shoulder_angle_roll = acos(KDL::dot(left_shoulder_elbow, left_shoulder_neck));
-          left_shoulder_angle_roll = left_shoulder_angle_roll - HALFPI;
+          static double left_shoulder_angle_roll = 0;
+          if (joint_position_neck.fConfidence >= 0.5 && 
+          		joint_position_left_elbow.fConfidence >= 0.5 && 
+              joint_position_left_shoulder.fConfidence >= 0.5)
+          {
+          	left_shoulder_angle_roll = acos(KDL::dot(left_shoulder_elbow, left_shoulder_neck));
+          	left_shoulder_angle_roll = left_shoulder_angle_roll - HALFPI;
+          }
                    
           // right shoulder roll
           KDL::Vector right_shoulder_elbow(right_elbow - right_shoulder);
         	KDL::Vector right_shoulder_neck(neck - right_shoulder);
           right_shoulder_elbow.Normalize();
           right_shoulder_neck.Normalize();
-          double right_shoulder_angle_roll = acos(KDL::dot(right_shoulder_elbow, right_shoulder_neck));
-          right_shoulder_angle_roll = -(right_shoulder_angle_roll - HALFPI);                                      
-                   
+          static double right_shoulder_angle_roll = 0;
+          if (joint_position_neck.fConfidence >= 0.5 && 
+          		joint_position_right_elbow.fConfidence >= 0.5 && 
+              joint_position_right_shoulder.fConfidence >= 0.5)
+          {     
+          	right_shoulder_angle_roll = acos(KDL::dot(right_shoulder_elbow, right_shoulder_neck));
+          	right_shoulder_angle_roll = -(right_shoulder_angle_roll - HALFPI);                                      
+          } 
+                          
           // left shoulder pitch
-          double left_shoulder_angle_pitch = asin(left_shoulder_elbow.y());
-          left_shoulder_angle_pitch = left_shoulder_angle_pitch + HALFPI;
+          static double left_shoulder_angle_pitch = 0;
+          if (joint_position_left_shoulder.fConfidence >= 0.5)
+          { 
+          	left_shoulder_angle_pitch = asin(left_shoulder_elbow.y());
+          	left_shoulder_angle_pitch = left_shoulder_angle_pitch + HALFPI;
+          }
           
   				// right shoulder pitch
-          double right_shoulder_angle_pitch = asin(right_shoulder_elbow.y());
-          right_shoulder_angle_pitch = -(right_shoulder_angle_pitch + HALFPI);
+          static double right_shoulder_angle_pitch = 0;
+        	if (joint_position_right_shoulder.fConfidence >= 0.5)
+          { 
+          	right_shoulder_angle_pitch = asin(right_shoulder_elbow.y());
+          	right_shoulder_angle_pitch = -(right_shoulder_angle_pitch + HALFPI);
+          }
                                                         
           // left shoulder yaw
-        	double left_shoulder_angle_yaw = asin(left_elbow_hand.y());  // left_shoulder_elbow.x()
+        	static double left_shoulder_angle_yaw = 0;
+          if (joint_position_left_shoulder.fConfidence >= 0.5)
+          {           
+          	left_shoulder_angle_yaw = asin(left_elbow_hand.y());  // left_shoulder_elbow.x()
+          }
           
           // right shoulder yaw
-        	double right_shoulder_angle_yaw = asin(right_elbow_hand.y());  // left_shoulder_elbow.x()
-					right_shoulder_angle_yaw = -right_shoulder_angle_yaw;
+        	static double right_shoulder_angle_yaw = 0;
+          if (joint_position_right_shoulder.fConfidence >= 0.5)
+          {  
+          	right_shoulder_angle_yaw = asin(right_elbow_hand.y());  // left_shoulder_elbow.x()
+						right_shoulder_angle_yaw = -right_shoulder_angle_yaw;
+          }
           
           // hand open/close or palm recognition to control grippers
-          
           
           // PROBLEM:
           // doing each of the 3 degrees of freedom in the shoulder separately is having problems.
