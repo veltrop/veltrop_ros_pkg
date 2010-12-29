@@ -59,7 +59,17 @@ private:
     	mot.data = "walk_backward";
       prev_button = true;
     }
-                      
+    else if (joy->buttons[3])
+		{
+      mot.data = "init";
+      prev_button = false;
+    }
+    else if (joy->buttons[0])
+    {
+    	mot.data = "stand_squat";
+      prev_button = false;
+    }
+                         
     if (joy->buttons[1])
     {    
       float neck_yaw = joy->axes[0] * -1.57;
