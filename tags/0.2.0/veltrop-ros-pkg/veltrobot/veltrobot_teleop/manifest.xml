@@ -1,0 +1,23 @@
+<package>
+  <description brief="veltrobot_teleop">
+
+     Control robots with the keyboard, Sony PS3 six axis controller, or 
+     Microsoft XBox Kinect.
+
+  </description>
+  <author>Taylor Veltrop</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-ros-pkg</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="joy"/>
+  <depend package="openni"/>
+  <depend package="nite"/> 
+  <depend package="tf"/> 
+  <depend package="kdl"/> 
+
+</package>
+
+
