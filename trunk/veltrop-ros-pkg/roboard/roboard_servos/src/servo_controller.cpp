@@ -160,8 +160,12 @@ private:
     {
       //std::string& joint_name = i->first;
       Servo& servo = i->second;
-      if (servo.channel_ != -1)
-        rcservo_SetServo(servo.channel_, servo.type_);
+      if (servo.channel_ >= 1 && servo.channel_ <= 32 && servo.bus_ == Servo::PWM)
+      {
+        rcservo_SetServo(servo.channel_ - 1, servo.type_);
+        if (servo.min_pwm_ != 700 || servo.max_pwm_ != 2300)
+        	rcservo_SetServoParams1(servo.channel_ - 1, 8000L, servo.min_pwm_, servo.max_pwm_);
+      }
     }
             
     if (rcservo_Initialize(servos_.getUsedPWMChannels()) == true)

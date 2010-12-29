@@ -14,7 +14,7 @@ Servo::Servo()
       , joint_name_("")
       , trim_pwm_(0)
       , max_pwm_(2300)
-      , min_pwm_(700)
+      , min_pwm_(700)    
       , max_rot_(HALFPI)
       , min_rot_(-HALFPI)
       , bus_(PWM)
@@ -27,7 +27,7 @@ Servo::Servo(XmlRpc::XmlRpcValue& servo_info)
       , joint_name_("")
       , trim_pwm_(0)
       , max_pwm_(2300)
-      , min_pwm_(700)
+      , min_pwm_(700)     
       , max_rot_(HALFPI)
       , min_rot_(-HALFPI)
       , bus_(PWM)
@@ -43,6 +43,10 @@ Servo::Servo(XmlRpc::XmlRpcValue& servo_info)
     std::string type_string = servo_info["type"];
     if (type_string == "RCSERVO_KONDO_KRS78X")
       type_ = RCSERVO_KONDO_KRS78X;
+    else if (type_string == "RCSERVO_KONDO_KRS788")
+      type_ = RCSERVO_KONDO_KRS788;
+    else if (type_string == "RCSERVO_KONDO_KRS4014")
+      type_ = RCSERVO_KONDO_KRS4014;      
     else if (type_string == "RCSERVO_HITEC_HSR8498")
       type_ = RCSERVO_HITEC_HSR8498;
     else if (type_string == "KONDO_ROS3030")
@@ -66,7 +70,7 @@ Servo::Servo(XmlRpc::XmlRpcValue& servo_info)
   if (servo_info.hasMember("min_pwm"))
     min_pwm_ = (int)servo_info["min_pwm"];
   if (servo_info.hasMember("max_pwm"))
-    max_pwm_ = (int)servo_info["max_pwm"]; 
+    max_pwm_ = (int)servo_info["max_pwm"];    
     
   if (servo_info.hasMember("trim"))
     trim_pwm_ = servo_info["trim"];  
