@@ -1,0 +1,4 @@
+string[] requestedJointNames
+---
+string[]  jointNames
+float32[] jointPositions
