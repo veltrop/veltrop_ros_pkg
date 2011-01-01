@@ -375,12 +375,15 @@ void glutKeyboard (unsigned char key, int x, int y)
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "teleop_kinect");
-  ros::NodeHandle n;
-  g_teleop_kinect.init();
-  char* onifile = NULL;
-  if (argc > 1)
-  	onifile = argv[1];
-  g_kinect_controller.init(onifile);
+	ros::NodeHandle np("~");
+  
+	string filepath;
+	bool is_recording;
+	np.getParam("load_filepath", filepath); 
+	np.param<bool>("load_recording", is_recording, false);      
+		
+	g_teleop_kinect.init();
+	g_kinect_controller.init(filepath.c_str(), is_recording);
   
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
