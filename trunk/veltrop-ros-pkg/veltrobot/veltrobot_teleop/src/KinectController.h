@@ -8,7 +8,7 @@ class KinectController
 {
 	public:
   	KinectController();
-    int init(char* recording=NULL);
+    int init(const char* path, bool recording=false);
     int shutdown();
     
     xn::UserGenerator&  getUserGenerator();

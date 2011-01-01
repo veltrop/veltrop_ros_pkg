@@ -1,7 +1,8 @@
 <launch>
   <node pkg="veltrobot_teleop" type="teleop_kinect" name="teleop_kinect"
         output="screen" >
-		<!--remap from="camera" to="openni" /-->
+		<param name="load_filepath" value="$(find openni)/lib/SamplesConfig.xml" />
+    <param name="load_recording" value="false" />
     <rosparam command="load" file="$(find openni_camera)/info/openni_params.yaml" />
   </node>
   
@@ -10,6 +11,3 @@
   <!-- <node pkg="tf" type="static_transform_publisher" name="base" args="0 0 0 0 0 0  /world /torso 100" /> -->
   
 </launch>
-
-
-<!-- args="/home/space/test/20101216-184313.oni" -->

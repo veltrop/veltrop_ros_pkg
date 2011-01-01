@@ -3,8 +3,6 @@
 
 #include "KinectController.h"
 
-#define SAMPLE_XML_PATH "/home/space/ni/ni/openni/lib/SamplesConfig.xml"
-
 #define CHECK_RC(nRetVal, what)										\
 	if (nRetVal != XN_STATUS_OK)									\
 	{																\
@@ -99,7 +97,7 @@ void XN_CALLBACK_TYPE UserCalibration_CalibrationEnd(xn::SkeletonCapability& cap
 }
 
 
-int KinectController::init(char* recording)
+int KinectController::init(const char* path, bool recording)
 {
 	XnStatus nRetVal = XN_STATUS_OK;
 
@@ -107,16 +105,16 @@ int KinectController::init(char* recording)
 	{
 		nRetVal = g_Context.Init();
 		CHECK_RC(nRetVal, "Init");
-		nRetVal = g_Context.OpenFileRecording(recording);
+		nRetVal = g_Context.OpenFileRecording(path);
 		if (nRetVal != XN_STATUS_OK)
 		{
-			printf("Can't open recording %s: %s\n", recording, xnGetStatusString(nRetVal));
+			printf("Can't open recording %s: %s\n", path, xnGetStatusString(nRetVal));
 			return 1;
 		}
 	}
 	else
 	{
-		nRetVal = g_Context.InitFromXmlFile(SAMPLE_XML_PATH);
+		nRetVal = g_Context.InitFromXmlFile(path);
 		CHECK_RC(nRetVal, "InitFromXml");
 	}
 
