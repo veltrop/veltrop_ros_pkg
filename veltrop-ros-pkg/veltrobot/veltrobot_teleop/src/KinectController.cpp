@@ -18,6 +18,7 @@ XnBool KinectController::g_bNeedPose = FALSE;
 XnChar KinectController::g_strPose[20] = "";
 
 KinectController::KinectController()
+: running_(false)
 {
 }
 
@@ -152,6 +153,8 @@ int KinectController::init(const char* path, bool recording)
 
 	nRetVal = g_Context.StartGeneratingAll();
 	CHECK_RC(nRetVal, "StartGenerating");
+	
+	running_ = true;
   
   return 0;
 }
@@ -159,5 +162,6 @@ int KinectController::init(const char* path, bool recording)
 int KinectController::shutdown()
 {
 	g_Context.Shutdown();
+	running_ = false;
   return 0;
 }
