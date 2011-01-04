@@ -10,7 +10,8 @@ class KinectController
   	KinectController();
     int init(const char* path, bool recording=false);
     int shutdown();
-    
+    bool isRunning() { return running_; }
+		
     xn::UserGenerator&  getUserGenerator();
     xn::DepthGenerator& getDepthGenerator();
 		xn::Context&        getContext();
@@ -22,6 +23,9 @@ class KinectController
 
 		static XnBool g_bNeedPose;
 		static XnChar g_strPose[20];
+		
+	private:
+		bool running_;
 };
 
 #endif 

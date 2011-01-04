@@ -16,7 +16,7 @@
   <depend package="openni"/>
   <depend package="nite"/> 
   <depend package="tf"/> 
-  <depend package="kdl"/> 
+  <depend package="kdl"/>
 
 </package>
 

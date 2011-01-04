@@ -5,6 +5,7 @@
 #include <kdl/frames.hpp>
 #include <GL/glut.h>
 #include <string>
+#include <pthread.h>
 #include "KinectController.h"
 #include "KinectDisplay.h"
 
@@ -27,14 +28,17 @@ namespace veltrobot_teleop
   {
     public:
       TeleopKinect()
+			: publish_kinect_tf_(false)
       {    
       }
       
       void init()
       {
         ros::NodeHandle n;
+				ros::NodeHandle np("~");
         motion_pub_ = n.advertise <std_msgs::String> ("motion_name", 1);
         joint_states_pub_ = n.advertise<sensor_msgs::JointState>("/joint_states", 1);
+				np.param<bool>("publish_kinect_tf_", publish_kinect_tf_, false);  
       }
       
       void publishTransform(KinectController& kinect_controller, XnUserID const& user, XnSkeletonJoint const& joint, string const& frame_id, string const& child_frame_id)
@@ -66,8 +70,8 @@ namespace veltrobot_teleop
         
       void processKinect(KinectController& kinect_controller)
       {
-        XnUserID users[15];
-        XnUInt16 users_count = 15;
+        XnUserID users[2];
+        XnUInt16 users_count = 2;
         xn::UserGenerator& UserGenerator = kinect_controller.getUserGenerator();
         UserGenerator.GetUsers(users, users_count);
 
@@ -76,30 +80,33 @@ namespace veltrobot_teleop
           XnUserID user = users[i];
           if (!UserGenerator.GetSkeletonCap().IsTracking(user))
             continue;
-            
-          string frame_id("openni_depth");
+          
+					if (publish_kinect_tf_)
+					{
+						string frame_id("openni_depth");
 
-          publishTransform(kinect_controller, user, XN_SKEL_HEAD,           frame_id, "head");
-          publishTransform(kinect_controller, user, XN_SKEL_NECK,           frame_id, "neck");
-          publishTransform(kinect_controller, user, XN_SKEL_TORSO,          frame_id, "torso");
+						publishTransform(kinect_controller, user, XN_SKEL_HEAD,           frame_id, "head");
+						publishTransform(kinect_controller, user, XN_SKEL_NECK,           frame_id, "neck");
+						publishTransform(kinect_controller, user, XN_SKEL_TORSO,          frame_id, "torso");
 
-          publishTransform(kinect_controller, user, XN_SKEL_LEFT_SHOULDER,  frame_id, "left_shoulder");
-          publishTransform(kinect_controller, user, XN_SKEL_LEFT_ELBOW,     frame_id, "left_elbow");
-          publishTransform(kinect_controller, user, XN_SKEL_LEFT_HAND,      frame_id, "left_hand");
+						publishTransform(kinect_controller, user, XN_SKEL_LEFT_SHOULDER,  frame_id, "left_shoulder");
+						publishTransform(kinect_controller, user, XN_SKEL_LEFT_ELBOW,     frame_id, "left_elbow");
+						publishTransform(kinect_controller, user, XN_SKEL_LEFT_HAND,      frame_id, "left_hand");
 
-          publishTransform(kinect_controller, user, XN_SKEL_RIGHT_SHOULDER, frame_id, "right_shoulder");
-          publishTransform(kinect_controller, user, XN_SKEL_RIGHT_ELBOW,    frame_id, "right_elbow");
-          publishTransform(kinect_controller, user, XN_SKEL_RIGHT_HAND,     frame_id, "right_hand");
+						publishTransform(kinect_controller, user, XN_SKEL_RIGHT_SHOULDER, frame_id, "right_shoulder");
+						publishTransform(kinect_controller, user, XN_SKEL_RIGHT_ELBOW,    frame_id, "right_elbow");
+						publishTransform(kinect_controller, user, XN_SKEL_RIGHT_HAND,     frame_id, "right_hand");
 
-          publishTransform(kinect_controller, user, XN_SKEL_LEFT_HIP,       frame_id, "left_hip");
-          publishTransform(kinect_controller, user, XN_SKEL_LEFT_KNEE,      frame_id, "left_knee");
-          publishTransform(kinect_controller, user, XN_SKEL_LEFT_FOOT,      frame_id, "left_foot");
+						publishTransform(kinect_controller, user, XN_SKEL_LEFT_HIP,       frame_id, "left_hip");
+						publishTransform(kinect_controller, user, XN_SKEL_LEFT_KNEE,      frame_id, "left_knee");
+						publishTransform(kinect_controller, user, XN_SKEL_LEFT_FOOT,      frame_id, "left_foot");
 
-          publishTransform(kinect_controller, user, XN_SKEL_RIGHT_HIP,      frame_id, "right_hip");
-          publishTransform(kinect_controller, user, XN_SKEL_RIGHT_KNEE,     frame_id, "right_knee");
-          publishTransform(kinect_controller, user, XN_SKEL_RIGHT_FOOT,     frame_id, "right_foot");  
+						publishTransform(kinect_controller, user, XN_SKEL_RIGHT_HIP,      frame_id, "right_hip");
+						publishTransform(kinect_controller, user, XN_SKEL_RIGHT_KNEE,     frame_id, "right_knee");
+						publishTransform(kinect_controller, user, XN_SKEL_RIGHT_FOOT,     frame_id, "right_foot");  
+					}
       		
-          // two ways to go about this...
+          // two ways to go about this direct geometry approach...
           // 1 calculated approach
           // 1.1? publish transform of two joints relative to openni_depth frame
           // 1.2? request transform between two joints own frames 
@@ -222,12 +229,18 @@ namespace veltrobot_teleop
           
           // PROBLEM:
           // doing each of the 3 degrees of freedom in the shoulder separately is having problems.
-          // 1. the acos has no sign, it only reads less than one quater pi rotation
+          // 1. the acos has no sign, it only reads less than one half pi rotation
           // 2. there is a paradox/redundancy with joint movement to be considered: ie, to lift the
           //    arm vertically up it could either rotate the pitch or roll joint by one pi
           // SOLUTION?:
           // if we take the raw tf rotation from the input shoulder, can we apply that to our
           // final dof of our shoulder chain, and then back solve for the two joints leading to it?
+					// or do that from the hand?
+					
+					// knee left pitch
+					static double knee_left_angle_pitch = 0;
+					
+					
         
         	// send to robot
           sensor_msgs::JointState js; 
@@ -255,8 +268,14 @@ namespace veltrobot_teleop
           js.name.push_back("shoulder_right_yaw");
           js.position.push_back(right_shoulder_angle_yaw);
           js.velocity.push_back(10);         
-                              
-          
+   
+          js.name.push_back("knee_left_pitch");
+          js.position.push_back(knee_left_angle_pitch);
+          js.velocity.push_back(10);
+          js.name.push_back("knee_right_pitch");
+          js.position.push_back(knee_right_angle_pitch);
+          js.velocity.push_back(10);
+					          
           /*
           js.name.push_back("neck_pitch");
           js.position.push_back(0);
@@ -274,9 +293,6 @@ namespace veltrobot_teleop
           js.name.push_back("hip_left_pitch");
           js.position.push_back(0);
           js.velocity.push_back(10);
-          js.name.push_back("knee_left_pitch");
-          js.position.push_back(0);
-          js.velocity.push_back(10);
           js.name.push_back("ankle_left_pitch");
           js.position.push_back(0);
           js.velocity.push_back(10);
@@ -292,9 +308,6 @@ namespace veltrobot_teleop
           js.name.push_back("hip_right_pitch");
           js.position.push_back(0);
           js.velocity.push_back(10);
-          js.name.push_back("knee_right_pitch");
-          js.position.push_back(0);
-          js.velocity.push_back(10);
           js.name.push_back("ankle_right_pitch");
           js.position.push_back(0);
           js.velocity.push_back(10);
@@ -303,15 +316,16 @@ namespace veltrobot_teleop
           js.velocity.push_back(10);                
           */          
 
-//    <joint name="base_yaw"  position="0.0" />
-//    <joint name="base_pitch"  position="0.0" />
-//    <joint name="base_roll"  position="0.0" />
-//    <joint name="base"  position="0.0" />
-//    <joint name="stereo_camera_fixed"  position="0.0" />                                    
+					/*
+					<joint name="base_yaw"  position="0.0" />
+					<joint name="base_pitch"  position="0.0" />
+					<joint name="base_roll"  position="0.0" />
+					<joint name="base"  position="0.0" />
+					<joint name="stereo_camera_fixed"  position="0.0" />
+					*/                                 
 
           joint_states_pub_.publish(js);
-        
-        
+			
         	break;	// only read first user
         }
       }
@@ -319,45 +333,52 @@ namespace veltrobot_teleop
     private:
       ros::Publisher   motion_pub_;
       ros::Publisher   joint_states_pub_;
+			bool             publish_kinect_tf_;
   };
 
 } // namespace veltrobot_teleop
 
 
-#define GL_WIN_SIZE_X 720
-#define GL_WIN_SIZE_Y 480
+#define GL_WIN_SIZE_X 320
+#define GL_WIN_SIZE_Y 240
 KinectController g_kinect_controller;
 veltrobot_teleop::TeleopKinect g_teleop_kinect;
+bool g_running = false;
+pthread_mutex_t g_kinect_data_mutex;
+
+xn::UserGenerator g_user_genearator;
+xn::DepthGenerator g_depth_genearator;
 
 void glutIdle (void)
 {
+	// using loop_rate is less CPU intensive than an ROS timer.
+	static ros::Rate loop_rate(15); // limit 15 fps display
 	glutPostRedisplay();
+	loop_rate.sleep();
 }
 
 void glutDisplay (void)
 {
 	xn::SceneMetaData sceneMD;
 	xn::DepthMetaData depthMD;
-  
-  g_kinect_controller.getContext().WaitAndUpdateAll();
-  g_teleop_kinect.processKinect(g_kinect_controller);
-  g_kinect_controller.getDepthGenerator().GetMetaData(depthMD);
-  g_kinect_controller.getUserGenerator().GetUserPixels(0, sceneMD);  
 	
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Setup the OpenGL viewpoint
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-
-	glOrtho(0, depthMD.XRes(), depthMD.YRes(), 0, -1.0, 1.0);
-  
-  glDisable(GL_TEXTURE_2D);
-  
-  kinect_display_drawDepthMapGL(depthMD, sceneMD);
-	kinect_display_drawSkeletonGL(g_kinect_controller.getUserGenerator(),
-                                g_kinect_controller.getDepthGenerator());  
+	
+	pthread_mutex_lock(&g_kinect_data_mutex);	
+	{
+		g_depth_genearator.GetMetaData(depthMD);
+		g_user_genearator.GetUserPixels(0, sceneMD); 	
+		
+		glOrtho(0, depthMD.XRes(), depthMD.YRes(), 0, -1.0, 1.0);
+		kinect_display_drawDepthMapGL(depthMD, sceneMD);
+		kinect_display_drawSkeletonGL(g_user_genearator,
+																	g_depth_genearator);
+	}															
+	pthread_mutex_unlock(&g_kinect_data_mutex);
   
 	glutSwapBuffers();
 }
@@ -370,6 +391,24 @@ void glutKeyboard (unsigned char key, int x, int y)
     exit(1);
     break;
 	}
+}
+
+void* updateKinectThread(void *ptr)
+{
+	while (g_running)
+	{
+		g_kinect_controller.getContext().WaitAndUpdateAll();
+		g_teleop_kinect.processKinect(g_kinect_controller);
+		
+		pthread_mutex_lock(&g_kinect_data_mutex);	
+		{		
+			g_depth_genearator = g_kinect_controller.getDepthGenerator();
+			g_user_genearator = g_kinect_controller.getUserGenerator();
+		}
+		pthread_mutex_unlock(&g_kinect_data_mutex);
+	}
+	
+	return NULL;
 }
 
 int main(int argc, char** argv)
@@ -391,19 +430,28 @@ int main(int argc, char** argv)
 	glutCreateWindow ("Veltrobot Kinect Controller");
 	//glutFullScreen();
 	//glutSetCursor(GLUT_CURSOR_NONE);
-
 	glutKeyboardFunc(glutKeyboard);
 	glutDisplayFunc(glutDisplay);
 	glutIdleFunc(glutIdle);
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
-
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);  
-  
+
+  g_running = true;
+	static pthread_t kinect_thread;
+	static pthread_attr_t kinect_thread_attr;
+	
+	pthread_mutex_init (&g_kinect_data_mutex, NULL);
+
+	int rv;
+	if ((rv = pthread_create(&kinect_thread, &kinect_thread_attr, updateKinectThread, NULL)) != 0)
+		ROS_FATAL("Unable to create kinect thread: rv = %d", rv);
   glutMainLoop();
-  
+  g_running = false;
+	pthread_join(kinect_thread, NULL);//(void **)&rv);
+		
   g_kinect_controller.shutdown();
   
 	return 0;
