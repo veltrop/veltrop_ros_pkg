@@ -4,6 +4,7 @@
 #include <geometry_msgs/Twist.h>
 #include <tf/transform_broadcaster.h>
 #include <kdl/frames.hpp>
+#include <veltrobot_msgs/EnableJointGroup.h>
 #include "KinectTeleop.h"
 #include <string>
 
@@ -26,6 +27,8 @@ namespace veltrobot_teleop
 
 KinectTeleop::KinectTeleop()
 : publish_kinect_tf_(false)
+, arms_enabled_(false)
+, legs_enabled_(false)
 {    
 }
       
@@ -37,6 +40,19 @@ void KinectTeleop::init()
 	joint_states_pub_ = n.advertise<sensor_msgs::JointState>("/joint_states", 1);
 	cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 	np.param<bool>("publish_kinect_tf_", publish_kinect_tf_, false);  
+  enable_joint_group_sub_ = n.subscribe("/enable_joint_group", 1,
+                                        &KinectTeleop::enableJointGroupCB, this);
+}
+
+void KinectTeleop::enableJointGroupCB(const veltrobot_msgs::EnableJointGroupConstPtr& msg)
+{
+	for (size_t i=0; i < msg->jointGroups.size(); i++)
+  {
+  	if (msg->jointGroups[i] == "legs")
+    	legs_enabled_ = msg->enabledStates[i];
+    else if (msg->jointGroups[i] == "arms")
+    	arms_enabled_ = msg->enabledStates[i];
+  }
 }
       
 void KinectTeleop::publishTransform(KinectController& kinect_controller,
@@ -506,85 +522,85 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		/////
 		
 		sensor_msgs::JointState js; 
-		js.name.push_back("elbow_left_roll");
-		js.position.push_back(left_elbow_angle_roll);
-		js.velocity.push_back(10);
-		js.name.push_back("elbow_right_roll");
-		js.position.push_back(right_elbow_angle_roll);
-		js.velocity.push_back(10);
-		js.name.push_back("shoulder_left_roll");
-		js.position.push_back(left_shoulder_angle_roll);
-		js.velocity.push_back(10);
-		js.name.push_back("shoulder_right_roll");
-		js.position.push_back(right_shoulder_angle_roll);
-		js.velocity.push_back(10);          
-		js.name.push_back("shoulder_left_pitch");
-		js.position.push_back(left_shoulder_angle_pitch);
-		js.velocity.push_back(10);
-		js.name.push_back("shoulder_right_pitch");
-		js.position.push_back(right_shoulder_angle_pitch);
-		js.velocity.push_back(10);          
-		js.name.push_back("shoulder_left_yaw");
-		js.position.push_back(left_shoulder_angle_yaw);
-		js.velocity.push_back(10);
-		js.name.push_back("shoulder_right_yaw");
-		js.position.push_back(right_shoulder_angle_yaw);
-		js.velocity.push_back(10);            
-		js.name.push_back("knee_left_pitch");
-		js.position.push_back(knee_left_angle_pitch);
-		js.velocity.push_back(10);
-		js.name.push_back("knee_right_pitch");
-		js.position.push_back(knee_right_angle_pitch);
-		js.velocity.push_back(10);
-		js.name.push_back("hip_left_roll");
-		js.position.push_back(hip_left_angle_roll);
-		js.velocity.push_back(10);		
-		js.name.push_back("hip_right_roll");
-		js.position.push_back(hip_right_angle_roll);
-		js.velocity.push_back(10);		
-		js.name.push_back("ankle_left_pitch");
-		js.position.push_back(left_ankle_angle_pitch);
-		js.velocity.push_back(10);		
-		js.name.push_back("ankle_right_pitch");
-		js.position.push_back(right_ankle_angle_pitch);
-		js.velocity.push_back(10);
-		js.name.push_back("ankle_left_roll");
-		js.position.push_back(left_ankle_angle_roll);
-		js.velocity.push_back(10);		
-		js.name.push_back("ankle_right_roll");
-		js.position.push_back(right_ankle_angle_roll);
-		js.velocity.push_back(10);   
+    
+    if (arms_enabled_)
+    {
+      js.name.push_back("elbow_left_roll");
+      js.position.push_back(left_elbow_angle_roll);
+      js.velocity.push_back(10);
+      js.name.push_back("elbow_right_roll");
+      js.position.push_back(right_elbow_angle_roll);
+      js.velocity.push_back(10);
+      js.name.push_back("shoulder_left_roll");
+      js.position.push_back(left_shoulder_angle_roll);
+      js.velocity.push_back(10);
+      js.name.push_back("shoulder_right_roll");
+      js.position.push_back(right_shoulder_angle_roll);
+      js.velocity.push_back(10);          
+      js.name.push_back("shoulder_left_pitch");
+      js.position.push_back(left_shoulder_angle_pitch);
+      js.velocity.push_back(10);
+      js.name.push_back("shoulder_right_pitch");
+      js.position.push_back(right_shoulder_angle_pitch);
+      js.velocity.push_back(10);          
+      js.name.push_back("shoulder_left_yaw");
+      js.position.push_back(left_shoulder_angle_yaw);
+      js.velocity.push_back(10);
+      js.name.push_back("shoulder_right_yaw");
+      js.position.push_back(right_shoulder_angle_yaw);
+      js.velocity.push_back(10);    
+    }        
+    
+    if (legs_enabled_)
+    {
+      js.name.push_back("knee_left_pitch");
+      js.position.push_back(knee_left_angle_pitch);
+      js.velocity.push_back(10);
+      js.name.push_back("knee_right_pitch");
+      js.position.push_back(knee_right_angle_pitch);
+      js.velocity.push_back(10);
+      js.name.push_back("hip_left_roll");
+      js.position.push_back(hip_left_angle_roll);
+      js.velocity.push_back(10);		
+      js.name.push_back("hip_right_roll");
+      js.position.push_back(hip_right_angle_roll);
+      js.velocity.push_back(10);		
+      js.name.push_back("ankle_left_pitch");
+      js.position.push_back(left_ankle_angle_pitch);
+      js.velocity.push_back(10);		
+      js.name.push_back("ankle_right_pitch");
+      js.position.push_back(right_ankle_angle_pitch);
+      js.velocity.push_back(10);
+      js.name.push_back("ankle_left_roll");
+      js.position.push_back(left_ankle_angle_roll);
+      js.velocity.push_back(10);		
+      js.name.push_back("ankle_right_roll");
+      js.position.push_back(right_ankle_angle_roll);
+      js.velocity.push_back(10); 
+      
+      js.name.push_back("hip_left_yaw");
+      js.position.push_back(0);
+      js.velocity.push_back(10);
+      js.name.push_back("hip_left_pitch");
+      js.position.push_back(0);
+      js.velocity.push_back(10);
+      
+      js.name.push_back("hip_right_yaw");
+      js.position.push_back(0);
+      js.velocity.push_back(10);
+      js.name.push_back("hip_right_pitch");
+      js.position.push_back(0);
+      js.velocity.push_back(10);
+    }  
 		
-		
-
-				
-		
+    /*
 		js.name.push_back("neck_pitch");
 		js.position.push_back(head_angle_pitch);
 		js.velocity.push_back(10);
 		js.name.push_back("neck_yaw");
 		js.position.push_back(head_angle_yaw);
 		js.velocity.push_back(10);
-		
-		
-
-		js.name.push_back("hip_left_yaw");
-		js.position.push_back(0);
-		js.velocity.push_back(10);
-		js.name.push_back("hip_left_pitch");
-		js.position.push_back(0);
-		js.velocity.push_back(10);
-
-		
-		js.name.push_back("hip_right_yaw");
-		js.position.push_back(0);
-		js.velocity.push_back(10);
-		js.name.push_back("hip_right_pitch");
-		js.position.push_back(0);
-		js.velocity.push_back(10);
-		
-
-             
+		*/
 
 		//cmd_vel_pub_.publish(cmd_vel);
 		joint_states_pub_.publish(js);
