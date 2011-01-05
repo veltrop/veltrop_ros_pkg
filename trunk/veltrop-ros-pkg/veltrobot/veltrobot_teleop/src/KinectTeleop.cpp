@@ -255,8 +255,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 				joint_position_left_elbow.fConfidence >= 0.5 && 
 				joint_position_left_shoulder.fConfidence >= 0.5)
 		{
-//			left_elbow_angle_roll = acos(KDL::dot(left_elbow_hand, left_elbow_shoulder));
-//			left_elbow_angle_roll = left_elbow_angle_roll - PI;
+			left_elbow_angle_roll = acos(KDL::dot(left_elbow_hand, left_elbow_shoulder));
+			left_elbow_angle_roll = left_elbow_angle_roll - PI;
 		}
 		
 		// right elbow roll
@@ -269,8 +269,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 				joint_position_right_elbow.fConfidence >= 0.5 && 
 				joint_position_right_shoulder.fConfidence >= 0.5)
 		{          
-//			right_elbow_angle_roll = acos(KDL::dot(right_elbow_hand, right_elbow_shoulder));
-//			right_elbow_angle_roll = -(right_elbow_angle_roll - PI);
+			right_elbow_angle_roll = acos(KDL::dot(right_elbow_hand, right_elbow_shoulder));
+			right_elbow_angle_roll = -(right_elbow_angle_roll - PI);
 		}  
 						
 		// left shoulder roll
@@ -283,8 +283,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 				joint_position_left_elbow.fConfidence >= 0.5 && 
 				joint_position_left_shoulder.fConfidence >= 0.5)
 		{
-//			left_shoulder_angle_roll = acos(KDL::dot(left_shoulder_elbow, left_shoulder_neck));
-//			left_shoulder_angle_roll = left_shoulder_angle_roll - HALFPI;
+			left_shoulder_angle_roll = acos(KDL::dot(left_shoulder_elbow, left_shoulder_neck));
+			left_shoulder_angle_roll = left_shoulder_angle_roll - HALFPI;
 		}
 						 
 		// right shoulder roll
@@ -297,39 +297,39 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 				joint_position_right_elbow.fConfidence >= 0.5 && 
 				joint_position_right_shoulder.fConfidence >= 0.5)
 		{     
-//			right_shoulder_angle_roll = acos(KDL::dot(right_shoulder_elbow, right_shoulder_neck));
-//			right_shoulder_angle_roll = -(right_shoulder_angle_roll - HALFPI);                                      
+			right_shoulder_angle_roll = acos(KDL::dot(right_shoulder_elbow, right_shoulder_neck));
+			right_shoulder_angle_roll = -(right_shoulder_angle_roll - HALFPI);                                      
 		} 
 										
 		// left shoulder pitch
 		static double left_shoulder_angle_pitch = 0;
 		if (joint_position_left_shoulder.fConfidence >= 0.5)
 		{ 
-//			left_shoulder_angle_pitch = asin(left_shoulder_elbow.y());
-//			left_shoulder_angle_pitch = left_shoulder_angle_pitch + HALFPI;
+			left_shoulder_angle_pitch = asin(left_shoulder_elbow.y());
+			left_shoulder_angle_pitch = left_shoulder_angle_pitch + HALFPI;
 		}
 		
 		// right shoulder pitch
 		static double right_shoulder_angle_pitch = 0;
 		if (joint_position_right_shoulder.fConfidence >= 0.5)
 		{ 
-//			right_shoulder_angle_pitch = asin(right_shoulder_elbow.y());
-//			right_shoulder_angle_pitch = -(right_shoulder_angle_pitch + HALFPI);
+			right_shoulder_angle_pitch = asin(right_shoulder_elbow.y());
+			right_shoulder_angle_pitch = -(right_shoulder_angle_pitch + HALFPI);
 		}
 																									
 		// left shoulder yaw
 		static double left_shoulder_angle_yaw = 0;
 		if (joint_position_left_shoulder.fConfidence >= 0.5)
 		{           
-//			left_shoulder_angle_yaw = asin(left_elbow_hand.y());  // left_shoulder_elbow.x()
+			left_shoulder_angle_yaw = asin(left_elbow_hand.y());  // left_shoulder_elbow.x()
 		}
 		
 		// right shoulder yaw
 		static double right_shoulder_angle_yaw = 0;
 		if (joint_position_right_shoulder.fConfidence >= 0.5)
 		{  
-//			right_shoulder_angle_yaw = asin(right_elbow_hand.y());  // left_shoulder_elbow.x()
-//			right_shoulder_angle_yaw = -right_shoulder_angle_yaw;
+			right_shoulder_angle_yaw = asin(right_elbow_hand.y());  // left_shoulder_elbow.x()
+			right_shoulder_angle_yaw = -right_shoulder_angle_yaw;
 		}
 					
 		///////////////////////////////////////////////////////////////////////////
@@ -354,8 +354,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 				joint_position_left_knee.fConfidence >= 0.5 && 
 				joint_position_left_hip.fConfidence >= 0.5)
 		{
-//			knee_left_angle_pitch = acos(KDL::dot(left_knee_foot, left_knee_hip));
-//			knee_left_angle_pitch = knee_left_angle_pitch - PI;
+			knee_left_angle_pitch = acos(KDL::dot(left_knee_foot, left_knee_hip));
+			knee_left_angle_pitch = knee_left_angle_pitch - PI;
 		}	
 		
 		// Knee right pitch					
@@ -368,8 +368,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 				joint_position_right_knee.fConfidence >= 0.5 && 
 				joint_position_right_hip.fConfidence >= 0.5)
 		{
-//			knee_right_angle_pitch = acos(KDL::dot(right_knee_foot, right_knee_hip));
-//			knee_right_angle_pitch = -(knee_right_angle_pitch - PI);
+			knee_right_angle_pitch = acos(KDL::dot(right_knee_foot, right_knee_hip));
+			knee_right_angle_pitch = -(knee_right_angle_pitch - PI);
 		}	
 		
 		// Hip left roll					
@@ -452,16 +452,16 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		static double left_ankle_angle_pitch = 0;
 		if (joint_position_left_foot.fConfidence >= 0.5)
 		{ 
-//			left_ankle_angle_pitch = asin(left_knee_foot.y());
-//			left_ankle_angle_pitch = -(left_ankle_angle_pitch + HALFPI);
+			left_ankle_angle_pitch = asin(left_knee_foot.y());
+			left_ankle_angle_pitch = -(left_ankle_angle_pitch + HALFPI);
 		}
 		
 		// right ankle pitch
 		static double right_ankle_angle_pitch = 0;
 		if (joint_position_right_foot.fConfidence >= 0.5)
 		{ 
-//			right_ankle_angle_pitch = asin(right_knee_foot.y());
-//			right_ankle_angle_pitch = (right_ankle_angle_pitch + HALFPI);
+			right_ankle_angle_pitch = asin(right_knee_foot.y());
+			right_ankle_angle_pitch = (right_ankle_angle_pitch + HALFPI);
 		}		
 		
 		// left ankle roll
@@ -516,7 +516,70 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 			//head_angle_pitch = head_angle_pitch - HALFPI;
 		}
 	  */		
+    
+    /////
+    // Velocity foot mouse gestures
+    /////
+    
+	  KDL::Vector right_left_foot(right_foot - left_foot);
+	  static double foot_mouse_angle = 0;
+	  static double foot_mouse_length = 0;
+	  geometry_msgs::Twist cmd_vel;
+
+	  if (joint_position_left_foot.fConfidence >= 0.5 && 
+	      joint_position_right_foot.fConfidence >= 0.5)
+    {
+      foot_mouse_length = sqrt(right_left_foot.x()*right_left_foot.x() + 
+             right_left_foot.z()*right_left_foot.z());
+      foot_mouse_angle = atan2(right_left_foot.x(), right_left_foot.z());
+      foot_mouse_angle = foot_mouse_angle - HALFPI;
+
+      cmd_vel.linear.x = foot_mouse_length / 2400;
+
+      if (cmd_vel.linear.x > 0.2)
+      {
+        cmd_vel.linear.x = 0.2;
+      }
+
+      if (foot_mouse_angle > 0.75 && foot_mouse_angle < 1.5)
+      {
+        cmd_vel.angular.z = 0;
+      }
+      else if (foot_mouse_angle > 0.0 && foot_mouse_angle < 0.75)
+      {
+        //cmd_vel.angular.z = cmd_vel.linear.x;
+        if (cmd_vel.linear.x > 0.1)
+        	cmd_vel.angular.z = 0.4;
+        else
+        	cmd_vel.angular.z = 0.0;
+        cmd_vel.linear.x = 0.0;
+      }
+      else if (foot_mouse_angle < 0.0 && foot_mouse_angle > -0.75)
+      {
+        //cmd_vel.angular.z = -cmd_vel.linear.x;
+        if (cmd_vel.linear.x > 0.1) cmd_vel.angular.z = -0.4;
+        else cmd_vel.angular.z = 0.0;
+        cmd_vel.linear.x = 0.0;
+      }
+      else 
+      {
+        cmd_vel.linear.x = -cmd_vel.linear.x;
+        cmd_vel.angular.z = 0;
+      }
+      last_vel_linear_x = cmd_vel.linear.x;
+      last_vel_angular_z = cmd_vel.angular.z;
+    }
+	  else
+    {
+      cmd_vel.linear.x = 0.0;
+      cmd_vel.angular.z = 0.0;
+    }
+
+		//ROS_INFO("LENGTH: %f", foot_mouse_length);
+	  //ROS_INFO("ANGLE: %f", foot_mouse_angle);
 	
+    cmd_vel_pub_.publish(cmd_vel);
+  
 		/////
 		// Send to robot
 		/////
@@ -601,9 +664,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		js.position.push_back(head_angle_yaw);
 		js.velocity.push_back(10);
 		*/
-
-		//cmd_vel_pub_.publish(cmd_vel);
-		joint_states_pub_.publish(js);
+    		
+    joint_states_pub_.publish(js);
 
 		break;	// only read first user
 	}
