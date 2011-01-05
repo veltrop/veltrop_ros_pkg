@@ -9,11 +9,11 @@ servos:
     max_pwm: 16382
     min_rotation: -1.0471975512
     max_rotation: 1.0471975512       
-# 225
+
   - joint_name: neck_pitch
     channel: 4
     type: KONDO_ROS3030
-    trim: -625
+    trim: 225
     bus: COM4
     min_pwm: 1
     max_pwm: 16382 
