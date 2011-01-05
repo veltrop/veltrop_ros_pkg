@@ -11,10 +11,15 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_executable(teleop_kb src/teleop_kb.cpp)
 rosbuild_add_executable(teleop_joy src/teleop_joy.cpp)
+<<<<<<< .mine
+#rosbuild_add_executable(teleop_kinect src/teleop_kinect.cpp src/KinectController.cpp src/KinectDisplay.cpp)
+#target_link_libraries(teleop_kinect glut)
+=======
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 rosbuild_add_executable(teleop_kinect src/teleop_kinect.cpp src/KinectController.cpp src/KinectDisplay.cpp)
 target_link_libraries(teleop_kinect glut)
+>>>>>>> .r45
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

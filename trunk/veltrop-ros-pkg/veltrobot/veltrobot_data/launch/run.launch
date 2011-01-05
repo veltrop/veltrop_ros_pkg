@@ -12,9 +12,9 @@
 
   <node pkg="veltrobot_movement" type="control_movement" name="movement_controller" output="screen" />
     
-	<node pkg="veltrobot_movement" type="balance_movement" name="balance_controller"  output="screen">
+<!--	<node pkg="veltrobot_movement" type="balance_movement" name="balance_controller"  output="screen">
     <param name="processing_fps" value="60" /> 
     <param name="movement_fps" value="100" />
   	<rosparam command="load" file="$(find veltrobot_data)/conf/gyro_balancing.yaml" />
-  </node>
+  </node> -->
 </launch>

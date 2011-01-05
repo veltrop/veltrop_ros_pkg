@@ -13,10 +13,11 @@
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="joy"/>
-  <depend package="openni"/>
-  <depend package="nite"/> 
+  <!--<depend package="openni"/>
+  <depend package="nite"/> -->
   <depend package="tf"/> 
   <depend package="kdl"/>
+  <depend package="veltrobot_msgs"/>
 
 </package>
 
