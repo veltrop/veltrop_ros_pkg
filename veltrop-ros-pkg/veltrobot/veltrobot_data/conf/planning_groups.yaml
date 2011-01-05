@@ -60,6 +60,66 @@ groups:
       arm_right_lower_x      
     planner_configs:
       RRTkConfig2 SBLkConfig2 
+			
+  - name: legs
+    joints:
+      hip_left_yaw
+      hip_left_roll
+      hip_left_pitch
+      knee_left_pitch
+      ankle_left_pitch
+      ankle_left_roll
+      hip_right_yaw
+      hip_right_roll
+      hip_right_pitch
+      knee_right_pitch
+      ankle_right_pitch
+      ankle_right_roll
+    links:
+      hip_left_upper_zx
+      hip_left_lower_xy
+      leg_left_upper_yy
+      leg_left_lower_yy
+      ankle_left_yx
+      foot_left_x
+      hip_right_upper_zx
+      hip_right_lower_xy
+      leg_right_upper_yy
+      leg_right_lower_yy
+      ankle_right_yx
+      foot_right_x
+      
+  - name: left_leg
+    joints:
+      hip_left_yaw
+      hip_left_roll
+      hip_left_pitch
+      knee_left_pitch
+      ankle_left_pitch
+      ankle_left_roll
+    links:
+      hip_left_upper_zx
+      hip_left_lower_xy
+      leg_left_upper_yy
+      leg_left_lower_yy
+      ankle_left_yx
+      foot_left_x   
+      
+  - name: right_leg
+    joints:
+      hip_right_yaw
+      hip_right_roll
+      hip_right_pitch
+      knee_right_pitch
+      ankle_right_pitch
+      ankle_right_roll
+    links:
+      hip_right_upper_zx
+      hip_right_lower_xy
+      leg_right_upper_yy
+      leg_right_lower_yy
+      ankle_right_yx
+      foot_right_x            
 
 #  - name: l_end_effector
 #    links: 
