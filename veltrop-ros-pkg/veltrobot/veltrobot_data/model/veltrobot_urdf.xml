@@ -362,7 +362,7 @@
         <parent link="leg_left_lower_yy" />
         <child link="ankle_left_yx" />
         <origin xyz="0.02 0 -0.055" rpy="0 0 0" />
-        <axis xyz="0 -1 0" />
+        <axis xyz="0 1 0" />
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="ankle_left_roll" type="revolute">
@@ -477,7 +477,7 @@
         <parent link="leg_right_lower_yy" />
         <child link="ankle_right_yx" />
         <origin xyz="0.02 0 -0.055" rpy="0 0 0" />
-        <axis xyz="0 1 0" />
+        <axis xyz="0 -1 0" />
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
     <joint name="ankle_right_roll" type="revolute">
@@ -485,7 +485,7 @@
         <parent link="ankle_right_yx" />
         <child link="foot_right_x" />
         <origin xyz="0 0.015 -0.045" rpy="0 0 0" />
-        <axis xyz="-1 0 0" />
+        <axis xyz="1 0 0" />
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
 </robot>
