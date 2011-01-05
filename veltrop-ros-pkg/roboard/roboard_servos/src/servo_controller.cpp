@@ -64,7 +64,9 @@ public:
       if (servo.bus_ == Servo::COM4)
       {
         usleep(1);
-        com4_ics_pos(servo.channel_, 8193);
+        //com4_ics_pos(servo.channel_, 8193);
+				// TODO: there is a command to tell the servo to lock into its current position, but
+				//       doesnt seem to work.
       }
     }
     
