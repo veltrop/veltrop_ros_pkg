@@ -39,7 +39,7 @@ void KinectTeleop::init()
 	ros::NodeHandle np("~");
 	motion_pub_ = n.advertise <std_msgs::String> ("motion_name", 1);
 	joint_states_pub_ = n.advertise<sensor_msgs::JointState>("/joint_states", 1);
-	cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);	
+	//cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);	
   np.param<bool>("publish_kinect_tf_", publish_kinect_tf_, false);  
   enable_joint_group_sub_ = n.subscribe("/enable_joint_group", 1,
                                         &KinectTeleop::enableJointGroupCB, this);
@@ -148,7 +148,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_TORSO, joint_position_torso);
 		KDL::Vector torso(joint_position_torso.position.X, joint_position_torso.position.Y, joint_position_torso.position.Z);
 							
-	  XnSkeletonJointOrientation joint_orientation_head;
+	  /*
+    XnSkeletonJointOrientation joint_orientation_head;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_HEAD, joint_orientation_head);
 		m = joint_orientation_head.orientation.elements;
 		KDL::Rotation head_rotation(m[0], m[1], m[2],
@@ -156,7 +157,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 																m[6], m[7], m[8]);
 	  double head_roll, head_pitch, head_yaw;
 	  head_rotation.GetRPY(head_roll, head_pitch, head_yaw);
-		/*
+		
 	  XnSkeletonJointOrientation joint_orientation_neck;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_NECK, joint_orientation_neck);
 		m = joint_orientation_neck.orientation.elements;
@@ -165,7 +166,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 																m[6], m[7], m[8]);
 		double neck_roll, neck_pitch, neck_yaw;
 	  neck_rotation.GetRPY(neck_roll, neck_pitch, neck_yaw);		
-		*/
+		
 	  XnSkeletonJointOrientation joint_orientation_torso;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_TORSO, joint_orientation_torso);
 	  m = joint_orientation_torso.orientation.elements;
@@ -174,7 +175,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 																 m[6], m[7], m[8]);
 		double torso_roll, torso_pitch, torso_yaw;
 	  torso_rotation.GetRPY(torso_roll, torso_pitch, torso_yaw);				
-																							
+		*/
+    																					
 		// Left Arm
 		XnSkeletonJointPosition joint_position_left_hand;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_HAND, joint_position_left_hand);
@@ -507,19 +509,21 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		//	torso_angle_yaw = t_pitch;
 		//}
 
+		/*
 		// Head Yaw
-	  static double head_angle_yaw = 0;
+    static double head_angle_yaw = 0;
 		if (joint_orientation_head.fConfidence >= 0.5)
 		{     
-			//head_angle_yaw = head_pitch - torso_pitch;
+			head_angle_yaw = head_pitch - torso_pitch;
 		}
 
 		// Head Pitch
 	  static double head_angle_pitch = 0;
 		if (joint_orientation_head.fConfidence >= 0.5)
 		{           
-			//head_angle_pitch = head_roll - torso_roll;
+			head_angle_pitch = head_roll - torso_roll;
 		}
+    */
 		
 	  /*
 		// head pitch
@@ -540,7 +544,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
     /////
     // Velocity foot mouse gestures
     /////
-    
+    /*
 	  KDL::Vector right_left_foot(right_foot - left_foot);
 	  static double foot_mouse_angle = 0;
 	  static double foot_mouse_length = 0;
@@ -599,7 +603,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 	  //ROS_INFO("ANGLE: %f", foot_mouse_angle);
 	
     cmd_vel_pub_.publish(cmd_vel);
-
+		*/
+    
     // adapt velocity to 4 static motions
     /*std_msgs::String mot;
     mot.data = "stand_squat";
@@ -645,6 +650,14 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.name.push_back("shoulder_right_yaw");
       js.position.push_back(right_shoulder_angle_yaw);
       js.velocity.push_back(10);    
+      
+		js.name.push_back("neck_pitch");
+		js.position.push_back(0.3);
+		js.velocity.push_back(10);
+		js.name.push_back("neck_yaw");
+		js.position.push_back(0.0);
+		js.velocity.push_back(10);      
+      
     }        
     
     if (legs_enabled_)
