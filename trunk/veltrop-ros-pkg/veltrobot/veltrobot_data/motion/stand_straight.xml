@@ -2,7 +2,7 @@
 
 <motion name="stand_straight" first_phase="stand_straight">
     <phases>
-        <phase name="stand_straight" next_phase="" duration="" abort_safe="true">
+        <phase balancing_enabled="true" name="stand_straight" next_phase="" duration="" abort_safe="true">
             <pose name="stand_straight" />
         </phase>
     </phases>
