@@ -96,11 +96,26 @@ void I2CDeviceITG3200::pollCB(const ros::TimerEvent& e)
   	i2c0_SetSpeed(I2CMODE_AUTO, speed_);
      
     if (!i2c0master_StartN(0x69, I2C_WRITE, 1))
+    {
     	ROS_ERROR_STREAM("ITG3200 i2c0master_StartN " << roboio_GetErrMsg());
+      reset();
+      unlockI2C();
+      return;
+    }
     if (!i2c0master_SetRestartN(I2C_READ, 4))
+    {
     	ROS_ERROR_STREAM("ITG3200 i2c0master_SetRestartN " << roboio_GetErrMsg());
+      reset();
+      unlockI2C();
+      return;
+    }      
     if (!i2c0master_WriteN(0x1D)) //Read from X register
+    {
     	ROS_ERROR_STREAM("ITG3200 i2c0master_WriteN " << roboio_GetErrMsg()); 
+      reset();
+      unlockI2C();
+      return;
+    }      
     
     msb1 = i2c0master_ReadN(); 
     lsb1 = i2c0master_ReadN(); 

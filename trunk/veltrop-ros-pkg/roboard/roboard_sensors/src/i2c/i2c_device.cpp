@@ -1,3 +1,4 @@
+#include <roboard.h>
 #include "i2c_device.h"
 
 namespace roboard_sensors
@@ -16,6 +17,12 @@ I2CDevice::I2CDevice(XmlRpc::XmlRpcValue& device_info)
   {
   	initialized_ = true;
 		pthread_mutex_init(&i2c_mutex_, NULL);
+    
+    if (!i2c_Initialize(I2CIRQ_DISABLE))
+    { 
+      ROS_ERROR("Failed to initialize i2c");
+    }     
+    i2c0_SetSpeed(I2CMODE_AUTO, 100000L); 
   }
     
   device_name_ = std::string(device_info["name"]);
@@ -53,6 +60,14 @@ void I2CDevice::unlockI2C()
 {
 	pthread_mutex_unlock(&i2c_mutex_);
 }*/
+
+void I2CDevice::reset()
+{
+	i2c_Close();
+  usleep(1);
+	if (!i2c_Initialize(I2CIRQ_DISABLE))
+  	ROS_ERROR("Failed to re-initialize i2c");
+}
 
 void I2CDevice::pollCB(const ros::TimerEvent& e)
 {

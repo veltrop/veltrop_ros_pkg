@@ -15,14 +15,14 @@ I2CDeviceManager::I2CDeviceManager()
   np.param<double>("spin_rate", freq, 10000.0); 
   freq_ = freq;
   
-  if (!i2c_Initialize(I2CIRQ_DISABLE))
-  { 
-    ROS_ERROR("Failed to initialize i2c");
-    ros::shutdown();
-    exit(-1);
-  } 
+  //if (!i2c_Initialize(I2CIRQ_DISABLE))
+  //{ 
+  //  ROS_ERROR("Failed to initialize i2c");
+  //  ros::shutdown();
+  //  exit(-1);
+  //} 
 
-  i2c0_SetSpeed(I2CMODE_AUTO, 100000L); 
+  //i2c0_SetSpeed(I2CMODE_AUTO, 100000L); 
   
   loadDevices();
 }

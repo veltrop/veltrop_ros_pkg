@@ -23,6 +23,8 @@ class I2CDevice
   protected:
     virtual void pollCB(const ros::TimerEvent& e);
     
+    virtual void reset();
+    
     std::string device_name_;
     char base_address_;
     double poll_frequency_;
