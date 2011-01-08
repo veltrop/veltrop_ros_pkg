@@ -24,6 +24,7 @@ void MotionPhase::clear()
   abort_safe_ = true;
   duration_ = 0;
   poses_.clear();
+  balancing_enabled_ = true;
 }
 
 void MotionPhase::loadXML(TiXmlElement* pElem)
@@ -45,6 +46,11 @@ void MotionPhase::loadXML(TiXmlElement* pElem)
     abort_safe_ = true;
   else
     abort_safe_ = false;  
+  pStr = pElem->Attribute("balancing_enabled");
+  if (strcmp("false", pStr) == 0)
+    balancing_enabled_ = false;
+  else
+    balancing_enabled_ = true;     
         
   //
 	// Load child node "pose" and its siblings

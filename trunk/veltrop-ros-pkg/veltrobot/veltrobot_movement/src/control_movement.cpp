@@ -1,7 +1,9 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <sensor_msgs/JointState.h>
+#include <geometry_msgs/Twist.h>
 #include <veltrobot_movement/pose.h>
 #include <veltrobot_movement/motion.h>
 
@@ -29,12 +31,17 @@ public:
     
     // Prepare joint state publisher
     joint_states_pub_ = n_.advertise<sensor_msgs::JointState>("/joint_states", 10);
+    enable_balancing_pub_ = n_.advertise<std_msgs::Bool>("/enable_balancing", 10);
     
     // Prepare our subscription callbacks
     motion_name_sub_ = n_.subscribe("motion_name", 10, 
                                     &ControlMovement::motionNameCB, this);
     pose_name_sub_   = n_.subscribe("pose_name", 10,
                                     &ControlMovement::poseNameCB, this);
+                                    
+                          
+    //cmd_vel_sub_     = n_.subscribe("/cmd_vel", 1,
+    //                                &ControlMovement::cmdVelCB, this); 
   }
 
   void spin()
@@ -47,13 +54,19 @@ private:
   PoseLibrary     poses_;
   MotionLibrary   motions_;
   ros::Publisher  joint_states_pub_;
+  ros::Publisher  enable_balancing_pub_;
   ros::Subscriber motion_name_sub_;
-  ros::Subscriber pose_name_sub_;    
+  ros::Subscriber pose_name_sub_;  
+  //ros::Subscriber cmd_vel_sub_;  
   ros::Timer      phase_timer_;
   std::string     current_motion_;
   std::string     current_phase_;
   std::string     prev_phase_;
   std::string     requested_motion_;
+  
+  //void cmdVelCB(const geometry_msgs::TwistConstPtr& msg)
+  //{
+  //}
 
   void motionNameCB(const std_msgs::StringConstPtr& msg)
   {
@@ -99,6 +112,10 @@ private:
     if (phase.poses_.size())
       duration = applyPoseToJointState(phase.poses_[0], phase.duration_);
       
+    std_msgs::Bool eb;
+    eb.data = phase.balancing_enabled_;
+    enable_balancing_pub_.publish(eb);  
+      
     // advance phase
     prev_phase_ = current_phase_;
     current_phase_ = phase.next_phase_;
@@ -135,6 +152,7 @@ private:
       js.position.push_back(position);
       js.velocity.push_back(duration);
     }
+    
     joint_states_pub_.publish(js);
     
     return duration;
