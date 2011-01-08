@@ -92,6 +92,14 @@ private:
       group.jointGroups.push_back("legs");
       group.enabledStates.push_back(prev_L2);
     }
+    
+    static bool prev_R1 = false;
+    if (joy->buttons[11] != prev_R1) // R1
+    {
+      prev_R1 = joy->buttons[11];
+      group.jointGroups.push_back("motions");
+      group.enabledStates.push_back(prev_R1);
+    }    
                          
     if (joy->buttons[1])
     {    
