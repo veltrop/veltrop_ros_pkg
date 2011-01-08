@@ -15,7 +15,7 @@
 		<joint name="hip_left_pitch"  position="0.4832" />
 		<joint name="knee_left_pitch"  position="-0.906" />
 		<joint name="ankle_left_pitch"  position="-0.453" />
-		<joint name="ankle_left_roll"  position="-0.151" />
+		<joint name="ankle_left_roll"  position="-0.1208" />
 		<joint name="hip_right_yaw"  position="0.0" />
 		<joint name="hip_right_roll"  position="-0.1208" />
 		<joint name="hip_right_pitch"  position="-0.5738" />

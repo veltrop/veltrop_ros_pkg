@@ -1,30 +1,27 @@
 <?xml version="1.0" ?>
-
 <pose name="walk_forward_cog_to_right_foot_start">
-	<joint_positions duration="300" units="radians_offset">
-		<joint name="shoulder_left_pitch"  position="0.0" />
-		<joint name="shoulder_left_roll"  position="0.1208" />
-		<joint name="elbow_left_roll"  position="0.0" />
-		<joint name="shoulder_left_yaw"  position="0.0" />
-		<joint name="shoulder_right_pitch"  position="0.0" />
-		<joint name="shoulder_right_roll"  position="-0.1208" />
-		<joint name="elbow_right_roll"  position="0.0" />
-		<joint name="shoulder_right_yaw"  position="0.0" />
-		<joint name="hip_left_yaw"  position="0.0" />
-		<joint name="hip_left_roll"  position="0.0906" />
-		<joint name="hip_left_pitch"  position="0.604" />
-		<joint name="knee_left_pitch"  position="-1.1476" />
-		<joint name="ankle_left_pitch"  position="-0.5738" />
-		<joint name="ankle_left_roll"  position="0.0906" />
-		<joint name="hip_right_yaw"  position="0.0" />
-		<joint name="hip_right_roll"  position="0.0906" />
-		<joint name="hip_right_pitch"  position="-0.4832" />
-		<joint name="knee_right_pitch"  position="0.906" />
-		<joint name="ankle_right_pitch"  position="0.453" />
-		<joint name="ankle_right_roll"  position="0.151" />
-    <joint name="neck_pitch" position="0.000000" />
-    <joint name="neck_yaw" position="0.000000" /> 
-
-	</joint_positions>
+    <joint_positions duration="300" units="radians_offset">
+        <joint name="ankle_left_pitch" position="-0.573800" />
+        <joint name="ankle_left_roll" position="0.090600" />
+        <joint name="ankle_right_pitch" position="0.453000" />
+        <joint name="ankle_right_roll" position="0.100000" />
+        <joint name="elbow_left_roll" position="0.000000" />
+        <joint name="elbow_right_roll" position="0.000000" />
+        <joint name="hip_left_pitch" position="0.604000" />
+        <joint name="hip_left_roll" position="0.090600" />
+        <joint name="hip_left_yaw" position="0.000000" />
+        <joint name="hip_right_pitch" position="-0.483200" />
+        <joint name="hip_right_roll" position="0.090600" />
+        <joint name="hip_right_yaw" position="0.000000" />
+        <joint name="knee_left_pitch" position="-1.147600" />
+        <joint name="knee_right_pitch" position="0.906000" />
+        <joint name="neck_pitch" position="0.000000" />
+        <joint name="neck_yaw" position="0.000000" />
+        <joint name="shoulder_left_pitch" position="0.000000" />
+        <joint name="shoulder_left_roll" position="0.120800" />
+        <joint name="shoulder_left_yaw" position="0.000000" />
+        <joint name="shoulder_right_pitch" position="0.000000" />
+        <joint name="shoulder_right_roll" position="-0.120800" />
+        <joint name="shoulder_right_yaw" position="0.000000" />
+    </joint_positions>
 </pose>
-
