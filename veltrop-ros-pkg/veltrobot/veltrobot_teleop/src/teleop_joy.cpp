@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <std_msgs/Int16.h>
 #include <std_msgs/String.h>
 #include <sensor_msgs/JointState.h>
 #include <veltrobot_msgs/EnableJointGroup.h>
@@ -12,8 +13,8 @@ class VeltrobotTeleopJoy
 public:
 	VeltrobotTeleopJoy()
 	{
-  
-	  motion_pub_ = n_.advertise <std_msgs::String> ("motion_name", 1);
+  	joint_ics_pub_ = n_.advertise<std_msgs::Int16>("/servo_command", 1);
+	  motion_pub_ = n_.advertise <std_msgs::String> ("motion_name", 2);
     joint_states_pub_ = n_.advertise<sensor_msgs::JointState>("/joint_states", 1);
     joy_sub_ = n_.subscribe <joy::Joy> ("joy", 1, &VeltrobotTeleopJoy::joyCB, this);
     enable_joint_group_pub_ = n_.advertise<veltrobot_msgs::EnableJointGroup>("/enable_joint_group", 1);
@@ -26,9 +27,10 @@ public:
 	
 private:
 	ros::NodeHandle n_;
-	ros::Publisher motion_pub_;
+	ros::Publisher  motion_pub_;
   ros::Publisher  joint_states_pub_;
   ros::Publisher  enable_joint_group_pub_;
+  ros::Publisher  joint_ics_pub_;
   ros::Subscriber joy_sub_;
 	
 	void joyCB(const joy::Joy::ConstPtr& joy)
@@ -38,6 +40,7 @@ private:
     std_msgs::String mot;
     mot.data = "";
     static bool prev_move = false;
+    static bool hold_power = false;
     
     if (!joy->buttons[4] && !joy->buttons[5] && 
         !joy->buttons[6] && !joy->buttons[7] && prev_move)
@@ -66,15 +69,72 @@ private:
       prev_move = true;
     }
     
-    else if (joy->buttons[3])
+    else if (joy->buttons[12])
+		{
+      mot.data = "get_up_belly";
+      prev_move = false;
+    }
+    else if (joy->buttons[14])
+    {
+    	mot.data = "flip_back_to_belly";
+      prev_move = false;
+    }    
+    
+    else if (joy->buttons[3] && joy->buttons[0])
+    {
+    	static ros::Time prev_time;
+    	if (!hold_power)
+      {
+      	prev_time = ros::Time::now();
+      }
+      else 
+      {
+      	if ((ros::Time::now() - prev_time) > ros::Duration(4))
+        	system("sudo shutdown -h now");
+      }
+      
+    	hold_power = true;
+      prev_move = false;
+    }
+    
+    else if (joy->buttons[3] && !joy->buttons[0])
 		{
       mot.data = "init";
       prev_move = false;
     }
-    else if (joy->buttons[0])
+    else if (joy->buttons[0] && !joy->buttons[3])
     {
-    	mot.data = "stand_squat";
+    	static bool flip = false;
+      if (flip)
+    		mot.data = "stand_squat2";
+      else 
+        mot.data = "stand_squat";
+      flip = !flip;
       prev_move = false;
+    }    
+    
+   /* else if (joy->buttons[11])
+    {
+    	std_msgs::Int16 msg;
+      msg.data = 0;
+  		joint_ics_pub_.publish(msg);
+ 		 	msg.data = 100;
+  		joint_ics_pub_.publish(msg);
+      prev_move = false;
+    }     
+  	else if (joy->buttons[9])
+    {
+  		std_msgs::Int16 msg;
+  		msg.data = 101;
+  		joint_ics_pub_.publish(msg);    
+      msg.data = 1;
+  		joint_ics_pub_.publish(msg);
+ 		 	prev_move = false;
+    } */
+    
+    if (!(joy->buttons[3] && joy->buttons[0]))
+    {
+			hold_power = false;
     }
     
     static bool prev_L1 = false;
@@ -85,6 +145,7 @@ private:
       group.enabledStates.push_back(prev_L1);
     }
     
+    /*
     static bool prev_L2 = false;
     if (joy->buttons[8] != prev_L2) // L2
     {
@@ -100,11 +161,12 @@ private:
       group.jointGroups.push_back("motions");
       group.enabledStates.push_back(prev_R1);
     }    
+    */
                          
-    if (joy->buttons[2])
+    if (joy->buttons[1])
     {    
-      float neck_yaw = joy->axes[2] * -1.57;
-      float neck_pitch = joy->axes[3] * -1.57;
+      float neck_yaw = joy->axes[0] * -1.57;
+      float neck_pitch = joy->axes[1] * -1.57;
 
       sensor_msgs::JointState js; 
       js.name.push_back("neck_yaw");
