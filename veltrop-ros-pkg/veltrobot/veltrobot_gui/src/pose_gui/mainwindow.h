@@ -20,6 +20,8 @@ public:
     ~MainWindow();
 
 private:
+    void loadLists();
+
     std::map <std::string, PoseWindow*> pose_windows_;
     veltrobot_movement::PoseManager pose_manager_;
     Ui::MainWindow *ui;
@@ -27,6 +29,10 @@ private:
     QStringListModel* poses_model_;
 
 private slots:
+    void on_pushButton_8_clicked();
+    void on_listView_poses_doubleClicked(QModelIndex index);
+    void on_pushButton_motionExecute_clicked();
+    void on_pushButton_rescan_clicked();
     void on_pushButton_editPose_clicked();
     void _on_listView_motions_selectionChanged( const QItemSelection & selected, const QItemSelection & deselected);
     void on_pushButton_newPose_clicked();

@@ -29,7 +29,7 @@ class KinectTeleop
 		ros::Publisher   cmd_vel_pub_;
     ros::Subscriber  enable_joint_group_sub_;
 		bool             publish_kinect_tf_;
-    bool             arms_enabled_, legs_enabled_;
+    bool             arms_enabled_, legs_enabled_, motion_enabled_;
 };
 
 } // namespace veltrobot_teleop

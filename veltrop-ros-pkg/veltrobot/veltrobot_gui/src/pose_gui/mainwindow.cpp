@@ -4,10 +4,34 @@
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
+  pose_manager_("/joint_states_alternate"),
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
 
+  loadLists();
+
+  connect(ui->listView_motions->selectionModel(),
+          SIGNAL (selectionChanged ( const QItemSelection &, const QItemSelection & )),
+          this,
+          SLOT   (_on_listView_motions_selectionChanged ( const QItemSelection &, const QItemSelection &)));
+}
+
+MainWindow::~MainWindow()
+{
+  for (std::map<std::string, PoseWindow*>::iterator i = pose_windows_.begin();
+       i != pose_windows_.end(); ++i)
+  {
+    PoseWindow* w = i->second;
+    delete w;
+  }
+  pose_windows_.clear();
+
+  delete ui;
+}
+
+void MainWindow::loadLists()
+{
   QStringList motion_names;
   for (std::map<std::string, veltrobot_movement::Motion>::iterator i = pose_manager_.motions_.begin();
        i != pose_manager_.motions_.end(); ++i)
@@ -31,16 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
   //QAbstractItemModel *pose_model = new QStringListModel(pose_names);
   poses_model_ = new QStringListModel(pose_names);
   ui->listView_poses->setModel(poses_model_);
-
-  connect(ui->listView_motions->selectionModel(),
-          SIGNAL (selectionChanged ( const QItemSelection &, const QItemSelection & )),
-          this,
-          SLOT   (_on_listView_motions_selectionChanged ( const QItemSelection &, const QItemSelection &)));
-}
-
-MainWindow::~MainWindow()
-{
-  delete ui;
 }
 
 void MainWindow::_on_listView_motions_selectionChanged ( const QItemSelection & selected, const QItemSelection & deselected)
@@ -117,5 +131,45 @@ void MainWindow::on_pushButton_editPose_clicked()
     PoseWindow* w = new PoseWindow(pose_manager_, pose_name);
     pose_windows_[pose_name] = w;
     w->show();
+  }
+}
+
+void MainWindow::on_pushButton_rescan_clicked()
+{
+  pose_manager_.reload();
+  loadLists();
+}
+
+void MainWindow::on_pushButton_motionExecute_clicked()
+{
+
+}
+
+void MainWindow::on_listView_poses_doubleClicked(QModelIndex index)
+{
+  int selected_index = index.row();
+  QString pose_name_q = poses_model_->stringList().at(selected_index);
+  std::string pose_name = pose_name_q.toStdString();
+
+  PoseWindow* w = new PoseWindow(pose_manager_, pose_name);
+  pose_windows_[pose_name] = w;
+  w->show();
+}
+
+void MainWindow::on_pushButton_8_clicked()
+{
+  QItemSelectionModel *selectionModel = ui->listView_poses->selectionModel();
+  QModelIndexList selected_indexes = selectionModel->selectedRows();
+
+  for (int i=0; i < selected_indexes.size(); i++)
+  {
+    int selected_index = selected_indexes[i].row();
+    QString pose_name_q = poses_model_->stringList().at(selected_index);
+    std::string pose_name = pose_name_q.toStdString();
+
+    PoseWindow* w = new PoseWindow(pose_manager_, pose_name);
+    pose_windows_[pose_name] = w;
+    w->on_pushButton_apply_clicked();
+    delete w;
   }
 }

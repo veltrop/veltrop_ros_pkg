@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>784</width>
-    <height>482</height>
+    <width>740</width>
+    <height>400</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Edit Pose</string>
@@ -27,17 +33,17 @@
      <string>+</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_rest">
+   <widget class="QPushButton" name="pushButton_unrest">
     <property name="geometry">
      <rect>
       <x>100</x>
       <y>10</y>
-      <width>81</width>
+      <width>41</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Rest</string>
+     <string>Un</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_capture">
@@ -51,22 +57,6 @@
     </property>
     <property name="text">
      <string>Capture</string>
-    </property>
-   </widget>
-   <widget class="QSlider" name="horizontalSlider_duration">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>10</y>
-      <width>160</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
     </property>
    </widget>
    <widget class="QSpinBox" name="spinBox_duration">
@@ -87,11 +77,11 @@
      <rect>
       <x>0</x>
       <y>40</y>
-      <width>621</width>
-      <height>381</height>
+      <width>631</width>
+      <height>331</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout" rowminimumheight="0" columnminimumwidth="0">
+    <layout class="QGridLayout" name="gridLayout">
      <property name="sizeConstraint">
       <enum>QLayout::SetMinimumSize</enum>
      </property>
@@ -110,35 +100,53 @@
      </rect>
     </property>
     <property name="text">
-     <string>Apply</string>
+     <string>Execute</string>
     </property>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>784</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
+   <widget class="QPushButton" name="pushButton_rest">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
     </property>
-    <addaction name="actionSave_Pose"/>
-    <addaction name="actionRevert"/>
-   </widget>
-   <widget class="QMenu" name="menuSelect">
-    <property name="title">
-     <string>Select</string>
+    <property name="text">
+     <string>Rest</string>
     </property>
-    <addaction name="actionAll_For_Capture"/>
-    <addaction name="actionNone_For_Capture"/>
    </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuSelect"/>
+   <widget class="QPushButton" name="pushButton_save">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>10</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Save</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_poseName">
+    <property name="geometry">
+     <rect>
+      <x>357</x>
+      <y>7</y>
+      <width>195</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+    <item>
+     <property name="text">
+      <string>Other...</string>
+     </property>
+    </item>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSave_Pose">
