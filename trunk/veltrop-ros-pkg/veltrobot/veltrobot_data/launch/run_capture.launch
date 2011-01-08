@@ -1,0 +1,9 @@
+<launch>    
+  <node pkg="roboard_servos" type="servo_controller" name="servo_controller" output="screen">
+    <rosparam command="load" file="$(find veltrobot_data)/conf/servos.yaml" />
+    <param name="servo_fps" value="60" /> 
+    <param name="force_mix" value="true" />
+    <param name="reset_after_mix" value="false" />
+    <param name="playaction_thread" value="false" />
+  </node>
+</launch>
