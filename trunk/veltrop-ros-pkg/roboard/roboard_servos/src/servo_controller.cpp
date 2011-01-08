@@ -25,6 +25,8 @@ public:
     : np_("~")
     , do_mix_(false)
     , running_(false)
+    , capture_mode_(false)
+    , balancing_enabled_(true)
   {
     pthread_mutex_init (&playframe_mutex_, NULL);
     pthread_mutex_init (&mixframe_mutex_, NULL);
@@ -32,19 +34,16 @@ public:
            
 		loadConfig();
     
-    // Prepare our subscription callbacks
-    //update_trim_sub_ = n_.subscribe("/trim_updated", 10, 
-    //                                &ServoController::updateTrimCB, this);   
     joint_state_sub_ = n_.subscribe("/joint_states", 10, 
-                                    &ServoController::jointStateCB, this);  
+                                    &ServoController::jointStateCB, this); 
+		joint_state_alt_sub_ = n_.subscribe("/joint_states_alternate", 10, 
+                                    &ServoController::jointStateCB2, this);                                      
 		balance_joint_state_sub_ = n_.subscribe("/balancing_joint_states", 1, 
                                     &ServoController::balancingJointStateCB, this); 
-    receive_servo_command_sub_ = n_.subscribe("/servo_command", 1,
+    receive_servo_command_sub_ = n_.subscribe("/servo_command", 10,
                                            &ServoController::receiveServoCommandCB, this);
-		//receive_playmode_command_sub_ = n_.subscribe("/servo_playmode", 1,
-    //                                       &ServoController::receiveServoPlaymodeCB, this);                                           
-		//receive_capturemode_command_sub_ = n_.subscribe("/servo_capturemode", 1,
-    //                                       &ServoController::receiveServoCapturemodeCB, this);                                           
+    receive_enable_balancing_sub_ = n_.subscribe("/enable_balancing", 10,
+                                           &ServoController::receiveEnableBalancingCB, this);                                           
 		update_config_sub_ = n_.subscribe("/update_config", 1, 
                                     &ServoController::receiveUpdateConfigCB, this);    
     capture_pose_srv_ = n_.advertiseService("/capture_pose", &ServoController::capturePoseCB, this);
@@ -76,16 +75,20 @@ public:
     static pthread_attr_t controlThreadAttr_;
 
     int rv;
-    if ((rv = pthread_create(&controlThread_, &controlThreadAttr_, playActionThread, this)) != 0)
+    if (playaction_thread_)
     {
-      ROS_FATAL("Unable to create control thread: rv = %d", rv);
-      ROS_BREAK();
+    	if ((rv = pthread_create(&controlThread_, &controlThreadAttr_, playActionThread, this)) != 0)
+      {
+        ROS_FATAL("Unable to create control thread: rv = %d", rv);
+        ROS_BREAK();
+      }
     }
     
     ros::spin();
 
     running_ = false;
-    pthread_join(controlThread_, NULL);//(void **)&rv);
+    if (playaction_thread_)
+    	pthread_join(controlThread_, NULL);//(void **)&rv);
     rcservo_Close();
     
     for(i = servos_.begin(); i != servos_.end(); ++i)
@@ -104,13 +107,11 @@ public:
 private:
   ros::NodeHandle n_;
   ros::NodeHandle np_;
-  //ros::Subscriber update_trim_sub_;
-  ros::Subscriber joint_state_sub_;
+  ros::Subscriber joint_state_sub_, joint_state_alt_sub_;
   ros::Subscriber balance_joint_state_sub_;
   ros::Subscriber receive_servo_command_sub_;
-  ros::Subscriber receive_servo_playmode_sub_;
-  ros::Subscriber receive_servo_capturemode_sub_;
   ros::Subscriber update_config_sub_;
+  ros::Subscriber receive_enable_balancing_sub_;
   ros::ServiceServer capture_pose_srv_;
   ServoLibrary    servos_;
   bool            do_mix_;
@@ -121,6 +122,9 @@ private:
   bool            running_;
   bool            force_mix_;
   bool            reset_after_mix_;
+  bool            capture_mode_;
+  bool						playaction_thread_;
+  bool            balancing_enabled_;
   pthread_mutex_t playframe_mutex_;
   pthread_mutex_t mixframe_mutex_;
   pthread_mutex_t com4_mutex_;
@@ -132,26 +136,29 @@ private:
     ros::Rate loop_rate(that->servo_fps_); 
     while (that->running_)
     {
-      if (that->do_mix_ || that->force_mix_) 
+      if (!that->capture_mode_)
       {
-        pthread_mutex_lock(&that->mixframe_mutex_);
-        pthread_mutex_lock(&that->playframe_mutex_);
-        rcservo_PlayActionMix(that->mixframe_);
-        pthread_mutex_unlock(&that->playframe_mutex_);
-        if (that->reset_after_mix_)
-          memset(that->mixframe_, 0, sizeof(long) * 32);
-        that->do_mix_ = false;
-        pthread_mutex_unlock(&that->mixframe_mutex_);
-      }
-      else
-      {
-        pthread_mutex_lock(&that->playframe_mutex_);
-        rcservo_PlayAction();
-        pthread_mutex_unlock(&that->playframe_mutex_);
+        if ((that->do_mix_ || that->force_mix_) && that->balancing_enabled_) 
+        {
+          pthread_mutex_lock(&that->mixframe_mutex_);
+          pthread_mutex_lock(&that->playframe_mutex_);
+          rcservo_PlayActionMix(that->mixframe_);
+          pthread_mutex_unlock(&that->playframe_mutex_);
+          if (that->reset_after_mix_)
+            memset(that->mixframe_, 0, sizeof(long) * 32);
+          that->do_mix_ = false;
+          pthread_mutex_unlock(&that->mixframe_mutex_);
+        }
+        else
+        {
+          pthread_mutex_lock(&that->playframe_mutex_);
+          rcservo_PlayAction();
+          pthread_mutex_unlock(&that->playframe_mutex_);
+        }
       }
       loop_rate.sleep();
     }
-    
+        
     return NULL;
   }
   
@@ -179,11 +186,6 @@ private:
       ROS_ERROR("RoBoIO: %s", roboio_GetErrMsg());
   }
   
-  //void updateTrimCB(const std_msgs::BoolConstPtr& msg)
-  //{
-  //  servos_.openURDFparam();
-  //}
-  
   void loadConfig()
   {
     servos_.loadServos();
@@ -206,9 +208,15 @@ private:
     
     np_.param<int>("servo_fps", servo_fps_, 100); 
     np_.param<bool>("force_mix", force_mix_, false);     
-    np_.param<bool>("reset_after_mix", reset_after_mix_, false);       
+    np_.param<bool>("reset_after_mix", reset_after_mix_, false);
+    np_.param<bool>("playaction_thread", playaction_thread_, true);       
   }
   
+  void receiveEnableBalancingCB(const std_msgs::BoolConstPtr& msg)
+  { 
+  	balancing_enabled_ = msg->data;
+  }
+    
   void receiveUpdateConfigCB(const std_msgs::EmptyConstPtr& msg)
   { 
   	loadConfig();
@@ -221,6 +229,14 @@ private:
       
     executeJointState(msg);
   }
+  
+  void jointStateCB2(const sensor_msgs::JointStateConstPtr& msg)
+  {
+    if (!msg->name.size())
+      return;
+      
+    executeJointState(msg, true);
+  }  
   
   void balancingJointStateCB(const sensor_msgs::JointStateConstPtr& msg)
   {
@@ -260,22 +276,42 @@ private:
       	pos = 0;
         cmd = RCSERVO_MIXWIDTH_POWEROFF;
         rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD_POWEROFF);
+        //rcservo_EnterPlayMode();
         break;
       case 1:
-      	pos = 16383;
+      	//pos = 16383;	// why does the position locking command not work?
         cmd = RCSERVO_MIXWIDTH_CMD1;
         rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD1);
+        //rcservo_EnterPlayMode();
         break;
       case 2:
-      	pos = 16383;
+      	//pos = 16383;  // why does the position locking command not work?
         cmd = RCSERVO_MIXWIDTH_CMD2;
         rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD2);
+        //rcservo_EnterPlayMode();
         break;
       case 3:
-      	pos = 16383;
+      	//pos = 16383;  // why does the position locking command not work?
         cmd = RCSERVO_MIXWIDTH_CMD3;
         rcservo_SetPlayModeCMD(servos_.getUsedPWMChannels(), RCSERVO_CMD3);
-        break;    
+        //rcservo_EnterPlayMode();
+        break; 
+      case 100:
+      	pos = 0;
+        capture_mode_ = true;
+      	pthread_mutex_lock(&playframe_mutex_);
+      		rcservo_EnterCaptureMode();
+        pthread_mutex_unlock(&playframe_mutex_);
+        //return;
+        break;
+      case 101:
+      	//pos = 16383;  // why does the position locking command not work?
+        capture_mode_ = false;
+      	pthread_mutex_lock(&playframe_mutex_);
+      		rcservo_EnterPlayMode(); 
+        pthread_mutex_unlock(&playframe_mutex_);    
+    		//return;
+        break;
       default:
         return;
     }
@@ -283,11 +319,17 @@ private:
     for (size_t i=0; i < 32; i++)
     	commandframe_[i] = cmd;
     
-    pthread_mutex_lock(&playframe_mutex_);
-    	rcservo_PlayActionMix(commandframe_);
-    pthread_mutex_unlock(&playframe_mutex_);
-          
-    pthread_mutex_lock(&com4_mutex_);     
+    if (playaction_thread_)
+    {
+    	//ROS_INFO("doing ics mix");
+    	pthread_mutex_lock(&playframe_mutex_);
+    		rcservo_PlayActionMix(commandframe_);
+    	pthread_mutex_unlock(&playframe_mutex_);
+    }
+    //rcservo_EnterPlayMode(); 
+    
+    if (pos == 0)	// ... the other ics commands arent working ...
+    {     
       ServoLibrary::iterator i = servos_.begin();
       for(; i != servos_.end(); ++i)
       {
@@ -295,21 +337,14 @@ private:
         Servo& servo = i->second;
         if (servo.bus_ == Servo::COM4)
         {
-          com4_ics_pos(servo.channel_, pos);
+          pthread_mutex_lock(&com4_mutex_);
+          	com4_ics_pos(servo.channel_, pos);
+          pthread_mutex_unlock(&com4_mutex_);
           usleep(1);
         }
       }   	
-    pthread_mutex_unlock(&com4_mutex_);
-  }
-
-  void receiveServoPlaymodeCB(const std_msgs::EmptyConstPtr& msg)
-  { 
-  	rcservo_EnterPlayMode();
-  }
+    }
     
-  void receiveServoCapturemodeCB(const std_msgs::EmptyConstPtr& msg)
-  { 
-  	rcservo_EnterCaptureMode();
   }
   
   bool capturePoseCB(veltrobot_msgs::CapturePose::Request  &req,
@@ -318,11 +353,11 @@ private:
   	//ROS_INFO("Capture pose requested.");
     unsigned long width[32];
     pthread_mutex_lock(&playframe_mutex_);
-    rcservo_EnterCaptureMode();
+    //rcservo_EnterCaptureMode();
     
     rcservo_ReadPositions(servos_.getUsedPWMChannels(), RCSERVO_CMD_POWEROFF, width);
     
-    rcservo_EnterPlayMode();
+    //rcservo_EnterPlayMode();
     pthread_mutex_unlock(&playframe_mutex_);
     
     for (size_t i=0; i < req.requestedJointNames.size(); i++)
@@ -353,7 +388,7 @@ private:
     return true;
   }
   
-  void executeJointState(const sensor_msgs::JointStateConstPtr& msg)
+  void executeJointState(const sensor_msgs::JointStateConstPtr& msg, bool alternate=false)
   {
     // TODO: something better than this for velocity and duration.
     //       it could be possible to work out a scheme where each servo can get
@@ -388,9 +423,19 @@ private:
     // OPTIONAL?: wait for previous movement to finish:
     //  while (rcservo_PlayAction() != RCSERVO_PLAYEND) { }
     //  or rcservo_MoveTo(playframe_, duration);
-    pthread_mutex_lock(&playframe_mutex_);
-    	rcservo_SetAction(playframe_, duration);
-    pthread_mutex_unlock(&playframe_mutex_);
+    
+    if (alternate)
+    {
+    	pthread_mutex_lock(&playframe_mutex_);
+    		rcservo_MoveTo(playframe_, duration);
+      pthread_mutex_unlock(&playframe_mutex_);  
+    }
+    else
+    {
+      pthread_mutex_lock(&playframe_mutex_);
+        rcservo_SetAction(playframe_, duration);
+      pthread_mutex_unlock(&playframe_mutex_);
+    }
 
 		// TODO: no concept of duration here, could use the speed parameters, 
     //       or could write a separate thread that interpolates for the serial
