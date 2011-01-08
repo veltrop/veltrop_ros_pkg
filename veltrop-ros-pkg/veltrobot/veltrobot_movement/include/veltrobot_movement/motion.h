@@ -27,6 +27,7 @@ public:
   std::vector <std::string> poses_;
   std::string               next_phase_;
   bool                      abort_safe_;
+  bool											balancing_enabled_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
