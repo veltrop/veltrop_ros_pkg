@@ -16,6 +16,9 @@ public:
     ~JointWidget();
 
     void setPosition(float position);
+    float getPosition() const;
+    std::string getName() const;
+    bool enableCapture() const;
 
 private:
     Ui::JointWidget *ui;

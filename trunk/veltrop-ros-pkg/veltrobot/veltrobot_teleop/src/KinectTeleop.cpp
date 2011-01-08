@@ -29,6 +29,7 @@ KinectTeleop::KinectTeleop()
 : publish_kinect_tf_(false)
 , arms_enabled_(false)
 , legs_enabled_(false)
+, motion_enabled_(false)
 {    
 }
       
@@ -38,10 +39,11 @@ void KinectTeleop::init()
 	ros::NodeHandle np("~");
 	motion_pub_ = n.advertise <std_msgs::String> ("motion_name", 1);
 	joint_states_pub_ = n.advertise<sensor_msgs::JointState>("/joint_states", 1);
-	cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
-	np.param<bool>("publish_kinect_tf_", publish_kinect_tf_, false);  
+	cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);	
+  np.param<bool>("publish_kinect_tf_", publish_kinect_tf_, false);  
   enable_joint_group_sub_ = n.subscribe("/enable_joint_group", 1,
                                         &KinectTeleop::enableJointGroupCB, this);
+                                      
 }
 
 void KinectTeleop::enableJointGroupCB(const veltrobot_msgs::EnableJointGroupConstPtr& msg)
@@ -52,6 +54,8 @@ void KinectTeleop::enableJointGroupCB(const veltrobot_msgs::EnableJointGroupCons
     	legs_enabled_ = msg->enabledStates[i];
     else if (msg->jointGroups[i] == "arms")
     	arms_enabled_ = msg->enabledStates[i];
+    else if (msg->jointGroups[i] == "motions")
+    	motion_enabled_ = msg->enabledStates[i];      
   }
 }
       
@@ -479,6 +483,22 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 			right_ankle_angle_roll = asin(right_knee_foot.x());
 			right_ankle_angle_roll = -(right_ankle_angle_roll);
 		}				
+    
+		// left hip pitch
+		static double left_hip_angle_pitch = 0;
+		if (joint_position_left_hip.fConfidence >= 0.5)
+		{ 
+			left_hip_angle_pitch = asin(left_knee_hip.y());
+			left_hip_angle_pitch = -(left_hip_angle_pitch - HALFPI);
+		}
+		
+		// right hip pitch
+		static double right_hip_angle_pitch = 0;
+		if (joint_position_right_hip.fConfidence >= 0.5)
+		{ 
+			right_hip_angle_pitch = asin(right_knee_hip.y());
+			right_hip_angle_pitch = (right_hip_angle_pitch - HALFPI);
+		}	    
 		
 		// Torso Yaw
 	  //static double torso_angle_yaw = 0;
@@ -579,6 +599,19 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 	  //ROS_INFO("ANGLE: %f", foot_mouse_angle);
 	
     cmd_vel_pub_.publish(cmd_vel);
+
+    // adapt velocity to 4 static motions
+    /*std_msgs::String mot;
+    mot.data = "stand_squat";
+    if (cmd_vel.linear.x > 0.0)
+      mot.data = "walk_forward";
+    if (cmd_vel.angular.z	> 0.0)
+      mot.data = "rotate_right";
+    if (cmd_vel.angular.z	< 0.0)
+      mot.data = "rotate_left";
+      
+    if (motion_enabled_)
+    	motion_pub_.publish(mot);*/
   
 		/////
 		// Send to robot
@@ -640,18 +673,17 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.name.push_back("ankle_right_roll");
       js.position.push_back(right_ankle_angle_roll);
       js.velocity.push_back(10); 
+      js.name.push_back("hip_left_pitch");
+      js.position.push_back(left_hip_angle_pitch);
+      js.velocity.push_back(10);
+			js.name.push_back("hip_right_pitch");
+      js.position.push_back(right_hip_angle_pitch);
+      js.velocity.push_back(10);      
       
       js.name.push_back("hip_left_yaw");
       js.position.push_back(0);
       js.velocity.push_back(10);
-      js.name.push_back("hip_left_pitch");
-      js.position.push_back(0);
-      js.velocity.push_back(10);
-      
       js.name.push_back("hip_right_yaw");
-      js.position.push_back(0);
-      js.velocity.push_back(10);
-      js.name.push_back("hip_right_pitch");
       js.position.push_back(0);
       js.velocity.push_back(10);
     }  

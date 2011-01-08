@@ -4,6 +4,8 @@
 #include <string>
 #include <map>
 #include <stdint.h>
+#include <tinyxml/tinyxml.h>
+
 
 namespace veltrobot_movement
 {
@@ -25,12 +27,15 @@ public:
   Pose();  
   void clear();
   void loadXML(std::string filename);
+  void saveXML(std::string filename="");
     
 public:
   std::string                  name_;
   int32_t                      duration_;    // in ms
   unit                         unit_;
   std::map<std::string, float> positions_;   // in veltrobot_movement::unit
+  std::string                  filename_;
+  //TiXmlDocument                doc_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

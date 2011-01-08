@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>590</width>
-    <height>343</height>
+    <width>593</width>
+    <height>320</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -54,7 +54,7 @@
       </sizepolicy>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_7">
+    <widget class="QPushButton" name="pushButton_motionExecute">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -106,19 +106,6 @@
       <string>Edit</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_11">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>230</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Rest</string>
-     </property>
-    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
@@ -142,7 +129,7 @@
       </rect>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::MultiSelection</enum>
+      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButton_8">
@@ -184,19 +171,6 @@
       <string>+</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_6">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>230</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Capture</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="pushButton_editPose">
      <property name="geometry">
       <rect>
@@ -211,23 +185,19 @@
      </property>
     </widget>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>590</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
+   <widget class="QPushButton" name="pushButton_rescan">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>270</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
     </property>
-    <addaction name="actionRescan_Library"/>
+    <property name="text">
+     <string>Rescan Library</string>
+    </property>
    </widget>
-   <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRescan_Library">

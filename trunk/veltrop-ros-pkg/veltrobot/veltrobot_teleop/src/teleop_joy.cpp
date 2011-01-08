@@ -101,10 +101,10 @@ private:
       group.enabledStates.push_back(prev_R1);
     }    
                          
-    if (joy->buttons[1])
+    if (joy->buttons[2])
     {    
-      float neck_yaw = joy->axes[0] * -1.57;
-      float neck_pitch = joy->axes[1] * -1.57;
+      float neck_yaw = joy->axes[2] * -1.57;
+      float neck_pitch = joy->axes[3] * -1.57;
 
       sensor_msgs::JointState js; 
       js.name.push_back("neck_yaw");

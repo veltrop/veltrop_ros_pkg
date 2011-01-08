@@ -1,7 +1,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <ros/ros.h>
-//#include <string>
+#include <string>
 #include <veltrobot_movement/pose.h>
 #include <tinyxml/tinyxml.h>
 
@@ -25,11 +25,46 @@ void Pose::clear()
   positions_.clear();
 }
 
+void Pose::saveXML(std::string filename)
+{
+	if (filename != "")
+  	filename_ = filename;
+    
+  TiXmlDocument doc;
+	TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "");
+  doc.LinkEndChild(decl);
+  
+  TiXmlElement* pose_element = new TiXmlElement("pose");
+  doc.LinkEndChild(pose_element);
+  pose_element->SetAttribute("name", name_.c_str());
+  
+  TiXmlElement* joint_positions_element = new TiXmlElement("joint_positions");
+  pose_element->LinkEndChild(joint_positions_element);
+  joint_positions_element->SetAttribute("duration", duration_);
+  joint_positions_element->SetAttribute("units", "radians_offset");
+	    
+  std::map<std::string, float>::iterator i = positions_.begin();
+  for(; i != positions_.end(); ++i)
+  {
+    const std::string& joint_name = i->first;
+    float position = i->second;
+
+		TiXmlElement* joint_element = new TiXmlElement("joint");
+    joint_positions_element->LinkEndChild(joint_element);
+    joint_element->SetAttribute("name", joint_name.c_str());
+    joint_element->SetDoubleAttribute("position", position);
+  }
+  
+	doc.SaveFile(filename.c_str());
+}
+
 void Pose::loadXML(std::string filename)
 {
 	TiXmlDocument doc(filename.c_str());
 	if (!doc.LoadFile())
     return;
+    
+  filename_ = filename;
 	
 	clear();
 
