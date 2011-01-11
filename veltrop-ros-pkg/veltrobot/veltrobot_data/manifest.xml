@@ -18,7 +18,6 @@
   <depend package="veltrobot_sensors" />
   <depend package="roboard_servos" />
   <depend package="roboard_sensors" />
-  <depend package="ps3joy"/>
    
 </package>
 
