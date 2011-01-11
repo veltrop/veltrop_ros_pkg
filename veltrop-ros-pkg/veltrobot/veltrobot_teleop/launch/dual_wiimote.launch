@@ -1,0 +1,29 @@
+
+
+<launch>
+  <node respawn="true" ns="wiimote1" pkg="veltrobot_teleop" type="wiimote_node.py" name="wiimote1" output="screen" >
+	<remap from="/wiimote/leds" to="/wiimote1/leds" />
+	<remap from="/wiimote/rumble" to="/wiimote1/rumble" />
+	<remap from="/wiimote/state" to="/wiimote1/state" />
+	<remap from="/imu/is_calibrated" to="/wiimote1/imu/is_calibrated" />
+</node>
+ <node respawn="true" ns="wiimote2" pkg="veltrobot_teleop" type="wiimote_node.py" name="wiimote1" output="screen" >
+	<remap from="/wiimote/leds" to="/wiimote2/leds" />
+	<remap from="/wiimote/rumble" to="/wiimote2/rumble" />
+	<remap from="/wiimote/state" to="/wiimote2/state" />
+	<remap from="/imu/is_calibrated" to="/wiimote2/imu/is_calibrated" />
+</node>
+
+ <node pkg="veltrobot_teleop" type="wiimoteLeds.py" name="wiimote1leds" >
+	<remap from="/wiimote/leds" to="/wiimote1/leds" />
+	<param name="led0" value="true" />
+ 	<param name="led1" value="true" />
+</node>
+ <node pkg="veltrobot_teleop" type="wiimoteLeds.py" name="wiimote2leds" >
+	<remap from="/wiimote/leds" to="/wiimote2/leds" />
+	<param name="led2" value="true" />
+ 	<param name="led3" value="true" />
+</node>
+
+</launch>
+

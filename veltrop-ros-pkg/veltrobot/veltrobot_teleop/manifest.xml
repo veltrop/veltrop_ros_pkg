@@ -18,6 +18,7 @@
   <depend package="tf"/> 
   <depend package="kdl"/>
   <depend package="veltrobot_msgs"/>
+  <depend package="wiimote"/>
 
 </package>
 
