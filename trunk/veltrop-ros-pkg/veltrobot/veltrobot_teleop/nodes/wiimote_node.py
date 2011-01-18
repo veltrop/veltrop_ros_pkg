@@ -328,17 +328,6 @@ class JoySender(WiimoteDataSender):
             while not rospy.is_shutdown():
                 (canonicalAccel, canonicalNunchukAccel, canonicalAngleRate) = self.obtainWiimoteData()
                 
-                dpad_x = 0.0
-                dpad_y = 0.0
-                if self.wiistate.buttons[BTN_UP]:
-                  dpad_y = 0.9
-                if self.wiistate.buttons[BTN_DOWN]:
-                  dpad_y = -0.9
-                if self.wiistate.buttons[BTN_LEFT]:
-                  dpad_x = -0.9
-                if self.wiistate.buttons[BTN_RIGHT]:
-                  dpad_x = 0.9
-
                 axes=[canonicalAccel[X], canonicalAccel[Y], canonicalAccel[Z]]
                 
                 # If a gyro is attached to the Wiimote, we add the
@@ -346,8 +335,6 @@ class JoySender(WiimoteDataSender):
                 if self.wiistate.motionPlusPresent:
                     axes.extend([canonicalAngleRate[PHI], canonicalAngleRate[THETA], canonicalAngleRate[PSI]])
                          
-                axes.extend([dpad_x, dpad_y])         
-
                 # Fill in the ROS message's buttons field (there *must* be
                 #     a better way in python to declare an array of 11 zeroes...]
 
