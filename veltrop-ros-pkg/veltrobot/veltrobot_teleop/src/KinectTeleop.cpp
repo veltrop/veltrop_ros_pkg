@@ -2,6 +2,7 @@
 #include <std_msgs/String.h>
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Point.h>
 #include <tf/transform_broadcaster.h>
 #include <kdl/frames.hpp>
 #include <veltrobot_msgs/EnableJointGroup.h>
@@ -20,14 +21,13 @@
 
 using std::string;
 
-// TODO I wish: hand open/close or palm recognition to control grippers
-
 namespace veltrobot_teleop
 {
 
 KinectTeleop::KinectTeleop()
 : publish_kinect_tf_(false)
-, arms_enabled_(false)
+, right_arm_enabled_(false)
+, left_arm_enabled_(false)
 , legs_enabled_(false)
 , motion_enabled_(false)
 {    
@@ -39,11 +39,13 @@ void KinectTeleop::init()
 	ros::NodeHandle np("~");
 	motion_pub_ = n.advertise <std_msgs::String> ("motion_name", 1);
 	joint_states_pub_ = n.advertise<sensor_msgs::JointState>("/joint_states", 1);
-	//cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);	
+  left_arm_destination_pub_ = n.advertise<geometry_msgs::Point>("/left_arm_destination", 1);
+  right_arm_destination_pub_ = n.advertise<geometry_msgs::Point>("/right_arm_destination", 1);
+	
+  //cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);	
   np.param<bool>("publish_kinect_tf_", publish_kinect_tf_, false);  
   enable_joint_group_sub_ = n.subscribe("/enable_joint_group", 1,
                                         &KinectTeleop::enableJointGroupCB, this);
-                                      
 }
 
 void KinectTeleop::enableJointGroupCB(const veltrobot_msgs::EnableJointGroupConstPtr& msg)
@@ -51,12 +53,26 @@ void KinectTeleop::enableJointGroupCB(const veltrobot_msgs::EnableJointGroupCons
 	for (size_t i=0; i < msg->jointGroups.size(); i++)
   {
   	if (msg->jointGroups[i] == "legs")
-    	legs_enabled_ = msg->enabledStates[i];
-    else if (msg->jointGroups[i] == "arms")
-    	arms_enabled_ = msg->enabledStates[i];
-    else if (msg->jointGroups[i] == "motions")
-    	motion_enabled_ = msg->enabledStates[i];      
-  }
+		{
+			legs_enabled_ = msg->enabledStates[i];
+		}
+		else if (msg->jointGroups[i] == "arms")
+		{
+			right_arm_enabled_ = left_arm_enabled_ = msg->enabledStates[i];
+		}
+		else if (msg->jointGroups[i] == "left_arm")
+		{
+		  left_arm_enabled_ = msg->enabledStates[i];
+		}	
+		else if (msg->jointGroups[i] == "right_arm")
+		{
+			right_arm_enabled_ = msg->enabledStates[i];
+		}
+		else if (msg->jointGroups[i] == "motions")
+		{
+			motion_enabled_ = msg->enabledStates[i];      
+  	}
+	}
 }
       
 void KinectTeleop::publishTransform(KinectController& kinect_controller,
@@ -624,41 +640,37 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		
 		sensor_msgs::JointState js; 
     
-    if (arms_enabled_)
+    if (left_arm_enabled_)
     {
       js.name.push_back("elbow_left_roll");
       js.position.push_back(left_elbow_angle_roll);
       js.velocity.push_back(10);
-      js.name.push_back("elbow_right_roll");
-      js.position.push_back(right_elbow_angle_roll);
-      js.velocity.push_back(10);
       js.name.push_back("shoulder_left_roll");
       js.position.push_back(left_shoulder_angle_roll);
+      js.velocity.push_back(10);
+      js.name.push_back("shoulder_left_pitch");
+      js.position.push_back(left_shoulder_angle_pitch);
+      js.velocity.push_back(10);
+      js.name.push_back("shoulder_left_yaw");
+      js.position.push_back(left_shoulder_angle_yaw);
+      js.velocity.push_back(10);
+    }
+
+		if (right_arm_enabled_)
+		{
+      js.name.push_back("elbow_right_roll");
+      js.position.push_back(right_elbow_angle_roll);
       js.velocity.push_back(10);
       js.name.push_back("shoulder_right_roll");
       js.position.push_back(right_shoulder_angle_roll);
       js.velocity.push_back(10);          
-      js.name.push_back("shoulder_left_pitch");
-      js.position.push_back(left_shoulder_angle_pitch);
-      js.velocity.push_back(10);
       js.name.push_back("shoulder_right_pitch");
       js.position.push_back(right_shoulder_angle_pitch);
       js.velocity.push_back(10);          
-      js.name.push_back("shoulder_left_yaw");
-      js.position.push_back(left_shoulder_angle_yaw);
-      js.velocity.push_back(10);
       js.name.push_back("shoulder_right_yaw");
       js.position.push_back(right_shoulder_angle_yaw);
       js.velocity.push_back(10);    
-      
-		js.name.push_back("neck_pitch");
-		js.position.push_back(0.3);
-		js.velocity.push_back(10);
-		js.name.push_back("neck_yaw");
-		js.position.push_back(0.0);
-		js.velocity.push_back(10);      
-      
-    }        
+		}		
     
     if (legs_enabled_)
     {
@@ -709,9 +721,39 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		js.position.push_back(head_angle_yaw);
 		js.velocity.push_back(10);
 		*/
-    		
-    joint_states_pub_.publish(js);
+    if (js.name.size()) 		
+      joint_states_pub_.publish(js);
 
+
+    KDL::Vector left_hand_torso  = left_hand  - torso;
+    KDL::Vector right_hand_torso = right_hand - torso;
+    
+    // need to scale from me to the nao.
+    // I am 1.69 meters, nao is 0.58.
+    // nao is 0.3432 of me.
+    
+    left_hand_torso  = 0.3432 * left_hand_torso;
+    right_hand_torso = 0.3432 * right_hand_torso;
+
+    geometry_msgs::Point p;
+
+    if (left_arm_enabled_)
+    {
+      p.x = left_hand_torso.x();
+      p.y = left_hand_torso.y();
+      p.z = left_hand_torso.z();
+      left_arm_destination_pub_.publish(p);
+    }
+
+    if (right_arm_enabled_)
+    {
+      p.x = right_hand_torso.x();
+      p.y = right_hand_torso.y();
+      p.z = right_hand_torso.z();
+      right_arm_destination_pub_.publish(p);
+    }
+
+   
 		break;	// only read first user
 	}
 }

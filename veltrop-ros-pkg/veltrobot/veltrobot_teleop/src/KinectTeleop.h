@@ -24,12 +24,15 @@ class KinectTeleop
 	private:
 		void enableJointGroupCB(const veltrobot_msgs::EnableJointGroupConstPtr& msg);
     
+    ros::Publisher   left_arm_destination_pub_;
+    ros::Publisher   right_arm_destination_pub_;
 		ros::Publisher   motion_pub_;
 		ros::Publisher   joint_states_pub_;
 		ros::Publisher   cmd_vel_pub_;
     ros::Subscriber  enable_joint_group_sub_;
 		bool             publish_kinect_tf_;
-    bool             arms_enabled_, legs_enabled_, motion_enabled_;
+    bool             right_arm_enabled_, left_arm_enabled_; 
+    bool             legs_enabled_, motion_enabled_;
 };
 
 } // namespace veltrobot_teleop

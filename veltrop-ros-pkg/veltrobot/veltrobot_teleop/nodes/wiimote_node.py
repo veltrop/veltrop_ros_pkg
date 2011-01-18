@@ -1,4 +1,10 @@
 #!/usr/bin/python
+
+# modified to work at 30 fps instead of 100, and only do joysender
+# it would be nice to provide parameters for these
+# also modified so that rocker switch is an axis, makes it more compatible
+# can these be put upstream to willow garage?
+
 ################################################################################
 #
 # File:         wiimode_node.py
@@ -322,32 +328,43 @@ class JoySender(WiimoteDataSender):
             while not rospy.is_shutdown():
                 (canonicalAccel, canonicalNunchukAccel, canonicalAngleRate) = self.obtainWiimoteData()
                 
-                msg = Joy(# the Joy msg does not have a header :-( header=None,
-                          axes=[canonicalAccel[X], canonicalAccel[Y], canonicalAccel[Z]],
-                          buttons=None)
+                dpad_x = 0.0
+                dpad_y = 0.0
+                if self.wiistate.buttons[BTN_UP]:
+                  dpad_y = 0.9
+                if self.wiistate.buttons[BTN_DOWN]:
+                  dpad_y = -0.9
+                if self.wiistate.buttons[BTN_LEFT]:
+                  dpad_x = -0.9
+                if self.wiistate.buttons[BTN_RIGHT]:
+                  dpad_x = 0.9
+
+                axes=[canonicalAccel[X], canonicalAccel[Y], canonicalAccel[Z]]
                 
                 # If a gyro is attached to the Wiimote, we add the
                 # gyro information:
                 if self.wiistate.motionPlusPresent:
-                    msg.axes.extend([canonicalAngleRate[PHI], canonicalAngleRate[THETA], canonicalAngleRate[PSI]])
-                          
+                    axes.extend([canonicalAngleRate[PHI], canonicalAngleRate[THETA], canonicalAngleRate[PSI]])
+                         
+                axes.extend([dpad_x, dpad_y])         
+
                 # Fill in the ROS message's buttons field (there *must* be
                 #     a better way in python to declare an array of 11 zeroes...]
 
-                theButtons = [False,False,False,False,False,False,False,False,False,False,False]
-                theButtons[State.MSG_BTN_1]     = self.wiistate.buttons[BTN_1]
-                theButtons[State.MSG_BTN_2]     = self.wiistate.buttons[BTN_2]
-                theButtons[State.MSG_BTN_A]     = self.wiistate.buttons[BTN_A]
-                theButtons[State.MSG_BTN_B]     = self.wiistate.buttons[BTN_B]
-                theButtons[State.MSG_BTN_PLUS]  = self.wiistate.buttons[BTN_PLUS]
-                theButtons[State.MSG_BTN_MINUS] = self.wiistate.buttons[BTN_MINUS]
-                theButtons[State.MSG_BTN_LEFT]  = self.wiistate.buttons[BTN_LEFT]
-                theButtons[State.MSG_BTN_RIGHT] = self.wiistate.buttons[BTN_RIGHT]
-                theButtons[State.MSG_BTN_UP]    = self.wiistate.buttons[BTN_UP]
-                theButtons[State.MSG_BTN_DOWN]  = self.wiistate.buttons[BTN_DOWN]
-                theButtons[State.MSG_BTN_HOME]  = self.wiistate.buttons[BTN_HOME]
+                buttons = [False,False,False,False,False,False,False,False,False,False,False]
+                buttons[State.MSG_BTN_1]     = self.wiistate.buttons[BTN_1]
+                buttons[State.MSG_BTN_2]     = self.wiistate.buttons[BTN_2]
+                buttons[State.MSG_BTN_A]     = self.wiistate.buttons[BTN_A]
+                buttons[State.MSG_BTN_B]     = self.wiistate.buttons[BTN_B]
+                buttons[State.MSG_BTN_PLUS]  = self.wiistate.buttons[BTN_PLUS]
+                buttons[State.MSG_BTN_MINUS] = self.wiistate.buttons[BTN_MINUS]
+                buttons[State.MSG_BTN_LEFT]  = self.wiistate.buttons[BTN_LEFT]
+                buttons[State.MSG_BTN_RIGHT] = self.wiistate.buttons[BTN_RIGHT]
+                buttons[State.MSG_BTN_UP]    = self.wiistate.buttons[BTN_UP]
+                buttons[State.MSG_BTN_DOWN]  = self.wiistate.buttons[BTN_DOWN]
+                buttons[State.MSG_BTN_HOME]  = self.wiistate.buttons[BTN_HOME]
 
-                msg.buttons = theButtons
+                msg = Joy(axes, buttons)
                 
                 measureTime = self.wiistate.time
                 timeSecs = int(measureTime)
@@ -358,8 +375,8 @@ class JoySender(WiimoteDataSender):
                 
                 self.pub.publish(msg)
                 
-                rospy.logdebug("Joystick state:")
-                rospy.logdebug("    Joy buttons: " + str(theButtons) + "\n    Joy accel: " + str(canonicalAccel) + "\n    Joy angular rate: " + str(canonicalAngleRate))
+                #rospy.logdebug("Joystick state:")
+                #rospy.logdebug("    Joy buttons: " + str(theButtons) + "\n    Joy accel: " + str(canonicalAccel) + "\n    Joy angular rate: " + str(canonicalAngleRate))
                 rospy.sleep(self.sleepDuration)
         except rospy.ROSInterruptException:
             rospy.loginfo("Shutdown request. Shutting down Joy sender.")
