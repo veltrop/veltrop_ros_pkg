@@ -30,6 +30,7 @@ public:
     joy1_sub_ = n_.subscribe <joy::Joy> ("/wiimote1/wiijoy", 10, &VeltrobotTeleopDualWii::joy1CB, this);
     joy2_sub_ = n_.subscribe <joy::Joy> ("/wiimote2/wiijoy", 10, &VeltrobotTeleopDualWii::joy2CB, this);
     arm_control_method_pub_ = n_.advertise <std_msgs::String> ("/arm_control_method", 10);
+    text_to_speech_pub_ = n_.advertise <std_msgs::String> ("speech", 1);
     virtual_joy_state_.axes.resize(4);
     virtual_joy_state_.buttons.resize(22); 
   }
@@ -49,6 +50,7 @@ private:
   ros::Publisher  virtual_joy_pub_;
   joy::Joy        virtual_joy_state_;
   ros::Publisher  arm_control_method_pub_;
+  ros::Publisher  text_to_speech_pub_;
 
   void processVirtual(const joy::Joy::ConstPtr& joy, int num)
   {
@@ -91,12 +93,19 @@ private:
       std_msgs::String method;
       method.data = "DIRECT";
       arm_control_method_pub_.publish(method);
+      
+      //std_msgs::String speech;
+      //speech.data = "Direct mode.";
+      //text_to_speech_pub_.publish(speech);
     }
     else if (joy->buttons[1])
     {
       std_msgs::String method;
       method.data = "IK";
       arm_control_method_pub_.publish(method);
+      //std_msgs::String speech;
+      //speech.data = "Ai kay mode.";
+      //text_to_speech_pub_.publish(speech);
     }
 
     static bool prev_A = false;
@@ -148,9 +157,18 @@ private:
 	{ 
     veltrobot_msgs::EnableJointGroup group;
     sensor_msgs::JointState js; 
-    //std_msgs::String mot;
-    //mot.data = "";
+    std_msgs::String mot;
+    mot.data = "";
     
+    if (joy->buttons[0])
+      mot.data = "sit";
+    else if (joy->buttons[1])
+      mot.data = "stand";
+    else if (joy->buttons[5])
+      mot.data = "relax";
+    else if (joy->buttons[4])
+      mot.data = "stiffen";
+
     static bool prev_A = false;
     if (joy->buttons[2] != prev_A)
     {
@@ -158,7 +176,7 @@ private:
       group.jointGroups.push_back("right_arm");
       group.enabledStates.push_back(prev_A);
     }
-		
+
     static bool prev_B = false;
 		//if (joy->buttons[3] != prev_B)
     //{    
@@ -184,8 +202,8 @@ private:
      	js.velocity.push_back(10);
 		}
 
-	  //if (mot.data != "")
-    //  motion_pub_.publish(mot); 
+	  if (mot.data != "")
+      motion_pub_.publish(mot); 
       
     if (js.name.size())
       joint_states_pub_.publish(js);
