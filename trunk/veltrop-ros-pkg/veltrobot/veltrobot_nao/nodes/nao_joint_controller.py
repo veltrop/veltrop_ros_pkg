@@ -5,6 +5,7 @@ import roslib
 roslib.load_manifest('veltrobot_nao')
 import rospy
 from sensor_msgs.msg import JointState
+import naoutil
 
 PI = 3.14159265359
 HALFPI = 1.57079632679
@@ -16,6 +17,14 @@ class NaoJointController():
     angles = list()
 
     # convert veltrobot joint names and zero-positions to nao
+
+    if "neck_pitch" in data.name:
+      names.append('HeadPitch')
+      angles.append(data.position[data.name.index("neck_pitch")])
+    
+    if "neck_yaw" in data.name:
+      names.append('HeadYaw')
+      angles.append(-data.position[data.name.index("neck_yaw")])
 
     if "shoulder_left_pitch" in data.name:
       names.append('LShoulderPitch')
@@ -65,7 +74,7 @@ class NaoJointController():
       names.append('LHand')
       angles.append(data.position[data.name.index("hand_left")])  
 
-    if names.len() is not 0:
+    if len(names) is not 0:
       fractionMaxSpeed = 0.9
       self.motionProxy.setAngles(names, angles, fractionMaxSpeed)
 
@@ -83,6 +92,10 @@ class NaoJointController():
 
     rospy.Subscriber("joint_states", JointState, self.JointStateCB, queue_size=1)
  	
+    #naoutil.StiffnessOn(self.motionProxy)
+    #naoutil.PoseInit(self.motionProxy)
+
+
 if __name__ == '__main__':
   joint_controller = NaoJointController()
   rospy.spin()

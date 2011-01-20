@@ -30,6 +30,7 @@ KinectTeleop::KinectTeleop()
 , left_arm_enabled_(false)
 , legs_enabled_(false)
 , motion_enabled_(false)
+, arm_control_method_(DIRECT)
 {    
 }
       
@@ -37,15 +38,28 @@ void KinectTeleop::init()
 {
 	ros::NodeHandle n;
 	ros::NodeHandle np("~");
-	motion_pub_ = n.advertise <std_msgs::String> ("motion_name", 1);
+	//motion_pub_ = n.advertise <std_msgs::String> ("motion_name", 1);
 	joint_states_pub_ = n.advertise<sensor_msgs::JointState>("/joint_states", 1);
   left_arm_destination_pub_ = n.advertise<geometry_msgs::Point>("/left_arm_destination", 1);
-  right_arm_destination_pub_ = n.advertise<geometry_msgs::Point>("/right_arm_destination", 1);
-	
+  right_arm_destination_pub_ = n.advertise<geometry_msgs::Point>("/right_arm_destination", 1);	
   //cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);	
-  np.param<bool>("publish_kinect_tf_", publish_kinect_tf_, false);  
-  enable_joint_group_sub_ = n.subscribe("/enable_joint_group", 1,
+  
+  np.param<bool>("publish_kinect_tf", publish_kinect_tf_, false);  
+  np.param<bool>("force_left_arm_enabled", left_arm_enabled_, false);
+  np.param<bool>("force_right_arm_enabled", right_arm_enabled_, false);
+
+  enable_joint_group_sub_ = n.subscribe("/enable_joint_group", 10,
                                         &KinectTeleop::enableJointGroupCB, this);
+  arm_control_method_sub_ = n.subscribe("/arm_control_method", 10,
+                                        &KinectTeleop::armControlMethodCB, this);
+}
+
+void KinectTeleop::armControlMethodCB(const std_msgs::StringConstPtr& msg)
+{
+  if (msg->data == "IK")
+    arm_control_method_ = IK;
+  else
+    arm_control_method_ = DIRECT;
 }
 
 void KinectTeleop::enableJointGroupCB(const veltrobot_msgs::EnableJointGroupConstPtr& msg)
@@ -246,7 +260,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		KDL::Vector left_foot(joint_position_left_foot.position.X, joint_position_left_foot.position.Y, joint_position_left_foot.position.Z);
 
 		///////////////////////////////////////////////////////////////////////////
-		// two ways to go about this direct geometry approach...
+		// two ways to go about this direct geometry approach... method two is used
 		//
 		// 1 semi calculated approach, the joint rotations are from the world perspective
 		//   so we need to get rotations of one joint relative to the next in a chain,
@@ -364,8 +378,11 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		// if we take the raw tf rotation from the input shoulder, can we apply that to our
 		// final dof of our shoulder chain, and then back solve for the two joints leading to it?
 		// or do that from the hand?
-		///////////////////////////////////////////////////////////////////////////
-											
+		// CONCLUSION:
+    // doing inverse ik increased the functional range of the arms a bit.  but did
+    // not make coordination any more simple or difficult
+    ///////////////////////////////////////////////////////////////////////////
+
 		// Knee left pitch					
 		KDL::Vector left_knee_foot(left_foot - left_knee);
 		KDL::Vector left_knee_hip(left_hip - left_knee);
@@ -422,54 +439,6 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 			hip_right_angle_roll = -(hip_right_angle_roll - HALFPI);
 		}			
 											
-		/*
-		// Right hip pitch
-		KDL::Vector right_hip_knee(right_knee - right_hip);
-		KDL::Vector right_hip_torso(torso - right_hip);
-		right_hip_knee.Normalize();
-		right_hip_torso.Normalize();
-		static double right_hip_angle_pitch = 0;
-		if (joint_position_right_hip.fConfidence >= 0.5 && 
-				joint_position_right_knee.fConfidence >= 0.5 && 
-				joint_position_torso.fConfidence >= 0.5)
-		{     
-			right_hip_angle_pitch = asin(KDL::dot(right_hip_knee, right_hip_torso));
-			// right_hip_angle_roll = -(right_hip_angle_roll - HALFPI);
-		} 
-
-		// Left hip roll
-		KDL::Vector left_hip_knee(left_knee - left_hip);
-		KDL::Vector left_hip_torso(torso - left_hip);
-		left_hip_knee.Normalize();
-		left_hip_torso.Normalize();
-		static double left_hip_angle_pitch = 0;
-		if (joint_position_left_hip.fConfidence >= 0.5 && 
-				joint_position_left_knee.fConfidence >= 0.5 && 
-				joint_position_torso.fConfidence >= 0.5)
-		{     
-			left_hip_angle_pitch = asin(KDL::dot(left_hip_knee, left_hip_torso));
-			//left_hip_angle_roll = -(left_hip_angle_roll - HALFPI);
-		}
-		*/
-		
-		/*
-		// Right ankle roll
-		XnSkeletonJointOrientation joint_orientation_right_knee;
-		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_RIGHT_KNEE, joint_orientation_right_knee);
-	  m = joint_orientation_right_knee.orientation.elements;
-	  KDL::Rotation right_knee_rotation(m[0], m[1], m[2],
-																 m[3], m[4], m[5],
-																 m[6], m[7], m[8]);
-		double right_knee_roll, right_knee_pitch, right_knee_yaw;
-	  right_knee_rotation.GetRPY(right_knee_roll, right_knee_pitch, right_knee_yaw);			
-		
-		static double right_ankle_roll = 0;
-		if (joint_orientation_right_knee.fConfidence >= 0.5)
-		{
-			right_ankle_roll = right_knee_roll;
-		}
-		*/
-		
 		// left ankle pitch
 		static double left_ankle_angle_pitch = 0;
 		if (joint_position_left_foot.fConfidence >= 0.5)
@@ -621,7 +590,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
     cmd_vel_pub_.publish(cmd_vel);
 		*/
     
-    // adapt velocity to 4 static motions
+    // adapt velocity to 4 veltrobot motions
     /*std_msgs::String mot;
     mot.data = "stand_squat";
     if (cmd_vel.linear.x > 0.0)
@@ -635,12 +604,12 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
     	motion_pub_.publish(mot);*/
   
 		/////
-		// Send to robot
+		// Send joint state to robot
 		/////
 		
 		sensor_msgs::JointState js; 
     
-    if (left_arm_enabled_)
+    if (left_arm_enabled_ && arm_control_method_ == DIRECT)
     {
       js.name.push_back("elbow_left_roll");
       js.position.push_back(left_elbow_angle_roll);
@@ -656,7 +625,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.velocity.push_back(10);
     }
 
-		if (right_arm_enabled_)
+		if (right_arm_enabled_ && arm_control_method_ == DIRECT)
 		{
       js.name.push_back("elbow_right_roll");
       js.position.push_back(right_elbow_angle_roll);
@@ -713,17 +682,12 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.velocity.push_back(10);
     }  
 		
-    /*
-		js.name.push_back("neck_pitch");
-		js.position.push_back(head_angle_pitch);
-		js.velocity.push_back(10);
-		js.name.push_back("neck_yaw");
-		js.position.push_back(head_angle_yaw);
-		js.velocity.push_back(10);
-		*/
     if (js.name.size()) 		
       joint_states_pub_.publish(js);
 
+    /////
+    //  Following is IK method
+    /////
 
     KDL::Vector left_hand_torso  = left_hand  - torso;
     KDL::Vector right_hand_torso = right_hand - torso;
@@ -731,29 +695,30 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
     // need to scale from me to the nao.
     // I am 1.69 meters, nao is 0.58.
     // nao is 0.3432 of me.
+    // magic number:
+    double scale = 0.0003432;
     
-    left_hand_torso  = 0.3432 * left_hand_torso;
-    right_hand_torso = 0.3432 * right_hand_torso;
+    left_hand_torso  = scale * left_hand_torso;
+    right_hand_torso = scale * right_hand_torso;
 
     geometry_msgs::Point p;
 
-    if (left_arm_enabled_)
+    if (left_arm_enabled_ && arm_control_method_ == IK)
     {
-      p.x = left_hand_torso.x();
-      p.y = left_hand_torso.y();
-      p.z = left_hand_torso.z();
+      p.x = -left_hand_torso.z();
+      p.y = -left_hand_torso.x();
+      p.z = left_hand_torso.y();
       left_arm_destination_pub_.publish(p);
     }
 
-    if (right_arm_enabled_)
+    if (right_arm_enabled_ && arm_control_method_ == IK)
     {
-      p.x = right_hand_torso.x();
-      p.y = right_hand_torso.y();
-      p.z = right_hand_torso.z();
+      p.x = -right_hand_torso.z();
+      p.y = -right_hand_torso.x();
+      p.z = right_hand_torso.y();
       right_arm_destination_pub_.publish(p);
     }
 
-   
 		break;	// only read first user
 	}
 }

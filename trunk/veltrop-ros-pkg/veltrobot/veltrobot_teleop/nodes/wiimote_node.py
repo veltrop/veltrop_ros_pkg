@@ -2,8 +2,6 @@
 
 # modified to work at 30 fps instead of 100, and only do joysender
 # it would be nice to provide parameters for these
-# also modified so that rocker switch is an axis, makes it more compatible
-# can these be put upstream to willow garage?
 
 ################################################################################
 #

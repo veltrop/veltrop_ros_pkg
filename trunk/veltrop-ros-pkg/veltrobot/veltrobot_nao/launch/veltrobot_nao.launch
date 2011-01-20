@@ -2,10 +2,35 @@
   <env name="PYTHONPATH"
   value="$(env PYTHONPATH)"
   /> 
-  <!-- <param name="nao_ip" value="192.168.3.101"> -->
- 
-  <node pkg="veltrobot_nao" type="nao_joint_controller.py" name="nao_joint_controller" />
+  <param name="naoqi_ip" value="192.168.3.101" /> 
+  
+  <include file="$(find veltrobot_teleop)/launch/dual_wiimote_teleop.launch" />
 
+  <node respawn="true" pkg="veltrobot_nao" type="nao_joint_controller.py" name="nao_joint_controller" /> 
+  <node respawn="true" pkg="veltrobot_nao" type="nao_arm_controller.py" name="nao_arm_controller" /> 
+  <node respawn="true" pkg="veltrobot_nao" type="nao_speech_recognition.py" name="nao_speech_recognition" />
+  <node respawn="true" pkg="veltrobot_nao" type="nao_behavior.py" name="nao_behavior" />
+  
+  <node respawn="true" pkg="veltrobot_nao" type="nao_head_tracker.py" name="nao_head_tracker" />
+  
+  <node respawn="true" pkg="nao_ctrl" type="nao_walker.py" name="nao_walker"
+        args="--pip=192.168.3.101 --pport=9559" />
+  <node respawn="true" pkg="nao_ctrl" type="nao_sensors.py" name="nao_sensors"
+        args="--pip=192.168.3.101 --pport=9559">
+    <remap from="joint_states" to="joint_states_nao_real" />
+  </node>
+
+  <param name="robot_description" textfile="$(find nao_description)/urdf/nao_robot.xml" />  
+  <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher">
+    <remap from="joint_states" to="joint_states_nao_real" />
+    <param name="tf_prefix" type="string" value="" /> 
+  </node>
+
+  <node pkg="nao_remote" type="teleop_nao_joy" name="teleop_nao_joy">
+    <rosparam file="$(find veltrobot_nao)/conf/virtual_wii.yaml" command="load"/>
+  </node>
+
+  <node pkg="nao_remote" type="remap_odometry" name="remap_odometry" />
 
 </launch>
 

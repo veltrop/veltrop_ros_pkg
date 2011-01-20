@@ -6,6 +6,7 @@ import roslib
 roslib.load_manifest('veltrobot_nao')
 import rospy
 from geometry_msgs.msg import Point
+import naoutil
 
 class NaoArmController():
   def LeftArmDestinationCB(self, data):
@@ -30,6 +31,8 @@ class NaoArmController():
                                            axisMask, times, isAbsolute)
 
   def __init__(self): 
+    rospy.sleep(1)
+
     rospy.init_node('nao_arm_controller')
     
     self.ip = rospy.get_param('naoqi_ip', '127.0.0.1');
@@ -43,7 +46,10 @@ class NaoArmController():
 
     rospy.Subscriber("right_arm_destination", Point, self.RightArmDestinationCB, queue_size=1)
     rospy.Subscriber("left_arm_destination", Point, self.LeftArmDestinationCB, queue_size=1)
- 	
+ 
+    #naoutil.StiffnessOn(self.motionProxy)
+    #naoutil.PoseInit(self.motionProxy)
+
 if __name__ == '__main__':
   arm_controller = NaoArmController()
   rospy.spin()

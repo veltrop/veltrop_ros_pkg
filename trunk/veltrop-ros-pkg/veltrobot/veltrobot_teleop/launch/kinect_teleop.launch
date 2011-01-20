@@ -3,6 +3,9 @@
     <param name="load_filepath" value="$(find openni)/lib/SamplesConfig.xml" />
     <param name="publish_kinect_tf" value="false" />
     <param name="load_recording" value="false" />
+    <param name="force_left_arm_enabled" value="false" /> 
+    <param name="force_right_arm_enabled" value="false" />
+   
     <rosparam command="load" file="$(find openni_camera)/info/openni_params.yaml" />
   </node>
   
