@@ -39,18 +39,20 @@ void KinectTeleop::init()
 	ros::NodeHandle n;
 	ros::NodeHandle np("~");
 	//motion_pub_ = n.advertise <std_msgs::String> ("motion_name", 1);
-	joint_states_pub_ = n.advertise<sensor_msgs::JointState>("/joint_states", 1);
-  left_arm_destination_pub_ = n.advertise<geometry_msgs::Point>("/left_arm_destination", 1);
-  right_arm_destination_pub_ = n.advertise<geometry_msgs::Point>("/right_arm_destination", 1);	
-  //cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);	
+	joint_states_pub_ = n.advertise<sensor_msgs::JointState>("joint_states", 1);
+  left_arm_destination_pub_ = n.advertise<geometry_msgs::Point>("left_arm_destination", 1);
+  right_arm_destination_pub_ = n.advertise<geometry_msgs::Point>("right_arm_destination", 1);	
+  //cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);	
+  torso_destination_pub_ = n.advertise<geometry_msgs::Point>("torso_destination", 1);
+  pointing_destination_pub_ = n.advertise<geometry_msgs::Point>("pointing_destination", 1);
   
   np.param<bool>("publish_kinect_tf", publish_kinect_tf_, false);  
   np.param<bool>("force_left_arm_enabled", left_arm_enabled_, false);
   np.param<bool>("force_right_arm_enabled", right_arm_enabled_, false);
 
-  enable_joint_group_sub_ = n.subscribe("/enable_joint_group", 10,
+  enable_joint_group_sub_ = n.subscribe("enable_joint_group", 10,
                                         &KinectTeleop::enableJointGroupCB, this);
-  arm_control_method_sub_ = n.subscribe("/arm_control_method", 10,
+  arm_control_method_sub_ = n.subscribe("arm_control_method", 10,
                                         &KinectTeleop::armControlMethodCB, this);
 }
 
@@ -196,7 +198,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 																m[6], m[7], m[8]);
 		double neck_roll, neck_pitch, neck_yaw;
 	  neck_rotation.GetRPY(neck_roll, neck_pitch, neck_yaw);		
-		
+	  */	
 	  XnSkeletonJointOrientation joint_orientation_torso;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_TORSO, joint_orientation_torso);
 	  m = joint_orientation_torso.orientation.elements;
@@ -205,7 +207,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 																 m[6], m[7], m[8]);
 		double torso_roll, torso_pitch, torso_yaw;
 	  torso_rotation.GetRPY(torso_roll, torso_pitch, torso_yaw);				
-		*/
+		
     																					
 		// Left Arm
 		XnSkeletonJointPosition joint_position_left_hand;
@@ -695,6 +697,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
     // need to scale from me to the nao.
     // I am 1.69 meters, nao is 0.58.
     // nao is 0.3432 of me.
+    // openni units in mm, nao in m.
     // magic number:
     double scale = 0.0003432;
     
@@ -719,7 +722,30 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       right_arm_destination_pub_.publish(p);
     }
 
-		break;	// only read first user
+    // ROS_INFO_STREAM(torso.x() << " " << torso.y() << " " << torso.z() );
+   
+
+    // The robot will receive and try to mirror my position
+    geometry_msgs::Point torso_destination;
+    torso_destination.x = -torso.z() / 1000.0;
+    torso_destination.y = -torso.x() / 1000.0;
+    //robot_destination.z = torso.y() / 1000.0;
+    torso_destination.z = torso_pitch;
+    torso_destination_pub_.publish(torso_destination);
+    
+    // next todo:
+    // point [at ground?] somewhere to direct robot there.  robot needs
+    // to be in same room as you for this to make sense.  otherwise if robot
+    // is in different room could do the point from the robots perspective.
+    //
+    // would it be easiest/best to use the tf of my hand, the kinect, and the nao
+    // to produce the goal position? need to get the kinect tf oriented...
+    
+
+
+
+  
+    break;	// only read first user
 	}
 }
 

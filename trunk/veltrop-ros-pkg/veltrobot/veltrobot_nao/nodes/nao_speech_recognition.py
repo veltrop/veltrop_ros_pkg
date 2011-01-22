@@ -33,7 +33,7 @@ class NaoSpeechRecognition():
 
   def run(self):
     self.speechRecogProxy.setLanguage("English")
-    wordList = ["come", "go", "stand", "sit", "relax", "fetch", "stiffen"]
+    wordList = ["come", "go", "stand", "sit", "relax", "stiffen"]
     self.speechRecogProxy.setWordListAsVocabulary(wordList)
     self.speechRecogProxy.subscribe("ros")
 
@@ -51,15 +51,19 @@ class NaoSpeechRecognition():
         rospy.logerr("Error accessing ALMemory: %s", e)
         rospy.signal_shutdown("No NaoQI available anymore")
 
-#      if (memoryData[0][1] >= 0.0) and (memoryData[0][0] != prev_word):
-      if memoryData[0][1] >= 0.0:
+      if (memoryData[0][1] >= 0.2) and (memoryData[0][0] != prev_word):
         msg = String()
         msg.data = memoryData[0][0]
         self.recognizedWordPub.publish(msg)
+        msg = String()
         msg.data = "Oh kay."
         self.textToSpeechPub.publish(msg)
-      
-      prev_word = memoryData[0][0]
+        prev_word = memoryData[0][0]
+
+      # reset  
+      if memoryData[0][0] == '':
+        prev_word = ''
+
       r.sleep()
 
 if __name__ == '__main__':
