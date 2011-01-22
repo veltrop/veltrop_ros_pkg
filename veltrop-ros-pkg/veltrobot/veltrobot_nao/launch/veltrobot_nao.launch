@@ -8,11 +8,13 @@
 
   <node respawn="true" pkg="veltrobot_nao" type="nao_joint_controller.py" name="nao_joint_controller" /> 
   <node respawn="true" pkg="veltrobot_nao" type="nao_arm_controller.py" name="nao_arm_controller" /> 
+  <!--  
   <node respawn="true" pkg="veltrobot_nao" type="nao_speech_recognition.py" name="nao_speech_recognition" />
+  -->
   <node respawn="true" pkg="veltrobot_nao" type="nao_behavior.py" name="nao_behavior" />
-  
   <node respawn="true" pkg="veltrobot_nao" type="nao_head_tracker.py" name="nao_head_tracker" />
-  
+  <node respawn="true" pkg="veltrobot_nao" type="nao_navigation_controller.py" name="nao_navigation_controller" />
+
   <node respawn="true" pkg="nao_ctrl" type="nao_walker.py" name="nao_walker"
         args="--pip=192.168.3.101 --pport=9559" />
   <node respawn="true" pkg="nao_ctrl" type="nao_sensors.py" name="nao_sensors"

@@ -47,6 +47,7 @@ class NaoArmController():
     rospy.Subscriber("right_arm_destination", Point, self.RightArmDestinationCB, queue_size=1)
     rospy.Subscriber("left_arm_destination", Point, self.LeftArmDestinationCB, queue_size=1)
  
+    self.motionProxy.setWalkArmsEnable(False, False)
     #naoutil.StiffnessOn(self.motionProxy)
     #naoutil.PoseInit(self.motionProxy)
 

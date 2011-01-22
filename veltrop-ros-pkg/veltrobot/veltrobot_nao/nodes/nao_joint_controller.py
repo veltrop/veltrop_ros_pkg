@@ -92,6 +92,7 @@ class NaoJointController():
 
     rospy.Subscriber("joint_states", JointState, self.JointStateCB, queue_size=1)
  	
+    self.motionProxy.setWalkArmsEnable(False, False)
     #naoutil.StiffnessOn(self.motionProxy)
     #naoutil.PoseInit(self.motionProxy)
 
