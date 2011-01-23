@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<motion name="walk_backward" first_phase="walk_backward_cog_to_right_foot_start">
+    <phases>
+        <phase balancing_enabled="true" name="walk_backward_cog_to_right_foot_start" next_phase="walk_backward_lift_left_foot" duration="" abort_safe="fakse">
+            <pose name="walk_backward_cog_to_right_foot_start" />
+        </phase>
+        <phase balancing_enabled="true" name="walk_backward_lift_left_foot" next_phase="walk_backward_step_left_foot" duration="" abort_safe="true">
+            <pose name="walk_backward_lift_left_foot" />
+        </phase>
+        <phase balancing_enabled="true" name="walk_backward_step_left_foot" next_phase="walk_backward_cog_to_left_foot" duration="" abort_safe="false">
+            <pose name="walk_backward_step_left_foot" />
+        </phase>
+        <phase balancing_enabled="true" name="walk_backward_cog_to_left_foot" next_phase="walk_backward_lift_right_foot" duration="" abort_safe="false">
+            <pose name="walk_backward_cog_to_left_foot" />
+        </phase>
+        <phase balancing_enabled="true" name="walk_backward_lift_right_foot" next_phase="walk_backward_step_right_foot" duration="" abort_safe="true">
+            <pose name="walk_backward_lift_right_foot" />
+        </phase>
+        <phase balancing_enabled="true" name="walk_backward_step_right_foot" next_phase="walk_backward_cog_to_right_foot" duration="" abort_safe="false">
+            <pose name="walk_backward_step_right_foot" />
+        </phase>
+        <phase balancing_enabled="true" name="walk_backward_cog_to_right_foot" next_phase="walk_backward_lift_left_foot" duration="" abort_safe="false">
+            <pose name="walk_backward_cog_to_right_foot" />
+        </phase>                                                              
+    </phases>
+</motion>   
+

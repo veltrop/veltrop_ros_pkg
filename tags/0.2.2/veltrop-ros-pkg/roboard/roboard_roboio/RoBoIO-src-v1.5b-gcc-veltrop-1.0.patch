@@ -1,0 +1,86 @@
+diff -crB RoBoIO-src-v1.5b-gcc/libsrc/rcservo.cpp RoBoIO-src-v1.5b-gcc.mine/libsrc/rcservo.cpp
+*** RoBoIO-src-v1.5b-gcc/libsrc/rcservo.cpp	2010-03-31 13:19:29.000000000 +0900
+--- RoBoIO-src-v1.5b-gcc.mine/libsrc/rcservo.cpp	2010-03-31 13:20:01.000000000 +0900
+***************
+*** 835,840 ****
+--- 835,877 ----
+  	}
+  
+  	return RCSERVO_playState;
++ }
++ 
++ RBAPI(int) rcservo_PlayAction_Mix(unsigned long* mix) {
++     unsigned long nowtime, t, tt;
++     unsigned long midaction[32];
++     int i;
++ 
++     if (RCSERVO_playState != RCSERVO_PLAYING) return RCSERVO_playState;
++ 
++     nowtime = timer_nowtime();
++     if (nowtime >= RCSERVO_curaction_endtime)
++     {
++         for (i=0; i<32; i++)
++             midaction[i] = ((mix == NULL)? 0L : mix[i]) + RCSERVO_curaction[i];
++ 
++         set_playmode_pulses(midaction);
++         RCSERVO_playState = RCSERVO_PLAYEND;
++     }
++     else
++     if (nowtime >= RCSERVO_curaction_nexttime)
++     {
++         t  = nowtime - RCSERVO_curaction_starttime;
++         tt = RCSERVO_curaction_endtime - RCSERVO_curaction_starttime;
++ 
++         for (i=0; i<32; i++)
++         {
++             if ((RCSERVO_validChannels & (1L<<i)) == 0L) continue;
++             midaction[i] = ((mix == NULL)? 0L : mix[i]) +
++                 interpolate(RCSERVO_lastaction[i], RCSERVO_curaction[i], tt, t);
++         }
++         set_playmode_pulses(midaction);
++ 
++         while (RCSERVO_curaction_nexttime <= nowtime)
++             RCSERVO_curaction_nexttime = RCSERVO_curaction_nexttime + RCSERVO_playInterval;
++     }
++ 
++     return RCSERVO_playState;
+  }
+  
+  static unsigned long RCSERVO_pausedtime;
+diff -crB RoBoIO-src-v1.5b-gcc/libsrc/rcservo.h RoBoIO-src-v1.5b-gcc.mine/libsrc/rcservo.h
+*** RoBoIO-src-v1.5b-gcc/libsrc/rcservo.h	2010-03-31 13:19:39.000000000 +0900
+--- RoBoIO-src-v1.5b-gcc.mine/libsrc/rcservo.h	2010-03-31 13:20:03.000000000 +0900
+***************
+*** 148,154 ****
+  RBAPI(void) rcservo_SetFPS(int fps);
+  RBAPI(void) rcservo_SetAction(unsigned long* width, unsigned long playtime);
+  
+! RBAPI(int)  rcservo_PlayAction(void);
+  //-- return values of rcservo_PlayAction()
+       #define RCSERVO_PLAYEND (0)
+       #define RCSERVO_PLAYING (1)
+--- 148,155 ----
+  RBAPI(void) rcservo_SetFPS(int fps);
+  RBAPI(void) rcservo_SetAction(unsigned long* width, unsigned long playtime);
+  
+! RBAPI(int)  rcservo_PlayAction(void);
+! RBAPI(int) rcservo_PlayAction_Mix(unsigned long* mix);
+  //-- return values of rcservo_PlayAction()
+       #define RCSERVO_PLAYEND (0)
+       #define RCSERVO_PLAYING (1)
+diff -crB RoBoIO-src-v1.5b-gcc/Make.LINUX RoBoIO-src-v1.5b-gcc.mine/Make.LINUX
+*** RoBoIO-src-v1.5b-gcc/Make.LINUX	2009-09-18 19:33:04.000000000 +0900
+--- RoBoIO-src-v1.5b-gcc.mine/Make.LINUX	2010-03-31 13:28:00.000000000 +0900
+***************
+*** 59,63 ****
+  
+  .PHONY : clean
+  clean :
+! 	-rm RoBoRC.exe libRBIO.a $(RBDEMO_OBJECTS) $(ROBOIO_OBJECTS)
+  
+--- 59,63 ----
+  
+  .PHONY : clean
+  clean :
+! 	-rm -f RoBoRC.exe libRBIO.a $(RBDEMO_OBJECTS) $(ROBOIO_OBJECTS)
+  

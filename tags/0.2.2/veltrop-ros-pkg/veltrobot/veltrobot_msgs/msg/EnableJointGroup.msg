@@ -1,0 +1,2 @@
+string[] jointGroups
+bool[] enabledStates

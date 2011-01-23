@@ -1,0 +1,18 @@
+<package>
+  <description brief="veltrobot_gui">
+
+     GUI programs for the veltrobot stack.
+
+  </description>
+  <author>Taylor Veltrop</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-ros-pkg</url>
+  
+  <depend package="std_msgs"/>
+  <depend package="veltrobot_msgs"/>
+  <depend package="veltrobot_movement"/>
+
+</package>
+
+

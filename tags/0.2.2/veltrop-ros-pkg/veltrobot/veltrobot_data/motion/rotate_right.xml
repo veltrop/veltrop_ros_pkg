@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<motion name="rotate_right" first_phase="rotate_right_02">
+    <phases>
+        <phase balancing_enabled="true" name="rotate_right_02" next_phase="rotate_right_03" duration="" abort_safe="false">
+            <pose name="rotate_right_02" />
+        </phase>
+        <phase balancing_enabled="true" name="rotate_right_03" next_phase="rotate_right_04" duration="" abort_safe="false">
+            <pose name="rotate_right_03" />
+        </phase>
+        <phase balancing_enabled="true" name="rotate_right_04" next_phase="rotate_right_05" duration="" abort_safe="false">
+            <pose name="rotate_right_04" />
+        </phase>
+        <phase balancing_enabled="true" name="rotate_right_05" next_phase="rotate_right_06" duration="" abort_safe="false">
+            <pose name="rotate_right_05" />
+        </phase>
+        <phase balancing_enabled="true" name="rotate_right_06" next_phase="rotate_right_07" duration="" abort_safe="false">
+            <pose name="rotate_right_06" />
+        </phase>
+        <phase balancing_enabled="true" name="rotate_right_07" next_phase="rotate_right_08" duration="" abort_safe="false">
+            <pose name="rotate_right_07" />
+        </phase>
+        <phase balancing_enabled="true" name="rotate_right_08" next_phase="rotate_right_02" duration="" abort_safe="true">
+            <pose name="rotate_right_08" />
+        </phase>  
+    </phases>
+</motion>  
+

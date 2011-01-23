@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<pose name="f03">
+    <joint_positions duration="200" units="radians_offset">
+        <joint name="ankle_left_pitch" position="0.007900" />
+        <joint name="ankle_left_roll" position="0.005900" />
+        <joint name="ankle_right_pitch" position="-0.009800" />
+        <joint name="ankle_right_roll" position="0.003900" />
+        <joint name="elbow_left_roll" position="-0.196300" />
+        <joint name="elbow_right_roll" position="0.031400" />
+        <joint name="hip_left_pitch" position="1.535500" />
+        <joint name="hip_left_roll" position="0.151200" />
+        <joint name="hip_left_yaw" position="-0.035300" />
+        <joint name="hip_right_pitch" position="0.176700" />
+        <joint name="hip_right_roll" position="-0.053000" />
+        <joint name="hip_right_yaw" position="-0.086400" />
+        <joint name="knee_left_pitch" position="0.005900" />
+        <joint name="knee_right_pitch" position="-0.170800" />
+        <joint name="neck_pitch" position="0.000000" />
+        <joint name="neck_yaw" position="0.000000" />
+        <joint name="shoulder_left_pitch" position="1.809500" />
+        <joint name="shoulder_left_roll" position="-0.039300" />
+        <joint name="shoulder_left_yaw" position="0.002000" />
+        <joint name="shoulder_right_pitch" position="-0.652300" />
+        <joint name="shoulder_right_roll" position="0.015700" />
+        <joint name="shoulder_right_yaw" position="0.002000" />
+    </joint_positions>
+</pose>

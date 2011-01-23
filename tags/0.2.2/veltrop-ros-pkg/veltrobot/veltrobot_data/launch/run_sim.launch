@@ -1,0 +1,11 @@
+<launch>
+  <include file="$(find veltrobot_data)/launch/model.launch" />
+
+  <include file="$(find veltrobot_data)/launch/teleop.launch" />
+    
+  <node pkg="veltrobot_movement" type="control_movement"
+    name="movement_controller" />
+    
+  <!-- <include file="$(find veltrobot_data)/launch/acquire_stereo.launch" /> -->
+
+</launch>

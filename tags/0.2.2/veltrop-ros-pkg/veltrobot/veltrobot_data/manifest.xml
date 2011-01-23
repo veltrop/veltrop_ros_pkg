@@ -1,0 +1,24 @@
+<package>
+  <description brief="veltrobot_data">
+
+     This package has no code.  It contains launchers, config data, 
+     and pose/motion data for the packages in the veltrop-ros-pkg
+     repository.  Also contains code to import poses from Kondo's
+     Heart2Heart software.
+
+  </description>
+  <author>space</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-ros-pkg</url>
+
+  <depend package="robot_state_publisher" />
+  <depend package="veltrobot_teleop" />
+  <depend package="veltrobot_movement" />
+  <depend package="veltrobot_sensors" />
+  <depend package="roboard_servos" />
+  <depend package="roboard_sensors" />
+   
+</package>
+
+
