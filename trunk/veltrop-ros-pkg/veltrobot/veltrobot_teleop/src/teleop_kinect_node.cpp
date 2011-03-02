@@ -21,9 +21,16 @@ xn::DepthGenerator g_depth_genearator;
 
 void glutIdle (void)
 {
-	// using loop_rate is less CPU intensive than an ROS timer.
+  // using loop_rate is less CPU intensive than an ROS timer.
 	static ros::Rate loop_rate(15); // limit to 15 fps display
-	glutPostRedisplay();
+  
+  //if (!ros::ok()) 
+  //{
+  //    // stop glut main loop, no way to do this 
+  //    return;
+  //}
+	
+  glutPostRedisplay();
 	loop_rate.sleep();
 }
 

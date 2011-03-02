@@ -43,7 +43,9 @@ private:
     static bool hold_power = false;
     
     if (!joy->buttons[4] && !joy->buttons[5] && 
-        !joy->buttons[6] && !joy->buttons[7] && prev_move)
+        !joy->buttons[6] && !joy->buttons[7] && 
+        !joy->buttons[8] && !joy->buttons[9] && 
+        prev_move)
     {
       mot.data = "stand_squat";
       prev_move = false;
@@ -66,6 +68,16 @@ private:
     else if (joy->buttons[6])
     {
     	mot.data = "walk_backward";
+      prev_move = true;
+    }
+    else if (joy->buttons[8])
+		{
+      mot.data = "sidestep_left";
+      prev_move = true;
+    }
+    else if (joy->buttons[9])
+    {
+    	mot.data = "sidestep_right";
       prev_move = true;
     }
     

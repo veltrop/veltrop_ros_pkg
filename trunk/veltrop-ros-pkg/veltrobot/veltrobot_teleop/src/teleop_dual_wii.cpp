@@ -180,7 +180,8 @@ private:
 		  if (prev_A)
 			{	
 				// 1 = open, 0 = closed
-				float pos = prev_B ? 0.0f : 0.95f;
+				//float pos = prev_B ? 0.0f : 0.95f;
+				float pos = prev_B ? 0.0f : 0.5f;
       	js.name.push_back("hand_left");
       	js.position.push_back(pos);
       	js.velocity.push_back(10);
@@ -191,7 +192,7 @@ private:
 		{
 			// input range is -10~+10 over -halfpi~+halfpi
 			// but the robot has 1.15pi range available
-		  float pos = joy->axes[0] * HALFPI / 10.0f;
+		  float pos = -joy->axes[0] * HALFPI / 10.0f;
       pos *= 1.15;
 	   	js.name.push_back("wrist_left_yaw");
      	js.position.push_back(pos);
@@ -254,7 +255,8 @@ private:
 		  if (prev_A)
 			{	
 				// 1 = open, 0 = closed
-				float pos = prev_B ? 0.0f : 0.95f;
+				float pos = prev_B ? 0.0f : -0.50f;
+				//float pos = prev_B ? 0.0f : 0.8f;
       	js.name.push_back("hand_right");
       	js.position.push_back(pos);
       	js.velocity.push_back(10);
@@ -265,7 +267,7 @@ private:
 		{
 			// input range is -10~+10 over -halfpi~+halfpi
 			// but the robot has 1.15pi range available
-		  float pos = joy->axes[0] * HALFPI / 10.0f;
+		  float pos = -joy->axes[0] * HALFPI / 10.0f;
       pos *= 1.15;
 	   	js.name.push_back("wrist_right_yaw");
      	js.position.push_back(pos);
