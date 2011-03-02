@@ -208,7 +208,35 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		double torso_roll, torso_pitch, torso_yaw;
 	  torso_rotation.GetRPY(torso_roll, torso_pitch, torso_yaw);				
 		
-    																					
+   	XnSkeletonJointOrientation joint_orientation_right_shoulder;
+		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_RIGHT_SHOULDER, joint_orientation_right_shoulder);
+    m = joint_orientation_right_shoulder.orientation.elements;
+	  KDL::Rotation right_shoulder_rotation(m[0], m[1], m[2],
+																 m[3], m[4], m[5],
+																 m[6], m[7], m[8]);
+		double right_shoulder_roll, right_shoulder_pitch, right_shoulder_yaw;
+	  right_shoulder_rotation.GetRPY(right_shoulder_roll, right_shoulder_pitch, right_shoulder_yaw);				
+    right_shoulder_roll -= torso_roll;
+    right_shoulder_pitch -= torso_pitch;
+    right_shoulder_yaw -= torso_yaw;   
+
+    //ROS_INFO_STREAM(right_shoulder_roll<<" "<<right_shoulder_pitch<< " " <<right_shoulder_yaw);    
+
+    XnSkeletonJointOrientation joint_orientation_left_shoulder;
+		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_LEFT_SHOULDER, joint_orientation_left_shoulder);
+    m = joint_orientation_left_shoulder.orientation.elements;
+	  KDL::Rotation left_shoulder_rotation(m[0], m[1], m[2],
+																 m[3], m[4], m[5],
+																 m[6], m[7], m[8]);
+		double left_shoulder_roll, left_shoulder_pitch, left_shoulder_yaw;
+	  left_shoulder_rotation.GetRPY(left_shoulder_roll, left_shoulder_pitch, left_shoulder_yaw);				
+    left_shoulder_roll -= torso_roll;
+    left_shoulder_pitch -= torso_pitch;
+    left_shoulder_yaw -= torso_yaw;   
+
+
+
+
 		// Left Arm
 		XnSkeletonJointPosition joint_position_left_hand;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_HAND, joint_position_left_hand);
@@ -345,30 +373,52 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		{ 
 			left_shoulder_angle_pitch = asin(left_shoulder_elbow.y());
 			left_shoulder_angle_pitch = left_shoulder_angle_pitch + HALFPI;
-		}
-		
+		  //if (torso.z() < left_shoulder_elbow.z())
+      //  left_shoulder_angle_pitch = -left_shoulder_angle_pitch;
+    }
+	  //if (joint_orientation_left_shoulder.fConfidence >= 0.5)
+    //{
+    //  left_shoulder_angle_pitch = left_shoulder_yaw + HALFPI;
+    //}
+	
 		// right shoulder pitch
 		static double right_shoulder_angle_pitch = 0;
-		if (joint_position_right_shoulder.fConfidence >= 0.5)
-		{ 
+	  if (joint_position_right_shoulder.fConfidence >= 0.5)
+		{
 			right_shoulder_angle_pitch = asin(right_shoulder_elbow.y());
 			right_shoulder_angle_pitch = -(right_shoulder_angle_pitch + HALFPI);
-		}
+			//if (torso.z() < right_shoulder_elbow.z())
+      //  right_shoulder_angle_pitch = -right_shoulder_angle_pitch;
+  	}
+    //if (joint_orientation_right_shoulder.fConfidence >= 0.5)
+    //{
+    //  right_shoulder_angle_pitch = -right_shoulder_pitch;
+    //}
+
+
 																									
 		// left shoulder yaw
 		static double left_shoulder_angle_yaw = 0;
-		if (joint_position_left_shoulder.fConfidence >= 0.5)
-		{           
-			left_shoulder_angle_yaw = asin(left_elbow_hand.y());  // left_shoulder_elbow.x()
-		}
-		
+		//if (joint_position_left_shoulder.fConfidence >= 0.5)
+		//{           
+		//	left_shoulder_angle_yaw = asin(left_elbow_hand.y());  // left_shoulder_elbow.x()
+		//}
+		if (joint_orientation_left_shoulder.fConfidence >= 0.4)
+    {
+      left_shoulder_angle_yaw = left_shoulder_roll;
+    }
+
 		// right shoulder yaw
 		static double right_shoulder_angle_yaw = 0;
-		if (joint_position_right_shoulder.fConfidence >= 0.5)
-		{  
-			right_shoulder_angle_yaw = asin(right_elbow_hand.y());  // left_shoulder_elbow.x()
-			right_shoulder_angle_yaw = -right_shoulder_angle_yaw;
-		}
+		//if (joint_position_right_shoulder.fConfidence >= 0.5)
+		//{  
+		//	right_shoulder_angle_yaw = asin(right_elbow_hand.y());  // left_shoulder_elbow.x()
+		//	right_shoulder_angle_yaw = -right_shoulder_angle_yaw;
+		//}
+    if (joint_orientation_right_shoulder.fConfidence >= 0.4)
+    {
+      right_shoulder_angle_yaw = -(right_shoulder_roll);
+    }
 					
 		///////////////////////////////////////////////////////////////////////////
 		// PROBLEM:

@@ -1,7 +1,7 @@
 <launch>
   <node required="true" pkg="veltrobot_teleop" type="teleop_kinect" name="teleop_kinect" output="screen" >
     <param name="load_filepath" value="$(find openni)/lib/SamplesConfig.xml" />
-    <param name="publish_kinect_tf" value="false" />
+    <param name="publish_kinect_tf" value="true" />
     <param name="load_recording" value="false" />
     <param name="force_left_arm_enabled" value="false" /> 
     <param name="force_right_arm_enabled" value="false" />
