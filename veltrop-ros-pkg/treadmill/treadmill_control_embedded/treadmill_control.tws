@@ -1,0 +1,21 @@
+[HIMDBVersion]
+2.0
+[DATABASE_VERSION]
+"1.1" 
+[CURRENT_PROJECT]
+"treadmill_control" 
+[GENERAL_DATA]
+[BREAKPOINTS]
+[OPEN_WORKSPACE_FILES]
+"C:\WorkSpace\KCB1\include\com.h" 
+"C:\WorkSpace\KCB1\include\kcb1.h" 
+"C:\WorkSpace\KCB1\include\uart.h" 
+"C:\WorkSpace\treadmill_control\treadmill_control\treadmill_control.c" 
+"C:\WorkSpace_100307\MCP\MCP\MCP.c" 
+[WORKSPACE_FILE_STATES]
+"C:\WorkSpace\KCB1\include\com.h" 110 120 829 299 0 3 
+"C:\WorkSpace\KCB1\include\kcb1.h" 132 144 829 299 0 4 
+"C:\WorkSpace\KCB1\include\uart.h" 88 96 829 299 0 2 
+"C:\WorkSpace\treadmill_control\treadmill_control\treadmill_control.c" -4 -25 969 473 1 0 
+"C:\WorkSpace_100307\MCP\MCP\MCP.c" 66 72 829 299 0 1 
+[END]
