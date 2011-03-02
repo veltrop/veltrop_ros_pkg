@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<pose name="walk_forward_cog_to_right_foot_start_noarms_slow">
+    <joint_positions duration="300" units="radians_offset">
+        <joint name="ankle_left_pitch" position="-0.286900" />
+        <joint name="ankle_left_roll" position="0.045300" />
+        <joint name="ankle_right_pitch" position="0.22650" />
+        <joint name="ankle_right_roll" position="0.050000" />
+        <joint name="hip_left_pitch" position="0.302000" />
+        <joint name="hip_left_roll" position="0.045300" />
+        <joint name="hip_left_yaw" position="0.000000" />
+        <joint name="hip_right_pitch" position="-0.241600" />
+        <joint name="hip_right_roll" position="0.045300" />
+        <joint name="hip_right_yaw" position="0.000000" />
+        <joint name="knee_left_pitch" position="-0.573800" />
+        <joint name="knee_right_pitch" position="0.453000" />
+    </joint_positions>
+</pose>

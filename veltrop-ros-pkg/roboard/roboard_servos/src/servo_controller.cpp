@@ -97,6 +97,10 @@ public:
       Servo& servo = i->second;
       if (servo.bus_ == Servo::COM4)
       {
+        com4_ics_set_stretch(servo.channel_, 4);
+        usleep(1);
+        com4_ics_set_speed(servo.channel_, 64);
+        usleep(1);
         com4_ics_pos(servo.channel_, 0);
         usleep(1);
       }
@@ -200,7 +204,7 @@ private:
     for (; j != servos_.end(); ++j)
     {
       Servo& servo = j->second;
-      if (servo.channel_ >= 1)
+      if (servo.channel_ >= 0)
         playframe_[servo.channel_ - 1] = (int)servo.trim_pwm_ +
                                          ((int)servo.max_pwm_ + (int)servo.min_pwm_)
                                          / (int)2;
@@ -250,7 +254,7 @@ private:
     for (size_t i=0; i < msg->name.size(); i++)
     {
       Servo& servo = servos_[msg->name[i]];
-      if (servo.channel_ < 1 || servo.channel_ > 32)
+      if (servo.channel_ < 0 || servo.channel_ > 32)
         continue;
       float rot_range = servo.max_rot_ - servo.min_rot_;
       float pwm_range = servo.max_pwm_ - servo.min_pwm_; 
@@ -363,7 +367,7 @@ private:
     for (size_t i=0; i < req.requestedJointNames.size(); i++)
     {    
       Servo& servo = servos_[req.requestedJointNames[i]];
-      if (servo.channel_ < 1 || servo.channel_ > 32)
+      if (servo.channel_ < 0 || servo.channel_ > 32)
         continue;
       
       int pwm_center = (servo.max_pwm_ + servo.min_pwm_) / 2;
@@ -404,7 +408,7 @@ private:
     for (size_t i=0; i < msg->name.size(); i++)
     {
       Servo& servo = servos_[msg->name[i]];
-      if (servo.channel_ < 1 || servo.channel_ > 32)
+      if (servo.channel_ < 0 || servo.channel_ > 32)
         continue;
 
       float rot_range = servo.max_rot_ - servo.min_rot_;
