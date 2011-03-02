@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+
+<motion name="stand_squat_noarms_slow" first_phase="stand_squat">
+    <phases>
+        <phase balancing_enabled="true" name="stand_squat" next_phase="" duration="" abort_safe="true">
+            <pose name="stand_squat_noarms_slow" />
+        </phase>
+    </phases>
+</motion>  
+

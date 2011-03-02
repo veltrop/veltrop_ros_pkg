@@ -265,4 +265,50 @@ int com4_ics_pos(unsigned int id, unsigned int pos)
 	return ((in_buf[1] & 0x7F) << 7) | (in_buf[2] & 0x7F);
 }
 
+#define ICS_PARAM_BYTE     2
+#define ICS_SET_PARAM_CMD  0xC0
+#define ICS_STRC_SC        1
+#define ICS_SPD_SC         2
+
+unsigned int com4_ics_set_param ( 
+	unsigned int id,    
+	unsigned int sc,   
+	unsigned int param
+)
+{
+	unsigned char out_buf[ICS_PARAM_BYTE + 1];
+	unsigned char in_buf[ICS_PARAM_BYTE + 1];
+	
+	out_buf[0] = (ICS_SET_PARAM_CMD | (id & 0x1F));
+	out_buf[1] = sc;
+	out_buf[2] = param;
+	
+	ics_trx_timeout(out_buf, ICS_PARAM_BYTE + 1, in_buf, ICS_PARAM_BYTE + 1, ICS_POS_TIMEOUT);
+	
+	return 0;
+}
+
+unsigned int com4_ics_set_stretch ( 
+	unsigned int id,   
+	unsigned int strc 
+)
+{
+	unsigned int ret;
+
+	ret = com4_ics_set_param (id, ICS_STRC_SC, (strc & 0x7F));
+	return ret;	
+}
+
+unsigned int com4_ics_set_speed ( 
+	unsigned int id,  
+	unsigned int speed
+)
+{
+	unsigned int ret;
+	
+	ret = com4_ics_set_param (id, ICS_SPD_SC, (speed & 0x7F));
+	return ret;
+}
+
+
 #endif

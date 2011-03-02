@@ -5,16 +5,16 @@
     
   <node pkg="roboard_servos" type="servo_controller" name="servo_controller" output="screen">
     <rosparam command="load" file="$(find veltrobot_data)/conf/servos.yaml" />
-    <param name="servo_fps" value="60" /> 
+    <param name="servo_fps" value="100" /> 
     <param name="force_mix" value="true" />
     <param name="reset_after_mix" value="false" />
   </node>
 
   <node pkg="veltrobot_movement" type="control_movement" name="movement_controller" output="screen" />
     
-<!--	<node pkg="veltrobot_movement" type="balance_movement" name="balance_controller"  output="screen">
-    <param name="processing_fps" value="60" /> 
+  <node pkg="veltrobot_movement" type="balance_movement" name="balance_controller"  output="screen">
+    <param name="processing_fps" value="100" /> 
     <param name="movement_fps" value="100" />
   	<rosparam command="load" file="$(find veltrobot_data)/conf/gyro_balancing.yaml" />
-  </node> -->
+  </node>
 </launch>
