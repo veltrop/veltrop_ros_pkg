@@ -103,26 +103,33 @@ public:
       
       // left
     
+      // beggining stuff
       for (int i=0; i < 14; i++) 
       {
         calibration_stream.getline(line,512);
         std::cout << i << " : " << line << std::endl;
       }
       
+      // camera matrix
       for (int i=0; i < 9; i++) 
       {
         calibration_stream >> left_info_.K[i];
         std::cout << i << " : " << left_info_.K[i] << std::endl;
       }
-      
+      //cout << "WTF" << std::endl; 
+      // junk till distortion
       for (int i=0; i < 3; i++) 
       {
         calibration_stream.getline(line,512);
         std::cout << i << " : " << line << std::endl;
       }
-      
+      //cout <<"WTF" << std::endl;
+      //cout.flush();
       for (int i=0; i < 5; i++) 
       {
+        //double d;
+        //calibration_stream >> d;
+        //left_info_.D[i] = d;
         calibration_stream >> left_info_.D[i];
         std::cout << i << " : " << left_info_.D[i] << std::endl;
       }

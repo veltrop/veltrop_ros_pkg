@@ -8,10 +8,10 @@ from std_msgs.msg import String
 
 class NaoBehavior():
   def __init__(self): 
-    rospy.sleep(4) 
+    #rospy.sleep(2) 
     rospy.init_node('nao_behavior')
     
-    self.ip = rospy.get_param('naoqi_ip', '127.0.0.1');
+    self.ip = rospy.get_param('naoqi_ip', '192.168.2.103');
     self.port = int(rospy.get_param('naoqi_port', '9559'));
 
     try:
@@ -24,12 +24,15 @@ class NaoBehavior():
     rospy.Subscriber("motion_name", String, self.MotionNameCB, queue_size=1)
  
   def RecognizedWordCB(self, data):
+    #print data.data
     if self.behaviorProxy.isBehaviorInstalled(data.data):
       self.behaviorProxy.runBehavior(data.data)
 
   def MotionNameCB(self, data):
-    #print self.behaviorProxy.getInstalledBehaviors()
+    print self.behaviorProxy.getInstalledBehaviors()
+    #print self.behaviorProxy.getRunningBehaviors()
     if self.behaviorProxy.isBehaviorInstalled(data.data):
+      #self.behaviorProxy.stopAllBehaviors()
       self.behaviorProxy.runBehavior(data.data)
 
 if __name__ == '__main__':

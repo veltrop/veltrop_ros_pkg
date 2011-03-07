@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="veltrobot_sensors" type="republish_stereo" name="republish_stereo">
+  <node output="screen" pkg="veltrobot_sensors" type="republish_stereo" name="republish_stereo">
     <param name="calibration" command="cat $(find veltrobot_data)/conf/ost.txt" />
     <param name="left_frame_id" value="/stereo_camera" />
     <param name="right_frame_id" value="/stereo_camera" />
@@ -29,7 +29,7 @@
     
     <!-- 200x150 -->
     <!-- 15 31 21 2 32 3 1 128 5 -->
-    <param name="prefilter_size" value="21" />
+    <!-- <param name="prefilter_size" value="21" />
     <param name="prefilter_cap" value="45" />
     <param name="correlation_window_size" value="35" />
     <param name="min_disparity" value="2" />
@@ -37,10 +37,10 @@
     <param name="uniqueness_ratio" value="4" />
     <param name="texture_threshold" value="0" />
     <param name="speckle_size" value="32" />
-    <param name="speckle_range" value="31" />
+    <param name="speckle_range" value="31" /> -->
     
     <!-- close minoru (20 cm): 15, 31, 21 or 35, 128, 128, 1, 1, 250, 5 -->
-    <!-- <param name="prefilter_size" value="15" />
+    <param name="prefilter_size" value="15" />
     <param name="prefilter_cap" value="31" />
     <param name="correlation_window_size" value="21" />
     <param name="min_disparity" value="128" />
@@ -48,7 +48,7 @@
     <param name="uniqueness_ratio" value="1" />
     <param name="texture_threshold" value="1" />
     <param name="speckle_size" value="250" />
-    <param name="speckle_range" value="5" /> -->
+    <param name="speckle_range" value="5" />
 
   </node>
 </launch>

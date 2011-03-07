@@ -8,7 +8,7 @@ import rospy
 from std_msgs.msg import Empty
 from std_msgs.msg import String
 from geometry_msgs.msg import Point
-import naoutil
+#import naoutil
 
 # TODO: really need services here instead of simple topics.
 

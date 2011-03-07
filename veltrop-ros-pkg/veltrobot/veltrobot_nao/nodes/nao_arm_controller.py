@@ -6,7 +6,7 @@ import roslib
 roslib.load_manifest('veltrobot_nao')
 import rospy
 from geometry_msgs.msg import Point
-import naoutil
+#import naoutil
 
 class NaoArmController():
   def LeftArmDestinationCB(self, data):
