@@ -1,24 +1,24 @@
 <launch>
-  <env name="PYTHONPATH"
-  value="$(env PYTHONPATH)"
-  /> 
-  <param name="naoqi_ip" value="192.168.3.101" /> 
+  <env name="PYTHONPATH" value="$(env PYTHONPATH)" /> 
+  <param name="naoqi_ip" value="192.168.2.103" /> 
   
   <include file="$(find veltrobot_teleop)/launch/dual_wiimote_teleop.launch" />
 
-  <node respawn="true" pkg="veltrobot_nao" type="nao_joint_controller.py" name="nao_joint_controller" /> 
+  <node respawn="true" pkg="veltrobot_nao" type="nao_joint_controller.py" name="nao_joint_controller"> 
+    <remap from="joint_states" to="joint_states_out" />
+  </node>
   <node respawn="true" pkg="veltrobot_nao" type="nao_arm_controller.py" name="nao_arm_controller" /> 
   <!--  
   <node respawn="true" pkg="veltrobot_nao" type="nao_speech_recognition.py" name="nao_speech_recognition" />
   -->
   <node respawn="true" pkg="veltrobot_nao" type="nao_behavior.py" name="nao_behavior" />
-  <node respawn="true" pkg="veltrobot_nao" type="nao_head_tracker.py" name="nao_head_tracker" />
+  <!-- <node respawn="true" pkg="veltrobot_nao" type="nao_head_tracker.py" name="nao_head_tracker" /> -->
   <node respawn="true" pkg="veltrobot_nao" type="nao_navigation_controller.py" name="nao_navigation_controller" />
 
-  <node respawn="true" pkg="nao_ctrl" type="nao_walker.py" name="nao_walker"
-        args="--pip=192.168.3.101 --pport=9559" />
+
+<node respawn="true" pkg="nao_ctrl" type="nao_walker.py" name="nao_walker" args="--pip=192.168.2.103 --pport=9559" />
   <node respawn="true" pkg="nao_ctrl" type="nao_sensors.py" name="nao_sensors"
-        args="--pip=192.168.3.101 --pport=9559">
+        args="--pip=192.168.2.103 --pport=9559">
     <remap from="joint_states" to="joint_states_nao_real" />
   </node>
 
@@ -33,6 +33,11 @@
   </node>
 
   <node pkg="nao_remote" type="remap_odometry" name="remap_odometry" />
+
+  <node output="screen" pkg="veltrobot_movement" type="joint_state_processor.py" name="joint_state_processor">
+    <rosparam file="$(find veltrobot_nao)/conf/veltrobot_to_nao_joint_conversions.yaml" command="load"/>
+    <remap from="joint_states_in" to="joint_states" />
+  </node>
 
 </launch>
 

@@ -20,7 +20,7 @@
   </node>-->
 
   <!-- Home Built Stereo with empia usb cards -->
-  <node pkg="veltrobot_sensors" type="acquire_stereo" name="acquire_stereo">    
+  <!-- <node pkg="veltrobot_sensors" type="acquire_stereo" name="acquire_stereo">    
     <param name="stereo_name" value="stereo_yuyv" />    
     <param name="buffers" value="2" />
     <param name="fps" value="4" />
@@ -29,19 +29,19 @@
     <param name="left_device" value="/dev/video0" />
     <param name="right_device" value="/dev/video1" />
     <param name="standard" value="NTSC" />
-  </node>
+  </node> -->
   
   <!-- Minoru stereo -->
-  <!-- <node pkg="veltrobot_sensors" type="acquire_stereo" name="acquire_stereo">    
+  <node pkg="veltrobot_sensors" type="acquire_stereo" name="acquire_stereo">    
     <param name="stereo_name" value="stereo_yuyv" />    
-    <param name="buffers" value="1" />
-    <param name="fps" value="1" />
+    <param name="buffers" value="2" />
+    <param name="fps" value="2" />
     <param name="width" value="640" />
     <param name="height" value="480" />
     <param name="left_device" value="/dev/video1" />
     <param name="right_device" value="/dev/video0" />
     <param name="standard_str" value="DEFAULT" />
-  </node> -->
+  </node>
 
 </launch>
 

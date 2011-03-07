@@ -193,7 +193,7 @@ private:
 			// input range is -10~+10 over -halfpi~+halfpi
 			// but the robot has 1.15pi range available
 		  float pos = -joy->axes[0] * HALFPI / 10.0f;
-      pos *= 1.15;
+      //pos *= 1.15;
 	   	js.name.push_back("wrist_left_yaw");
      	js.position.push_back(pos);
      	js.velocity.push_back(10);
@@ -268,7 +268,7 @@ private:
 			// input range is -10~+10 over -halfpi~+halfpi
 			// but the robot has 1.15pi range available
 		  float pos = -joy->axes[0] * HALFPI / 10.0f;
-      pos *= 1.15;
+      //pos *= 1.15;
 	   	js.name.push_back("wrist_right_yaw");
      	js.position.push_back(pos);
      	js.velocity.push_back(10);

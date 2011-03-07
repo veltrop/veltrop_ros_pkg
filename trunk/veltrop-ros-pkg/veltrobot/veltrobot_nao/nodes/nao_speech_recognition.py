@@ -6,7 +6,7 @@ import roslib
 roslib.load_manifest('veltrobot_nao')
 import rospy
 from std_msgs.msg import String
-import naoutil
+#import naoutil
 
 class NaoSpeechRecognition():
   def __init__(self): 
