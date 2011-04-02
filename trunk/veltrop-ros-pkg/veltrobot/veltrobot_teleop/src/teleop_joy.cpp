@@ -47,30 +47,30 @@ private:
         !joy->buttons[8] && !joy->buttons[9] && 
         prev_move)
     {
-      mot.data = "stand_squat";
+      mot.data = "stand_squat_noarms_slow";
       prev_move = false;
     }
     else if (joy->buttons[7])
     {
-      mot.data = "rotate_left";
+      mot.data = "rotate_left_noarms_slow";
       prev_move = true;
     }
     else if (joy->buttons[5])
 		{
-      mot.data = "rotate_right";
+      mot.data = "rotate_right_noarms_slow";
       prev_move = true;
     }
     else if (joy->buttons[4])
 		{
-      mot.data = "walk_forward";
+      mot.data = "walk_forward_noarms_slow";
       prev_move = true;
     }
     else if (joy->buttons[6])
     {
-    	mot.data = "walk_backward";
+    	mot.data = "walk_backward_noarms_slow";
       prev_move = true;
     }
-    else if (joy->buttons[8])
+    /*else if (joy->buttons[8])
 		{
       mot.data = "sidestep_left";
       prev_move = true;
@@ -79,7 +79,7 @@ private:
     {
     	mot.data = "sidestep_right";
       prev_move = true;
-    }
+    }*/
     
     else if (joy->buttons[12])
 		{

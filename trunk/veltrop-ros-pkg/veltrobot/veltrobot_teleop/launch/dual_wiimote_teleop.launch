@@ -25,19 +25,19 @@
 	</node>
 
 	<node pkg="veltrobot_teleop" type="teleop_dual_wii" name="teleop_dual_wii">
-    <!-- <remap from="joy" to="dual_wii" /> -->
+     <!-- remappings for veltrobot -->
+     <remap from="joy" to="dual_wii" />
   </node>
 
   <!-- remappings for veltrobot -->
-  <!--
   <node pkg="joystick_remapper" type="joystick_remapper.py" name="dual_wii_to_veltrobot_joy">
      <remap from="joy_source" to="dual_wii" />
      <remap from="joy_dest" to="joy" />
      <param name="button_mapping" type="str" value="21 -1 -1 10 8 18 9 17 6 7 -1 -1 12 -1 11 -1 -1" /> 
      <param name="axis_mapping" type="str" value="=" /> 
   </node>
-  -->
   
-  <!-- <node pkg="veltrobot_teleop" type="teleop_joy" name="teleop_joy" /> -->
+  <!-- remappings for veltrobot -->
+  <node pkg="veltrobot_teleop" type="teleop_joy" name="teleop_joy" /> 
 </launch>
 
