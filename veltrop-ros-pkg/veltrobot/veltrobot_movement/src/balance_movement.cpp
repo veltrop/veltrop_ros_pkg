@@ -124,13 +124,14 @@ private:
 		}  
   }
   
-  void processGyro(const std_msgs::Float32ConstPtr& msg,
+  void processGyro(float prev_gyro_val,
+                   float gyro_val,
                    const std::vector <JointMultiplier>& multipliers)
   {
     for (size_t i=0; i < multipliers.size(); i++)
     {
     	size_t j = multipliers[i].joint_state_index;
-  		float pi_sec = msg->data / 180.0f * 3.14159f; 
+  		float pi_sec = (gyro_val - prev_gyro_val) / 180.0f * 3.14159f; 
       float duration = 1.0f / movement_freq_;
       float offset = pi_sec * duration;
       js_.position[j] = multipliers[i].multiplier * offset;
@@ -140,12 +141,16 @@ private:
 
   void receiveGyroPitchCB(const std_msgs::Float32ConstPtr& msg)
   {
-		processGyro(msg, pitch_multipliers_);
+    static float prevData = 0.0;
+		processGyro(prevData, msg->data, pitch_multipliers_);
+    //prevData = msg->data;
   }
   
   void receiveGyroRollCB(const std_msgs::Float32ConstPtr& msg)
   {
-    processGyro(msg, roll_multipliers_);
+    static float prevData = 0.0;
+    processGyro(prevData, msg->data, roll_multipliers_);
+    //prevData = msg->data;
   }  
   
   void receiveUpdateConfigCB(const std_msgs::EmptyConstPtr& msg)
