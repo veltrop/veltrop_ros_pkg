@@ -116,7 +116,7 @@ class WiimoteNode():
         
         try:
             #IMUSender(wiimoteDevice, freq=30).start()
-            JoySender(wiimoteDevice, freq=30).start()
+            JoySender(wiimoteDevice, freq=10).start()
             #WiiSender(wiimoteDevice, freq=30).start()
             #NunSender(wiimoteDevice, freq=30).start()
             WiimoteListeners(wiimoteDevice).start()

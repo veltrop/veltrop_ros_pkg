@@ -49,6 +49,7 @@ void KinectTeleop::init()
   np.param<bool>("publish_kinect_tf", publish_kinect_tf_, false);  
   np.param<bool>("force_left_arm_enabled", left_arm_enabled_, false);
   np.param<bool>("force_right_arm_enabled", right_arm_enabled_, false);
+  np.param<bool>("force_legs_enabled", legs_enabled_, false);
 
   enable_joint_group_sub_ = n.subscribe("enable_joint_group", 10,
                                         &KinectTeleop::enableJointGroupCB, this);
@@ -447,6 +448,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		{
 			knee_left_angle_pitch = acos(KDL::dot(left_knee_foot, left_knee_hip));
 			knee_left_angle_pitch = knee_left_angle_pitch - PI;
+      //knee_left_angle_pitch *= 10.0;
 		}	
 		
 		// Knee right pitch					
@@ -461,8 +463,25 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		{
 			knee_right_angle_pitch = acos(KDL::dot(right_knee_foot, right_knee_hip));
 			knee_right_angle_pitch = -(knee_right_angle_pitch - PI);
-		}	
-		
+      //knee_right_angle_pitch *= 10.0;
+		}
+
+    knee_right_angle_pitch = (knee_right_angle_pitch - knee_left_angle_pitch) / 2.0;  
+		knee_right_angle_pitch *= 1.1;
+    knee_right_angle_pitch += 0.4;
+        
+    static double prev_safe = 0.4;
+    if (knee_right_angle_pitch >= 1.2 || knee_right_angle_pitch <= -0.1)
+    {
+      knee_right_angle_pitch = prev_safe;
+    }
+    else
+    {
+      prev_safe = knee_right_angle_pitch;
+    }
+    knee_left_angle_pitch = -knee_right_angle_pitch;
+
+
 		// Hip left roll					
 		KDL::Vector hip_left_knee(left_knee - left_hip);
 		KDL::Vector hip_left_right(right_hip - left_hip);
@@ -473,8 +492,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 				joint_position_left_hip.fConfidence >= 0.5 && 
 				joint_position_right_hip.fConfidence >= 0.5)
 		{
-			hip_left_angle_roll = acos(KDL::dot(hip_left_knee, hip_left_right));
-			hip_left_angle_roll = hip_left_angle_roll - HALFPI;
+		//	hip_left_angle_roll = acos(KDL::dot(hip_left_knee, hip_left_right));
+	  //  hip_left_angle_roll = hip_left_angle_roll - HALFPI;
 		}	
 		
 		// Hip right roll					
@@ -487,57 +506,77 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 				joint_position_right_hip.fConfidence >= 0.5 && 
 				joint_position_left_hip.fConfidence >= 0.5)
 		{
-			hip_right_angle_roll = acos(KDL::dot(hip_right_knee, hip_right_left));
-			hip_right_angle_roll = -(hip_right_angle_roll - HALFPI);
+		//	hip_right_angle_roll = acos(KDL::dot(hip_right_knee, hip_right_left));
+		//	hip_right_angle_roll = -(hip_right_angle_roll - HALFPI);
 		}			
 											
+    KDL::Vector lower_roll((right_hip + left_hip / 2.0) -
+                           (right_knee + left_knee / 2.0));
+    lower_roll.Normalize();
+
+		if (joint_position_left_knee.fConfidence >= 0.5 && 
+				joint_position_left_hip.fConfidence >= 0.5 && 
+				joint_position_right_hip.fConfidence >= 0.5 &&
+        joint_position_right_knee.fConfidence >= 0.5)
+		{
+       hip_right_angle_roll = hip_left_angle_roll = asin(lower_roll.x()) / 2.0;
+    }
+    //hip_right_angle_roll = hip_left_angle_roll = 
+    // (hip_right_angle_roll + hip_left_angle_roll) / 2.0 / 2.0;  
+
 		// left ankle pitch
 		static double left_ankle_angle_pitch = 0;
-		if (joint_position_left_foot.fConfidence >= 0.5)
-		{ 
-			left_ankle_angle_pitch = asin(left_knee_foot.y());
-			left_ankle_angle_pitch = -(left_ankle_angle_pitch + HALFPI);
-		}
+		//if (joint_position_left_foot.fConfidence >= 0.5)
+		//{ 
+      left_ankle_angle_pitch = knee_left_angle_pitch / 2.0;
+			//left_ankle_angle_pitch = asin(left_knee_foot.y());
+			//left_ankle_angle_pitch = -(left_ankle_angle_pitch + HALFPI);
+    //}
 		
 		// right ankle pitch
 		static double right_ankle_angle_pitch = 0;
-		if (joint_position_right_foot.fConfidence >= 0.5)
-		{ 
-			right_ankle_angle_pitch = asin(right_knee_foot.y());
-			right_ankle_angle_pitch = (right_ankle_angle_pitch + HALFPI);
-		}		
+		//if (joint_position_right_foot.fConfidence >= 0.5)
+		//{ 
+      right_ankle_angle_pitch = knee_right_angle_pitch / 2.0;
+			//right_ankle_angle_pitch = asin(right_knee_foot.y());
+			//right_ankle_angle_pitch = (right_ankle_angle_pitch + HALFPI);
+		//}		
 		
 		// left ankle roll
 		static double left_ankle_angle_roll = 0;
-		if (joint_position_left_foot.fConfidence >= 0.5)
-		{ 
-			left_ankle_angle_roll = asin(left_knee_foot.x());
-			left_ankle_angle_roll = -(left_ankle_angle_roll);
-		}
+		//if (joint_position_left_foot.fConfidence >= 0.5)
+		//{ 
+      left_ankle_angle_roll = hip_left_angle_roll;
+			//left_ankle_angle_roll = asin(left_knee_foot.x());
+			//left_ankle_angle_roll = -(left_ankle_angle_roll);
+		//}
 		
 		// right ankle roll
 		static double right_ankle_angle_roll = 0;
-		if (joint_position_right_foot.fConfidence >= 0.5)
-		{ 
-			right_ankle_angle_roll = asin(right_knee_foot.x());
-			right_ankle_angle_roll = -(right_ankle_angle_roll);
-		}				
+		//if (joint_position_right_foot.fConfidence >= 0.5)
+		//{ 
+      right_ankle_angle_roll = hip_right_angle_roll;
+			//right_ankle_angle_roll = asin(right_knee_foot.x());
+			//right_ankle_angle_roll = -(right_ankle_angle_roll);
+		//}				
     
 		// left hip pitch
 		static double left_hip_angle_pitch = 0;
-		if (joint_position_left_hip.fConfidence >= 0.5)
-		{ 
-			left_hip_angle_pitch = asin(left_knee_hip.y());
-			left_hip_angle_pitch = -(left_hip_angle_pitch - HALFPI);
-		}
+		//if (joint_position_left_hip.fConfidence >= 0.5)
+		//{ 
+			left_hip_angle_pitch = -knee_left_angle_pitch / 2.0;
+      //left_hip_angle_pitch = asin(left_knee_hip.y());
+			//left_hip_angle_pitch = -(left_hip_angle_pitch - HALFPI);
+		//}
 		
 		// right hip pitch
 		static double right_hip_angle_pitch = 0;
-		if (joint_position_right_hip.fConfidence >= 0.5)
-		{ 
-			right_hip_angle_pitch = asin(right_knee_hip.y());
-			right_hip_angle_pitch = (right_hip_angle_pitch - HALFPI);
-		}	    
+		//if (joint_position_right_hip.fConfidence >= 0.5)
+		//{ 
+			right_hip_angle_pitch = -knee_right_angle_pitch / 2.0;
+			//right_hip_angle_pitch = asin(right_knee_hip.y());
+			//right_hip_angle_pitch = (right_hip_angle_pitch - HALFPI);
+		//}	    
 		
 		// Torso Yaw
 	  //static double torso_angle_yaw = 0;
@@ -693,7 +732,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.velocity.push_back(10);    
 		}		
     
-    if (legs_enabled_)
+    if (legs_enabled_ && (left_arm_enabled_ || right_arm_enabled_)
+        && arm_control_method_ == DIRECT )
     {
       js.name.push_back("knee_left_pitch");
       js.position.push_back(knee_left_angle_pitch);
@@ -726,12 +766,16 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.position.push_back(right_hip_angle_pitch);
       js.velocity.push_back(10);      
       
+      // TODO: something static here or put that into the a special pose
       js.name.push_back("hip_left_yaw");
       js.position.push_back(0);
       js.velocity.push_back(10);
       js.name.push_back("hip_right_yaw");
       js.position.push_back(0);
       js.velocity.push_back(10);
+      
+      // TODO: head animation
+      // max angle = 0.6 (0.7 hit limit)
     }  
 		
     if (js.name.size()) 		
