@@ -64,7 +64,9 @@ public:
 
 	  for(;;)
 	  {
-		  // get the next event from the keyboard  
+		  usleep(100000); // 10hz
+
+      // get the next event from the keyboard  
 		  if(read(kfd, &c, 1) < 0)
 		  {
 			  perror("read():");
