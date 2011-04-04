@@ -84,7 +84,7 @@ class NaoJointController():
       angles.append(position)
 
     if len(names) is not 0:
-      fractionMaxSpeed = 0.9 #TODO: something better than this to respect timing...
+      fractionMaxSpeed = 0.999 #TODO: something better than this to respect timing...
       self.motionProxy.setAngles(names, angles, fractionMaxSpeed)
 
     #if len(names) is not 0:
