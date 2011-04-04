@@ -76,19 +76,19 @@ private:
       prev_move = true;
     }
     else if (joy->buttons[9])
-    {
+    {s
     	mot.data = "sidestep_right";
       prev_move = true;
     }*/
     
     else if (joy->buttons[12])
 		{
-      mot.data = "get_up_belly";
+      //mot.data = "get_up_belly";
       prev_move = false;
     }
     else if (joy->buttons[14])
     {
-    	mot.data = "flip_back_to_belly";
+    	//mot.data = "flip_back_to_belly";
       prev_move = false;
     }    
     
@@ -111,17 +111,17 @@ private:
     
     else if (joy->buttons[3] && !joy->buttons[0])
 		{
-      mot.data = "init";
+      mot.data = "stand_straight";
       prev_move = false;
     }
     else if (joy->buttons[0] && !joy->buttons[3])
     {
-    	static bool flip = false;
-      if (flip)
-    		mot.data = "stand_squat2";
-      else 
+    	//static bool flip = false;
+      //if (flip)
+    	//	mot.data = "stand_squat2";
+      //else 
         mot.data = "stand_squat";
-      flip = !flip;
+      //flip = !flip;
       prev_move = false;
     }    
     
