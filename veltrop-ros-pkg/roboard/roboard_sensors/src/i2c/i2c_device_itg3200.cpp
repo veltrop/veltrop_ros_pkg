@@ -73,9 +73,9 @@ void I2CDeviceITG3200::init()
     //i2c0master_WriteN(0x1E); // DLPF_CFG = 6 (5hz,1khz), FS_SEL = 3 
     //i2c0master_WriteN(0x1D); // DLPF_CFG = 5 (10hz,1khz), FS_SEL = 3  
     //i2c0master_WriteN(0x1C); // DLPF_CFG = 4 (20hz,1khz), FS_SEL = 3
-    i2c0master_WriteN(0x1B); // DLPF_CFG = 3 (42hz,1khz), FS_SEL = 3
-    //i2c0master_WriteN(0x1A);   // DLPF_CFG = 2 (98hz,1khz), FS_SEL = 3 
-    //i2c0master_WriteN(0x19); // DLPF_CFG = 1 (188hz,1khz), FS_SEL = 3 
+//    i2c0master_WriteN(0x1B); // DLPF_CFG = 3 (42hz,1khz), FS_SEL = 3
+    i2c0master_WriteN(0x1A);   // DLPF_CFG = 2 (98hz,1khz), FS_SEL = 3 
+//    i2c0master_WriteN(0x19); // DLPF_CFG = 1 (188hz,1khz), FS_SEL = 3 
     //i2c0master_WriteN(0x18); // DLPF_CFG = 0 (256hz,8khz), FS_SEL = 3     
     
     usleep(1000);

@@ -48,10 +48,10 @@ void com4_ics_init()
 	// O_RDWR   : open for read/write
 	// O_NOCTTY : do not cause terminal device to be controlling terminal
 	// O_NDELAY : program ignores DCD line (else program sleeps until DCD)
-  com4 = open("/dev/ttyS3", O_RDWR | O_NOCTTY | O_NDELAY); // 
+  com4 = open("/dev/ttyS2", O_RDWR | O_NOCTTY | O_NDELAY); // 
   if (com4 == -1 )
   {
-    fprintf(stderr, "uart.h: Cannot open /dev/ttyS3 - %s\n", strerror(errno));
+    fprintf(stderr, "Cannot open /dev/ttyS2 - %s\n", strerror(errno));
   	return;  
   }
   
@@ -64,12 +64,12 @@ void com4_ics_init()
 	// set baud 115200
 	result = cfsetispeed(&tio, B115200);
 	if (result < 0) {
-		printf("uart.h: cfsetispeed() failed - %s\n", strerror(errno));
+		printf("cfsetispeed() failed - %s\n", strerror(errno));
 		return;
 	}
 	result = cfsetospeed(&tio, B115200);
 	if (result < 0) {
-		printf("uart.h: cfsetospeed() failed - %s\n", strerror(errno));
+		printf("cfsetospeed() failed - %s\n", strerror(errno));
 		return;
 	}  
   
@@ -109,7 +109,6 @@ void com4_ics_init()
 	tio.c_iflag &= ~(IXON | IXOFF | IXANY);
 	tio.c_iflag |= (IGNPAR | IGNBRK);   
   
-  //tcflush(com4, TCIFLUSH);
   tcflush(com4, TCIOFLUSH);
   tcsetattr(com4, TCSANOW, &tio);  
   tcflush(com4, TCIOFLUSH);
@@ -206,12 +205,12 @@ int ics_trx_timeout(unsigned char * buf_out, unsigned int bytes_out, unsigned ch
 {
 	int i;
   
-  //tcflush(com4, TCIOFLUSH);
+  tcflush(com4, TCIOFLUSH);
   
 	if ((i = kondo_serial_write(buf_out, bytes_out)) < 0)
 		return i;
     
-  //tcflush(com4, TCIOFLUSH);
+  tcflush(com4, TCIOFLUSH);
 
 	//i = kondo_serial_read_timeout(buf_in, bytes_in, 0, timeout);
 
