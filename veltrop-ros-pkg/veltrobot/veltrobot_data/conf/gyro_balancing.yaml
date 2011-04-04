@@ -10,7 +10,7 @@ pitch:
     multiplier: 5.0
 
   - joint_name: ankle_left_pitch
-    multiplier: 8.0
+    multiplier: 8.5
     
 #  - joint_name: hip_right_pitch
 #    multiplier: -2.5
@@ -19,19 +19,19 @@ pitch:
     multiplier: -5.0
 
   - joint_name: ankle_right_pitch
-    multiplier: -8.0     
+    multiplier: -8.5     
     
 roll:
 # 5.4 and 7.2
   - joint_name: hip_left_roll
-    multiplier: -5.0
+    multiplier: -6.0
 
   - joint_name: ankle_left_roll
-    multiplier: -7.0
+    multiplier: -8.0
     
   - joint_name: hip_right_roll
-    multiplier: -5.0
+    multiplier: -6.0
 
   - joint_name: ankle_right_roll
-    multiplier: -7.0
+    multiplier: -8.0
     

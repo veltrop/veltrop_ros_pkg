@@ -189,3 +189,4 @@ servos:
     type: RCSERVO_KONDO_KRS788
     trim: -50
     bus: PWM
+

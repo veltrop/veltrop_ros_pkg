@@ -2,7 +2,7 @@
 
 <motion name="stand_squat" first_phase="stand_squat">
     <phases>
-        <phase balancing_enabled="true" name="stand_squat" next_phase="" duration="" abort_safe="true">
+        <phase balancing_enabled="true" name="stand_squat" next_phase="" duration="" abort_safe="false">
             <pose name="stand_squat" />
         </phase>
     </phases>

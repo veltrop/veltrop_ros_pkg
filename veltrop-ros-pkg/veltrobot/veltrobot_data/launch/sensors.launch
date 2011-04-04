@@ -3,9 +3,10 @@
   	<param name="spin_rate" value="200" />
   	 <rosparam command="load" file="$(find veltrobot_data)/conf/i2c_devices.yaml" />
   </node>
+  
   <!-- <node pkg="roboard_sensors" type="poll_ad" name="poll_ad" >
-  	<param name="fps" value="10" /> 
+  	<param name="fps" value="60" /> 
   	<rosparam command="load" file="$(find veltrobot_data)/conf/ad_devices.yaml" />
-    <param name="publish_raw" value="false" />
-  </node> -->   
+    <param name="publish_raw" value="true" />
+  </node> -->
 </launch>

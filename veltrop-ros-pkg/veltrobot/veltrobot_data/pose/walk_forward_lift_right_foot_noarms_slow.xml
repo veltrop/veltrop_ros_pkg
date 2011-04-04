@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<pose name="walk_forward_lift_right_foot">
+<pose name="walk_forward_lift_right_foot_noarms_slow">
 	<joint_positions duration="225" units="radians_offset">
 		<joint name="hip_left_yaw"  position="0.0" />
 		<joint name="hip_left_roll"  position="0.0" />
