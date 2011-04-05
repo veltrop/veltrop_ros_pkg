@@ -5,6 +5,7 @@
     <param name="load_recording" value="false" />
     <param name="force_left_arm_enabled" value="false" /> 
     <param name="force_right_arm_enabled" value="false" />
+    <param name="force_legs_enabled" value="false" />
    
     <rosparam command="load" file="$(find openni_camera)/info/openni_params.yaml" />
   </node>
