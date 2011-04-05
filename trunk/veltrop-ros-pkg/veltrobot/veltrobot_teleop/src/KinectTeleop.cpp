@@ -168,20 +168,21 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		
 		XnFloat* m;
 		
-		// Upper Joints
-		XnSkeletonJointPosition joint_position_head;
-		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_HEAD, joint_position_head);
-		KDL::Vector head(joint_position_head.position.X, joint_position_head.position.Y, joint_position_head.position.Z);
+		// Upper Joints positions
+		//XnSkeletonJointPosition joint_position_head;
+		//UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_HEAD, joint_position_head);
+		//KDL::Vector head(joint_position_head.position.X, joint_position_head.position.Y, joint_position_head.position.Z);
 		
-		XnSkeletonJointPosition joint_position_neck;
-		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_NECK, joint_position_neck);
-		KDL::Vector neck(joint_position_neck.position.X, joint_position_neck.position.Y, joint_position_neck.position.Z);
+		//XnSkeletonJointPosition joint_position_neck;
+		//UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_NECK, joint_position_neck);
+		//KDL::Vector neck(joint_position_neck.position.X, joint_position_neck.position.Y, joint_position_neck.position.Z);
 		
 		XnSkeletonJointPosition joint_position_torso;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_TORSO, joint_position_torso);
 		KDL::Vector torso(joint_position_torso.position.X, joint_position_torso.position.Y, joint_position_torso.position.Z);
 							
 	  /*
+    // Upper joints rotations
     XnSkeletonJointOrientation joint_orientation_head;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_HEAD, joint_orientation_head);
 		m = joint_orientation_head.orientation.elements;
@@ -200,6 +201,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		double neck_roll, neck_pitch, neck_yaw;
 	  neck_rotation.GetRPY(neck_roll, neck_pitch, neck_yaw);		
 	  */	
+
 	  XnSkeletonJointOrientation joint_orientation_torso;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_TORSO, joint_orientation_torso);
 	  m = joint_orientation_torso.orientation.elements;
@@ -207,116 +209,142 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 																 m[3], m[4], m[5],
 																 m[6], m[7], m[8]);
 		double torso_roll, torso_pitch, torso_yaw;
-	  torso_rotation.GetRPY(torso_roll, torso_pitch, torso_yaw);				
-		
-   	XnSkeletonJointOrientation joint_orientation_right_shoulder;
+	  torso_rotation.GetRPY(torso_roll, torso_pitch, torso_yaw);	
+    
+    // We need this rotation to correct the rest into the users own coordinate system
+    KDL::Rotation torso_rotation_inverse = torso_rotation.Inverse();
+
+    // get right shoulder orientation in kinects default cordinate system
+    XnSkeletonJointOrientation joint_orientation_right_shoulder;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_RIGHT_SHOULDER, joint_orientation_right_shoulder);
     m = joint_orientation_right_shoulder.orientation.elements;
 	  KDL::Rotation right_shoulder_rotation(m[0], m[1], m[2],
 																 m[3], m[4], m[5],
 																 m[6], m[7], m[8]);
-		double right_shoulder_roll, right_shoulder_pitch, right_shoulder_yaw;
+		
+    // Remove torso rotation and extract angles
+    right_shoulder_rotation = right_shoulder_rotation * torso_rotation_inverse;
+    double right_shoulder_roll, right_shoulder_pitch, right_shoulder_yaw;
 	  right_shoulder_rotation.GetRPY(right_shoulder_roll, right_shoulder_pitch, right_shoulder_yaw);				
-    right_shoulder_roll -= torso_roll;
-    right_shoulder_pitch -= torso_pitch;
-    right_shoulder_yaw -= torso_yaw;   
 
-    //ROS_INFO_STREAM(right_shoulder_roll<<" "<<right_shoulder_pitch<< " " <<right_shoulder_yaw);    
-
+    // get left shoulder orientation in kinect's coord sys
     XnSkeletonJointOrientation joint_orientation_left_shoulder;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, XN_SKEL_LEFT_SHOULDER, joint_orientation_left_shoulder);
     m = joint_orientation_left_shoulder.orientation.elements;
 	  KDL::Rotation left_shoulder_rotation(m[0], m[1], m[2],
 																 m[3], m[4], m[5],
 																 m[6], m[7], m[8]);
+    
+    // Remove torso rotation and extract angles
+    left_shoulder_rotation = left_shoulder_rotation * torso_rotation_inverse;
 		double left_shoulder_roll, left_shoulder_pitch, left_shoulder_yaw;
-	  left_shoulder_rotation.GetRPY(left_shoulder_roll, left_shoulder_pitch, left_shoulder_yaw);				
-    left_shoulder_roll -= torso_roll;
-    left_shoulder_pitch -= torso_pitch;
-    left_shoulder_yaw -= torso_yaw;   
+    left_shoulder_rotation.GetRPY(left_shoulder_roll, left_shoulder_pitch, left_shoulder_yaw);				
 
-
-
-
-		// Left Arm
+		// Left Arm 
 		XnSkeletonJointPosition joint_position_left_hand;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_HAND, joint_position_left_hand);
 		KDL::Vector left_hand(joint_position_left_hand.position.X, joint_position_left_hand.position.Y, joint_position_left_hand.position.Z);
-		
+    // torso relative coordinates
+    left_hand = left_hand - torso;
+    left_hand = torso_rotation_inverse * left_hand;
+
 		XnSkeletonJointPosition joint_position_left_elbow;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_ELBOW, joint_position_left_elbow);
 		KDL::Vector left_elbow(joint_position_left_elbow.position.X, joint_position_left_elbow.position.Y, joint_position_left_elbow.position.Z);        
-		
+    // torso relative coordinates
+    left_elbow = left_elbow - torso;
+    left_elbow = torso_rotation_inverse * left_elbow;
+
 		XnSkeletonJointPosition joint_position_left_shoulder;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_SHOULDER, joint_position_left_shoulder);
 		KDL::Vector left_shoulder(joint_position_left_shoulder.position.X, joint_position_left_shoulder.position.Y, joint_position_left_shoulder.position.Z);        	        	
+    // torso relative coordinates
+    left_shoulder = left_shoulder - torso;
+    left_shoulder = torso_rotation_inverse * left_shoulder;
 		
 		// Right Arm
 		XnSkeletonJointPosition joint_position_right_hand;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_HAND, joint_position_right_hand);
 		KDL::Vector right_hand(joint_position_right_hand.position.X, joint_position_right_hand.position.Y, joint_position_right_hand.position.Z);
+    // torso relative coordinates
+    right_hand = right_hand - torso;
+    right_hand = torso_rotation_inverse * right_hand;
 		
 		XnSkeletonJointPosition joint_position_right_elbow;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_ELBOW, joint_position_right_elbow);
 		KDL::Vector right_elbow(joint_position_right_elbow.position.X, joint_position_right_elbow.position.Y, joint_position_right_elbow.position.Z);        
+    // torso relative coordinates
+    right_elbow = right_elbow - torso;
+    right_elbow = torso_rotation_inverse * right_elbow;
 		
 		XnSkeletonJointPosition joint_position_right_shoulder;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_SHOULDER, joint_position_right_shoulder);
 		KDL::Vector right_shoulder(joint_position_right_shoulder.position.X, joint_position_right_shoulder.position.Y, joint_position_right_shoulder.position.Z);
+    // torso relative coordinates
+    right_shoulder = right_shoulder - torso;
+    right_shoulder = torso_rotation_inverse * right_shoulder;
 		
 		// Right Leg
 		XnSkeletonJointPosition joint_position_right_hip;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_HIP, joint_position_right_hip);
 		KDL::Vector right_hip(joint_position_right_hip.position.X, joint_position_right_hip.position.Y, joint_position_right_hip.position.Z);
+    // torso relative coordinates
+    right_hip = right_hip - torso;
+    right_hip = torso_rotation_inverse * right_hip;
 
 		XnSkeletonJointPosition joint_position_right_knee;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_KNEE, joint_position_right_knee);
 		KDL::Vector right_knee(joint_position_right_knee.position.X, joint_position_right_knee.position.Y, joint_position_right_knee.position.Z);
+    // torso relative coordinates
+    right_knee = right_knee - torso;
+    right_knee = torso_rotation_inverse * right_knee;
 
 		XnSkeletonJointPosition joint_position_right_foot;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_RIGHT_FOOT, joint_position_right_foot);
 		KDL::Vector right_foot(joint_position_right_foot.position.X, joint_position_right_foot.position.Y, joint_position_right_foot.position.Z);
+    // torso relative coordinates
+    right_foot = right_foot - torso;
+    right_foot = torso_rotation_inverse * right_foot;
 
 		// Left Leg
 		XnSkeletonJointPosition joint_position_left_hip;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_HIP, joint_position_left_hip);
 		KDL::Vector left_hip(joint_position_left_hip.position.X, joint_position_left_hip.position.Y, joint_position_left_hip.position.Z);
+    // torso relative coordinates
+    left_hip = left_hip - torso;
+    left_hip = torso_rotation_inverse * left_hip;
 
 		XnSkeletonJointPosition joint_position_left_knee;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_KNEE, joint_position_left_knee);
 		KDL::Vector left_knee(joint_position_left_knee.position.X, joint_position_left_knee.position.Y, joint_position_left_knee.position.Z);
+    // torso relative coordinates
+    left_knee = left_knee - torso;
+    left_knee = torso_rotation_inverse * left_knee;
 
 		XnSkeletonJointPosition joint_position_left_foot;
 		UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, XN_SKEL_LEFT_FOOT, joint_position_left_foot);
 		KDL::Vector left_foot(joint_position_left_foot.position.X, joint_position_left_foot.position.Y, joint_position_left_foot.position.Z);
-
-		///////////////////////////////////////////////////////////////////////////
-		// two ways to go about this direct geometry approach... method two is used
-		//
-		// 1 semi calculated approach, the joint rotations are from the world perspective
-		//   so we need to get rotations of one joint relative to the next in a chain,
-		//   like how the robot is:
-		// 1.1 publish transform of two joints relative to openni_depth frame.
-		// 1.2 request transform between two joints own frames .
-		// 1.3 apply that inner joint transform to correct robot joint.  problem
-		//     is that that joint of robot may have too few dof.
-		//
-		// 2 [nearly] direct aproach using joint positions, and geometry to relate them:
-		// 2.1 get points of three joints.
-		// 2.2 do many specific calculations relating that geometry to my own
-		//     robots geometry.
-		// 2.3 apply rotations to robot.				
-		///////////////////////////////////////////////////////////////////////////															
+    // torso relative coordinates
+    left_foot = left_foot - torso;
+    left_foot = torso_rotation_inverse * left_foot;
 		
-		/////
+    // the kinect and robot are in different rotation spaces, but at least 
+    // they are still axis aligned so its easy to correct... but I should
+    // have made correct transforms in the launch file...
+
+    /////
 		// Process and output joint rotations to the robot.																														
 		/////
-																																																																																			
+    
+    // ARMS for robot
+  																																																																									
 		// left elbow roll
 		KDL::Vector left_elbow_hand(left_hand - left_elbow);
 		KDL::Vector left_elbow_shoulder(left_shoulder - left_elbow);
 		left_elbow_hand.Normalize();
 		left_elbow_shoulder.Normalize();
+    //left_elbow_hand = torso_rotation_inverse * left_elbow_hand;
+    //left_elbow_shoulder = torso_rotation_inverse * left_elbow_shoulder;
 		static double left_elbow_angle_roll = 0;
 		if (joint_position_left_hand.fConfidence >= 0.5 && 
 				joint_position_left_elbow.fConfidence >= 0.5 && 
@@ -342,40 +370,47 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 						
 		// left shoulder roll
 		KDL::Vector left_shoulder_elbow(left_elbow - left_shoulder);
-		KDL::Vector left_shoulder_neck(neck - left_shoulder);
+		KDL::Vector left_shoulder_right_shoulder(right_shoulder - left_shoulder);
 		left_shoulder_elbow.Normalize();
-		left_shoulder_neck.Normalize();
+		left_shoulder_right_shoulder.Normalize();
+    //left_shoulder_elbow = torso_rotation_inverse * left_shoulder_elbow;
+    //left_shoulder_neck = torso_rotation_inverse * left_shoulder_neck;
 		static double left_shoulder_angle_roll = 0;
-		if (joint_position_neck.fConfidence >= 0.5 && 
+		if (joint_position_right_shoulder.fConfidence >= 0.5 && 
 				joint_position_left_elbow.fConfidence >= 0.5 && 
 				joint_position_left_shoulder.fConfidence >= 0.5)
 		{
-			left_shoulder_angle_roll = acos(KDL::dot(left_shoulder_elbow, left_shoulder_neck));
+			left_shoulder_angle_roll = acos(KDL::dot(left_shoulder_elbow, left_shoulder_right_shoulder));
 			left_shoulder_angle_roll = left_shoulder_angle_roll - HALFPI;
 		}
 						 
 		// right shoulder roll
 		KDL::Vector right_shoulder_elbow(right_elbow - right_shoulder);
-		KDL::Vector right_shoulder_neck(neck - right_shoulder);
+		KDL::Vector right_shoulder_left_shoulder(left_shoulder - right_shoulder);
 		right_shoulder_elbow.Normalize();
-		right_shoulder_neck.Normalize();
+		right_shoulder_left_shoulder.Normalize();
 		static double right_shoulder_angle_roll = 0;
-		if (joint_position_neck.fConfidence >= 0.5 && 
+		if (joint_position_left_shoulder.fConfidence >= 0.5 && 
 				joint_position_right_elbow.fConfidence >= 0.5 && 
 				joint_position_right_shoulder.fConfidence >= 0.5)
 		{     
-			right_shoulder_angle_roll = acos(KDL::dot(right_shoulder_elbow, right_shoulder_neck));
+			right_shoulder_angle_roll = acos(KDL::dot(right_shoulder_elbow, right_shoulder_left_shoulder));
 			right_shoulder_angle_roll = -(right_shoulder_angle_roll - HALFPI);                                      
 		} 
 										
 		// left shoulder pitch
 		static double left_shoulder_angle_pitch = 0;
-		if (joint_position_left_shoulder.fConfidence >= 0.5)
+		if (joint_position_left_shoulder.fConfidence >= 0.5 &&
+        joint_position_left_elbow.fConfidence >= 0.5)
 		{ 
-			left_shoulder_angle_pitch = asin(left_shoulder_elbow.y());
+		  left_shoulder_angle_pitch = asin(left_shoulder_elbow.y());
 			left_shoulder_angle_pitch = left_shoulder_angle_pitch + HALFPI;
-		  //if (torso.z() < left_shoulder_elbow.z())
-      //  left_shoulder_angle_pitch = -left_shoulder_angle_pitch;
+		  //left_shoulder_angle_pitch = -acos(left_shoulder_elbow.y());
+      //if (left_shoulder.z() < left_elbow.z())
+      ////  if (left_shoulder.x() < left_elbow.x()) 
+      ////    left_shoulder_angle_pitch = PI + PI - left_shoulder_angle_pitch;
+      ////  else
+      //    left_shoulder_angle_pitch = -left_shoulder_angle_pitch;
     }
 	  //if (joint_orientation_left_shoulder.fConfidence >= 0.5)
     //{
@@ -388,7 +423,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		{
 			right_shoulder_angle_pitch = asin(right_shoulder_elbow.y());
 			right_shoulder_angle_pitch = -(right_shoulder_angle_pitch + HALFPI);
-			//if (torso.z() < right_shoulder_elbow.z())
+			//right_shoulder_angle_pitch = acos(right_shoulder_elbow.y());
+      //if (right_shoulder_elbow.z() > 0.0)
       //  right_shoulder_angle_pitch = -right_shoulder_angle_pitch;
   	}
     //if (joint_orientation_right_shoulder.fConfidence >= 0.5)
@@ -407,6 +443,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		if (joint_orientation_left_shoulder.fConfidence >= 0.4)
     {
       left_shoulder_angle_yaw = left_shoulder_roll;
+      //left_shoulder_angle_yaw = left_shoulder_pitch;
     }
 
 		// right shoulder yaw
@@ -421,22 +458,9 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       right_shoulder_angle_yaw = -(right_shoulder_roll);
     }
 					
-		///////////////////////////////////////////////////////////////////////////
-		// PROBLEM:
-		// doing each of the 3 degrees of freedom in the shoulder separately is having problems.
-		// 1. the acos has no sign, it only reads less than one half pi rotation
-		// 2. there is a paradox/redundancy with joint movement to be considered: ie, to lift the
-		//    arm vertically up it could either rotate the pitch or roll joint by one pi
-		// SOLUTION?:
-		// if we take the raw tf rotation from the input shoulder, can we apply that to our
-		// final dof of our shoulder chain, and then back solve for the two joints leading to it?
-		// or do that from the hand?
-		// CONCLUSION:
-    // doing inverse ik increased the functional range of the arms a bit.  but did
-    // not make coordination any more simple or difficult
-    ///////////////////////////////////////////////////////////////////////////
-
-		// Knee left pitch					
+		// LEGS for robot
+    
+    // Knee left pitch					
 		KDL::Vector left_knee_foot(left_foot - left_knee);
 		KDL::Vector left_knee_hip(left_hip - left_knee);
 		left_knee_foot.Normalize();
@@ -483,35 +507,37 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 
 
 		// Hip left roll					
-		KDL::Vector hip_left_knee(left_knee - left_hip);
-		KDL::Vector hip_left_right(right_hip - left_hip);
-		hip_left_knee.Normalize();
-		hip_left_right.Normalize();
+		//KDL::Vector hip_left_knee(left_knee - left_hip);
+		//KDL::Vector hip_left_right(right_hip - left_hip);
+		//hip_left_knee.Normalize();
+		//hip_left_right.Normalize();
 		static double hip_left_angle_roll = 0;
-		if (joint_position_left_knee.fConfidence >= 0.5 && 
-				joint_position_left_hip.fConfidence >= 0.5 && 
-				joint_position_right_hip.fConfidence >= 0.5)
-		{
+		//if (joint_position_left_knee.fConfidence >= 0.5 && 
+		//		joint_position_left_hip.fConfidence >= 0.5 && 
+		//		joint_position_right_hip.fConfidence >= 0.5)
+		//{
 		//	hip_left_angle_roll = acos(KDL::dot(hip_left_knee, hip_left_right));
 	  //  hip_left_angle_roll = hip_left_angle_roll - HALFPI;
-		}	
+		//}	
 		
 		// Hip right roll					
-		KDL::Vector hip_right_knee(right_knee - right_hip);
-		KDL::Vector hip_right_left(left_hip - right_hip);
-		hip_right_knee.Normalize();
-		hip_right_left.Normalize();
+		//KDL::Vector hip_right_knee(right_knee - right_hip);
+		//KDL::Vector hip_right_left(left_hip - right_hip);
+		//hip_right_knee.Normalize();
+		//hip_right_left.Normalize();
 		static double hip_right_angle_roll = 0;
-		if (joint_position_right_knee.fConfidence >= 0.5 && 
-				joint_position_right_hip.fConfidence >= 0.5 && 
-				joint_position_left_hip.fConfidence >= 0.5)
-		{
+		//if (joint_position_right_knee.fConfidence >= 0.5 && 
+		//		joint_position_right_hip.fConfidence >= 0.5 && 
+		//		joint_position_left_hip.fConfidence >= 0.5)
+		//{
 		//	hip_right_angle_roll = acos(KDL::dot(hip_right_knee, hip_right_left));
 		//	hip_right_angle_roll = -(hip_right_angle_roll - HALFPI);
-		}			
+		//}			
 											
+    //KDL::Vector lower_roll((right_hip + left_hip / 2.0) -
+    //                       (right_knee + left_knee / 2.0));
     KDL::Vector lower_roll((right_hip + left_hip / 2.0) -
-                           (right_knee + left_knee / 2.0));
+                           (right_foot + left_foot / 2.0));
     lower_roll.Normalize();
 
 		if (joint_position_left_knee.fConfidence >= 0.5 && 
@@ -601,22 +627,40 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		}
     */
 		
-	  /*
+	  
 		// head pitch
-		KDL::Vector head_torso(head - torso);
-		KDL::Vector head_neck(head - neck);
-		head_torso.Normalize();
-		head_neck.Normalize();
+		//KDL::Vector head_torso(head - torso);
+		//KDL::Vector head_neck(head - neck);
+		//head_torso.Normalize();
+		//head_neck.Normalize();
 		static double head_angle_pitch = 0;
-		if (joint_position_neck.fConfidence >= 0.5 && 
-				joint_position_torso.fConfidence >= 0.5 && 
-				joint_position_head.fConfidence >= 0.5)
-		{
-			head_angle_pitch = asin(KDL::dot(head_torso, head_neck));
-			//head_angle_pitch = head_angle_pitch - HALFPI;
-		}
-	  */		
+    // Use head for counter balancing
+    static double hp_min = -0.1;
+    static double hp_max = 0.65;
+    // if this number is close to zero head should be hp_min
+    // if it is close to or above HALFPI then head should be hp_max
+		double arm_pitch_factor = (fabs(right_shoulder_angle_pitch) + 
+                               fabs(left_shoulder_angle_pitch)) / 2.0;
+    if (arm_pitch_factor >= HALFPI)
+      head_angle_pitch = 0.65;
+    else
+      head_angle_pitch = hp_min + ((arm_pitch_factor / HALFPI) * (hp_max - hp_min));
+   
+    // head follows arm most sideways
+    static double head_angle_yaw = 0;
+    double arm_roll_factor = (right_shoulder_angle_roll + 
+                             left_shoulder_angle_roll) / 2.0;
+    head_angle_yaw = arm_roll_factor * -1.1;
     
+
+    //if (joint_position_neck.fConfidence >= 0.5 && 
+		//		joint_position_torso.fConfidence >= 0.5 && 
+		//		joint_position_head.fConfidence >= 0.5)
+		//{
+		//	head_angle_pitch = asin(KDL::dot(head_torso, head_neck));
+			//head_angle_pitch = head_angle_pitch - HALFPI;
+		//}
+	  		
     /////
     // Velocity foot mouse gestures
     /////
@@ -700,7 +744,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		
 		sensor_msgs::JointState js; 
     
-    if (left_arm_enabled_ && arm_control_method_ == DIRECT)
+    if (left_arm_enabled_ && (arm_control_method_ == DIRECT))
     {
       js.name.push_back("elbow_left_roll");
       js.position.push_back(left_elbow_angle_roll);
@@ -716,7 +760,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.velocity.push_back(10);
     }
 
-		if (right_arm_enabled_ && arm_control_method_ == DIRECT)
+		if (right_arm_enabled_ && (arm_control_method_ == DIRECT))
 		{
       js.name.push_back("elbow_right_roll");
       js.position.push_back(right_elbow_angle_roll);
@@ -730,10 +774,20 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.name.push_back("shoulder_right_yaw");
       js.position.push_back(right_shoulder_angle_yaw);
       js.velocity.push_back(10);    
-		}		
+		}
+
+    if (right_arm_enabled_ || left_arm_enabled_)
+    {
+      js.name.push_back("neck_yaw");
+      js.position.push_back(head_angle_yaw);
+      js.velocity.push_back(10);          
+      js.name.push_back("neck_pitch");
+      js.position.push_back(head_angle_pitch);
+      js.velocity.push_back(10);    
+    }    
     
     if (legs_enabled_ && (left_arm_enabled_ || right_arm_enabled_)
-        && arm_control_method_ == DIRECT )
+        && (arm_control_method_ == DIRECT) )
     {
       js.name.push_back("knee_left_pitch");
       js.position.push_back(knee_left_angle_pitch);
@@ -800,7 +854,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 
     geometry_msgs::Point p;
 
-    if (left_arm_enabled_ && arm_control_method_ == IK)
+    if (left_arm_enabled_ && (arm_control_method_ == IK))
     {
       p.x = -left_hand_torso.z();
       p.y = -left_hand_torso.x();
@@ -808,16 +862,13 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       left_arm_destination_pub_.publish(p);
     }
 
-    if (right_arm_enabled_ && arm_control_method_ == IK)
+    if (right_arm_enabled_ && (arm_control_method_ == IK))
     {
       p.x = -right_hand_torso.z();
       p.y = -right_hand_torso.x();
       p.z = right_hand_torso.y();
       right_arm_destination_pub_.publish(p);
     }
-
-    // ROS_INFO_STREAM(torso.x() << " " << torso.y() << " " << torso.z() );
-   
 
     // The robot will receive and try to mirror my position
     geometry_msgs::Point torso_destination;
@@ -827,18 +878,6 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
     torso_destination.z = torso_pitch;
     torso_destination_pub_.publish(torso_destination);
     
-    // next todo:
-    // point [at ground?] somewhere to direct robot there.  robot needs
-    // to be in same room as you for this to make sense.  otherwise if robot
-    // is in different room could do the point from the robots perspective.
-    //
-    // would it be easiest/best to use the tf of my hand, the kinect, and the nao
-    // to produce the goal position? need to get the kinect tf oriented...
-    
-
-
-
-  
     break;	// only read first user
 	}
 }
