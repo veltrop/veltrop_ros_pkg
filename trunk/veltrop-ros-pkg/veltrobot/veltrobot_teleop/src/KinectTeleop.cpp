@@ -776,7 +776,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.velocity.push_back(10);    
 		}
 
-    if (right_arm_enabled_ || left_arm_enabled_)
+    /*if (right_arm_enabled_ || left_arm_enabled_)
     {
       js.name.push_back("neck_yaw");
       js.position.push_back(head_angle_yaw);
@@ -784,7 +784,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.name.push_back("neck_pitch");
       js.position.push_back(head_angle_pitch);
       js.velocity.push_back(10);    
-    }    
+    } */   
     
     if (legs_enabled_ && (left_arm_enabled_ || right_arm_enabled_)
         && (arm_control_method_ == DIRECT) )
@@ -839,8 +839,8 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
     //  Following is IK method
     /////
 
-    KDL::Vector left_hand_torso  = left_hand  - torso;
-    KDL::Vector right_hand_torso = right_hand - torso;
+    KDL::Vector left_hand_torso  = left_hand;  // - torso;
+    KDL::Vector right_hand_torso = right_hand; // - torso;
     
     // need to scale from me to the nao.
     // I am 1.69 meters, nao is 0.58.
@@ -848,7 +848,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
     // openni units in mm, nao in m.
     // magic number:
     double scale = 0.0003432;
-    
+
     left_hand_torso  = scale * left_hand_torso;
     right_hand_torso = scale * right_hand_torso;
 
