@@ -17,7 +17,7 @@ class NaoHeadTracker():
 
     rospy.init_node('nao_head_tracker')
     
-    self.ip = rospy.get_param('naoqi_ip', '192.168.2.103');
+    self.ip = rospy.get_param('naoqi_ip', '127.0.0.1');
     self.port = int(rospy.get_param('naoqi_port', '9559'));
 
     try:

@@ -330,7 +330,8 @@
         <!-- <servo channel="2" type="RCSERVO_KONDO_KRS78X" trim="62" /> -->
         <parent link="torso" />
         <child link="hip_left_upper_zx" />
-        <origin xyz="-0.025 0.02 -0.065" rpy="0 0 0" />
+        <origin xyz="-0.1 0.02 -0.065" rpy="0 0 0" />
+        <!--<origin xyz="-0.025 0.02 -0.065" rpy="0 0 0" />-->
         <axis xyz="0 0 1" />
         <limit effort="100" velocity="1000" lower="-1.57079632679" upper="1.57079632679" />
     </joint>
