@@ -103,11 +103,13 @@ conversions:
   - input_joint: wrist_left_yaw
     output_joint: LWristYaw
     multiply: -1.0
+#    add: -1.57
     add: 0.0
 
   - input_joint: wrist_right_yaw
     output_joint: RWristYaw
     multiply: -1.0
+#    add: -1.57
     add: 0.0
 
   - input_joint: hand_right

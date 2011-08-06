@@ -22,13 +22,16 @@ class NaoArmController():
     isAbsolute = True
 
     targetPos  = [data.x, data.y, data.z, 0.0, 0.0, 0.0]  
-    targetTime = 0.10
+    #targetTime = 0.10
+    targetTime = 0.15
 
     path  = [ targetPos ]
     times = [ targetTime ]
 
-    self.motionProxy.positionInterpolation(effector, space, path,
-                                           axisMask, times, isAbsolute)
+    self.motionProxy.wbSetEffectorControl("LArm", [data.x, data.y, data.z + 0.27])
+    #self.motionProxy.positionInterpolation(effector, space, path,
+    #                                       axisMask, times, isAbsolute)
+    time.sleep(0.2)
 
   def __init__(self): 
     rospy.sleep(1)
@@ -46,7 +49,10 @@ class NaoArmController():
 
     rospy.Subscriber("right_arm_destination", Point, self.RightArmDestinationCB, queue_size=1)
     rospy.Subscriber("left_arm_destination", Point, self.LeftArmDestinationCB, queue_size=1)
- 
+
+    
+    self.motionProxy.wbEnableEffectorControl("LArm", True)
+    
     self.motionProxy.setWalkArmsEnable(False, False)
     #naoutil.StiffnessOn(self.motionProxy)
     #naoutil.PoseInit(self.motionProxy)
