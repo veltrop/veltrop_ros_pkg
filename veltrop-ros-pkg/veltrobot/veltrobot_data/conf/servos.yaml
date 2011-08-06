@@ -55,7 +55,7 @@ servos:
   - joint_name: shoulder_left_pitch
     channel: 1
     type: RCSERVO_KONDO_KRS4014
-    trim: -375
+    trim: -360
     bus: PWM
     min_rotation: -2.26892802759
     max_rotation: 2.26892802759
@@ -87,7 +87,7 @@ servos:
   - joint_name: shoulder_right_pitch
     channel: 4
     type: RCSERVO_KONDO_KRS4014
-    trim: 312
+    trim: 380
     bus: PWM
     min_rotation: -2.26892802759
     max_rotation: 2.26892802759
@@ -127,7 +127,7 @@ servos:
   - joint_name: hip_left_roll
     channel: 17
     type: RCSERVO_KONDO_KRS788
-    trim: -38
+    trim: -27
     bus: PWM
 
   - joint_name: hip_left_pitch
@@ -136,22 +136,22 @@ servos:
     trim: -9
     bus: PWM
 
-  - joint_name: knee_left_pitch
-    channel: 20
-    type: RCSERVO_KONDO_KRS788
-    trim: 295
-    bus: PWM
+#  - joint_name: knee_left_pitch
+#    channel: 20
+#    type: RCSERVO_KONDO_KRS788
+#    trim: 290
+#    bus: PWM
 
   - joint_name: ankle_left_pitch
     channel: 19
     type: RCSERVO_KONDO_KRS788
-    trim: -180
+    trim: -185
     bus: PWM
 
   - joint_name: ankle_left_roll
     channel: 18
     type: RCSERVO_KONDO_KRS788
-    trim: -10
+    trim: 7
     bus: PWM
 
   - joint_name: hip_right_yaw
@@ -163,7 +163,7 @@ servos:
   - joint_name: hip_right_roll
     channel: 5
     type: RCSERVO_KONDO_KRS788
-    trim: -20
+    trim: -34
     bus: PWM
 
   - joint_name: hip_right_pitch
@@ -175,18 +175,18 @@ servos:
   - joint_name: knee_right_pitch
     channel: 8
     type: RCSERVO_KONDO_KRS788
-    trim: -345
+    trim: -340
     bus: PWM
 
   - joint_name: ankle_right_pitch
     channel: 7
     type: RCSERVO_KONDO_KRS788
-    trim: 156
+    trim: 161
     bus: PWM
     
   - joint_name: ankle_right_roll
     channel: 6
     type: RCSERVO_KONDO_KRS788
-    trim: -50
+    trim: -64
     bus: PWM
 
