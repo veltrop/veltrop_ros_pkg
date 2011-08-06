@@ -13,6 +13,6 @@
   <depend stack="robot_model" /> <!-- robot_state_publisher -->
   <depend stack="ros" /> <!-- std_msgs, roscpp -->
   <depend stack="vision_opencv" /> <!-- opencv2, cv_bridge -->
-  <depend stack="openni_kinect" /> <!-- openni, nite -->
+  <!--<depend stack="openni_kinect" />--> <!-- openni, nite -->
 
 </stack>
