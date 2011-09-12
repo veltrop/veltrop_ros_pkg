@@ -1,0 +1,33 @@
+<launch>
+
+  <node ns="stereo" name="stereo_image_proc" pkg="stereo_image_proc" type="stereo_image_proc" output="screen">
+    <!-- <param name="approximate_sync" type="bool" value="True" />
+    <param name="queue_size" type="int" value="8" /> -->
+  </node>
+
+  <node name="dynamic_reconfigure_load" pkg="dynamic_reconfigure" type="dynparam" args="load /stereo/stereo_image_proc $(find veltrobot_sensors)/conf/custom.yaml" />
+
+<node pkg="tf" type="static_transform_publisher" name="left_camera_tf"
+   args="0 0.03 0 -1.57 0 -1.57 /world /left_camera 100" /> 
+
+<!-- <node pkg="tf" type="static_transform_publisher" name="right_camera_tf"
+   args="0 -0.03 0 -1.57 0 -1.57 /world /right_camera 100" /> -->
+
+</launch>
+
+<!--
+
+To save:
+
+rosrun dynamic_reconfigure dynparam dump /stereo/stereo_image_proc /home/space/veltrop-ros-pkg/veltrobot/veltrobot_sensors/conf/minoru.yaml
+
+To calibrate:
+
+rosrun camera_calibration cameracalibrator.py -size 5x4 -square 0.04 right:=/stereo/right/image_raw left:=/stereo/left/image_raw left_camera:=/stereo/left right_camera:=/stereo/right
+
+To view:
+
+rosrun image_view stereo_view image:=image_rect_color stereo:=/stereo
+
+-->
+
