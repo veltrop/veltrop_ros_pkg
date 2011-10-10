@@ -15,7 +15,7 @@
     <param name="queue_size" type="int" value="8" /> -->
   </node>
 
-  <node name="dynamic_reconfigure_load" pkg="dynamic_reconfigure" type="dynparam" args="load /stereo/stereo_image_proc $(find veltrobot_sensors)/conf/veltrobot.yaml" />
+  <node name="dynamic_reconfigure_load" pkg="dynamic_reconfigure" type="dynparam" args="load /stereo/stereo_image_proc $(find stereo_capture)/conf/veltrobot.yaml" />
 
 </launch>
 
