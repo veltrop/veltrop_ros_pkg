@@ -12,10 +12,11 @@
 
   <node ns="stereo" name="stereo_image_proc" pkg="stereo_image_proc" type="stereo_image_proc" output="screen">
     <!-- <param name="approximate_sync" type="bool" value="True" />
-    <param name="queue_size" type="int" value="8" /> -->
+    <param name="queue_size" type="int" value="4" /> --> 
   </node>
 
-  <node name="dynamic_reconfigure_load" pkg="dynamic_reconfigure" type="dynparam" args="load /stereo/stereo_image_proc $(find stereo_capture)/conf/veltrobot.yaml" />
+  <node name="dynamic_reconfigure_load" pkg="dynamic_reconfigure" type="dynparam" args="load /stereo/stereo_image_proc $(find stereo_capture)/conf/veltrobot.yaml" /> 
+
 
 </launch>
 
