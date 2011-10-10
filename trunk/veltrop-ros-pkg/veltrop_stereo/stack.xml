@@ -1,0 +1,9 @@
+<stack>
+  <description brief="veltrop_stereo">veltrop_stereo</description>
+  <author>Maintained by </author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/veltrop_stereo</url>
+  <depend stack="ros" />
+
+</stack>
