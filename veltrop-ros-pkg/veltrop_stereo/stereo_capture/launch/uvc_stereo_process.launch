@@ -15,19 +15,4 @@
 
 </launch>
 
-<!--
-
-To save:
-
-rosrun dynamic_reconfigure dynparam dump /stereo/stereo_image_proc /home/space/veltrop-ros-pkg/veltrobot/veltrobot_sensors/conf/minoru.yaml
-
-To calibrate:
-
-rosrun camera_calibration cameracalibrator.py -size 5x4 -square 0.04 right:=/stereo/right/image_raw left:=/stereo/left/image_raw left_camera:=/stereo/left right_camera:=/stereo/right
-
-To view:
-
-rosrun image_view stereo_view image:=image_rect_color stereo:=/stereo
-
--->
 
