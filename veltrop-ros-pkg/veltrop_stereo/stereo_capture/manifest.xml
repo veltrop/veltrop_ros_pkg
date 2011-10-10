@@ -9,12 +9,13 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/stereo_capture</url>
 
- <depend package="roscpp"/>
+  <depend package="roscpp"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="image_transport"/>
   <depend package="opencv2"/>
   <depend package="cv_bridge"/>
+  <depend package="camera_info_manager"/>
 
   <export>
     <cpp cflags="-I${prefix}/include -I${prefix}/msg_gen/cpp" lflags="-L${prefix}/lib"/>
