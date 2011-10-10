@@ -1,6 +1,6 @@
 all: vr920
 
-TARBALL_URL = http://www.mygnu.de/wp-content/plugins/download-monitor/download.php?id=55
+TARBALL_URL = https://www.mygnu.de/wp-content/uploads/vrtrack-1.0.tar.gz
 TARBALL = build/vrtrack-1.0.tar.gz
 SOURCE_DIR = build/vrtrack-1.0
 #UNPACK_CMD = unzip -o
