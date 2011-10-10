@@ -13,11 +13,13 @@ vr920: $(SOURCE_DIR)/unpacked
 	mkdir -p bin
 	cd $(SOURCE_DIR) && make
 	cp -f $(SOURCE_DIR)/vrtrack $(SOURCE_DIR)/vrcontrol $(SOURCE_DIR)/multicastdemoclient bin
+	sudo chown root bin/vrtrack bin/vrcontrol
+	sudo chmod +s bin/vrtrack bin/vrcontrol
 	touch bin
 
 clean:
 	cd $(SOURCE_DIR) && make clean
-	rm -f bin/* 
+	rm -rf bin
 
 wipe:
 	-rm -rf build bin 
