@@ -1,0 +1,14 @@
+<package>
+  <description brief="stereo_capture">
+
+     stereo_capture
+
+  </description>
+  <author></author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/stereo_capture</url>
+
+</package>
+
+
