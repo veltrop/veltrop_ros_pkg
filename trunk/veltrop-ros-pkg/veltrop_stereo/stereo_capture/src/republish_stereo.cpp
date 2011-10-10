@@ -1,15 +1,11 @@
 // also inspired with code from stereo.cpp from uvc_camera of camera_umd repo.
 
 #include <iostream>
-//#include <opencv/cv.h>
-//#include <opencv/cvwimage.h>
-//#include <opencv/highgui.h>
 #include <ros/ros.h>
-#include <cv_bridge/CvBridge.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/SetCameraInfo.h>
+#include <camera_info_manager/camera_info_manager.h>
 #include <image_transport/image_transport.h>
 #include <stereo_capture/PairYUYVImages.h>
 
@@ -51,12 +47,12 @@ yuyv16_to_rgb24(int width, int height, const unsigned char *src, unsigned char *
          SAT(g);
          SAT(b);
 
-         *d++ = b;
-         *d++ = g;
-         *d++ = r;
-         //*d++ = r;
-         //*d++ = g;
          //*d++ = b;
+         //*d++ = g;
+         //*d++ = r;
+         *d++ = r;
+         *d++ = g;
+         *d++ = b;
         
          r = y2 + cr;
          b = y2 + cb;
@@ -65,12 +61,12 @@ yuyv16_to_rgb24(int width, int height, const unsigned char *src, unsigned char *
          SAT(g);
          SAT(b);
 
-         *d++ = b;
-         *d++ = g;
-         *d++ = r;
-         //*d++ = r;
-         //*d++ = g;
          //*d++ = b;
+         //*d++ = g;
+         //*d++ = r;
+         *d++ = r;
+         *d++ = g;
+         *d++ = b;
       }
    }
 }
@@ -81,47 +77,33 @@ public:
   RepublishStereo()
   : n_()
   , it_(n_)
-  , left_ipl_(NULL)
-  , right_ipl_(NULL)
+  , left_info_mgr_(ros::NodeHandle(n_, "left"), "left_camera")
+  , right_info_mgr_(ros::NodeHandle(n_, "right"), "right_camera")
   {
     ros::NodeHandle n_private("~"); 
-    std::string input_stereo_name, output_stereo_name, left_frame_id, right_frame_id;
+    std::string input_stereo_name;
     
-    n_private.param<std::string>("input_stereo_name", input_stereo_name, "/stereo_yuyv");
-    n_private.param<std::string>("output_stereo_name", output_stereo_name, "/stereo");
-    n_private.param<std::string>("left_frame_id", left_frame_id, "stereo_camera");
-    n_private.param<std::string>("right_frame_id", right_frame_id, "stereo_camera");
+    n_private.param<std::string>("stereo_name", input_stereo_name, "yuyv_pair");
+    n_private.param<std::string>("left_frame_id", left_frame_id_, "stereo_camera");
+    n_private.param<std::string>("right_frame_id", right_frame_id_, "stereo_camera");
   
-    {
-
-    // TODO: redo calibration
+    std::string left_url, right_url;
+    n_private.getParam("left_camera_info_url", left_url);
+    n_private.getParam("right_camera_info_url", right_url);
+    left_info_mgr_.loadCameraInfo(left_url);
+    right_info_mgr_.loadCameraInfo(right_url);
+        
+    left_image_pub_ = it_.advertise("left/image_raw", 1);
+    right_image_pub_ = it_.advertise("right/image_raw", 1);
     
-    left_info_.header.frame_id = left_frame_id;
-    right_info_.header.frame_id = right_frame_id;
-    
-    std::string left_image_str = output_stereo_name + "/left/image_raw";
-    std::string right_image_str = output_stereo_name + "/right/image_raw";
-    std::string left_info_str = output_stereo_name + "/left/camera_info";
-    std::string right_info_str = output_stereo_name + "/right/camera_info";
-    std::string set_left_info_str = output_stereo_name + "/left/set_camera_info";
-    std::string set_right_info_str = output_stereo_name + "/right/set_camera_info";
-    
-    left_info_srv_ = n_.advertiseService(set_left_info_str, &RepublishStereo::setLeftCameraInfoCB, this);
-    right_info_srv_ = n_.advertiseService(set_right_info_str, &RepublishStereo::setRightCameraInfoCB, this);
-
-    left_image_pub_ = it_.advertise(left_image_str.c_str(), 1);
-    right_image_pub_ = it_.advertise(right_image_str.c_str(), 1);
-    
-    left_info_pub_ = n_.advertise<sensor_msgs::CameraInfo>(left_info_str.c_str(), 1);
-    right_info_pub_ = n_.advertise<sensor_msgs::CameraInfo>(right_info_str.c_str(), 1);
+    left_info_pub_ = n_.advertise<sensor_msgs::CameraInfo>("left/camera_info", 1);
+    right_info_pub_ = n_.advertise<sensor_msgs::CameraInfo>("right/camera_info", 1);
     
     stereo_sub_ = n_.subscribe(input_stereo_name, 1, &RepublishStereo::getStereoCB, this);
   }
   
   ~RepublishStereo()
   {
-    cvReleaseImage(&left_ipl_);
-    cvReleaseImage(&right_ipl_);
   }
   
   void spin()
@@ -137,15 +119,10 @@ private:
   ros::Time t_prev_;
   int frames_;
   image_transport::ImageTransport it_;
-  image_transport::Publisher left_image_pub_;
-  image_transport::Publisher right_image_pub_;
-  ros::Publisher left_info_pub_;
-  ros::Publisher right_info_pub_;
-  IplImage *left_ipl_, *right_ipl_;
-  sensor_msgs::CameraInfo left_info_;
-  sensor_msgs::CameraInfo right_info_;
-  ros::ServiceServer left_info_srv_;
-  ros::ServiceServer right_info_srv_; 
+  image_transport::Publisher left_image_pub_, right_image_pub_;
+  ros::Publisher left_info_pub_, right_info_pub_;
+  CameraInfoManager left_info_mgr_, right_info_mgr_;
+  std::string left_frame_id_, right_frame_id_;
     
   void doFps()
   {
@@ -155,95 +132,50 @@ private:
       ros::Duration d = ros::Time::now() - t_prev_;
       t_prev_ = ros::Time::now();
       float fps = 10.0f / d.toSec();
-      ROS_INFO("last 10 image pairs received at %f fps\n", fps);
+      ROS_INFO("Recent 10 image pairs received at %f fps\n", fps);
     }  
-  }
-  
-  bool setLeftCameraInfoCB(sensor_msgs::SetCameraInfo::Request& request,
-                           sensor_msgs::SetCameraInfo::Response& response)
-  {
-    left_info_.roi = request.camera_info.roi;
-    left_info_.D = request.camera_info.D;
-    left_info_.K = request.camera_info.K;
-    left_info_.R = request.camera_info.R;
-    left_info_.P = request.camera_info.P;
-    response.success = true;
-    return true;
-  }
-  bool setRightCameraInfoCB(sensor_msgs::SetCameraInfo::Request& request,
-                           sensor_msgs::SetCameraInfo::Response& response)
-  {
-    right_info_.roi = request.camera_info.roi;
-    right_info_.D = request.camera_info.D;
-    right_info_.K = request.camera_info.K;
-    right_info_.R = request.camera_info.R;
-    right_info_.P = request.camera_info.P;
-    response.success = true;
-    return true;
   }
   
   void getStereoCB(const stereo_capture::PairYUYVImagesConstPtr& msg)
   {
     ros::Duration d = ros::Time::now() - msg->header.stamp;
-    ROS_INFO("image pair receive delay %f\n", d.toSec());
+    ROS_INFO("Image pair receive delay: %f\n", d.toSec());
     doFps();
-        
-    if (!left_ipl_)
-      left_ipl_=cvCreateImage(cvSize(msg->left_image.width,msg->left_image.height), 8, 3);
-    if (!right_ipl_)
-      right_ipl_=cvCreateImage(cvSize(msg->left_image.width,msg->left_image.height), 8, 3);
-    
-    // if new image is diff size, shoud release old and make new. but that shouldn't happen...
-        
-    //yuyv16_to_bgr24(msg->left_image.width, msg->left_image.height,
-    //                &msg->left_image.data[0], (unsigned char*)left_ipl_->imageData);        
-    //yuyv16_to_bgr24(msg->right_image.width, msg->right_image.height,
-    //                &msg->right_image.data[0], (unsigned char*)right_ipl_->imageData);    
-  
-    //cvShowImage("left", left_ipl_);
-    //cvShowImage("right", right_ipl_);
-    
-    yuyv16_to_rgb24(msg->left_image.width, msg->left_image.height,
-                    &msg->left_image.data[0], (unsigned char*)left_ipl_->imageData);        
-    yuyv16_to_rgb24(msg->right_image.width, msg->right_image.height,
-                    &msg->right_image.data[0], (unsigned char*)right_ipl_->imageData); 
-    
-    /*IplImage *t;
-    t = cvCloneImage(left_ipl_);
-    cvSmooth(t, left_ipl_, CV_GAUSSIAN, 3, 3, 0, 0);
-    cvReleaseImage(&t);
-    t = cvCloneImage(right_ipl_);
-    cvSmooth(t, right_ipl_, CV_GAUSSIAN, 3, 3, 0, 0);
-    cvReleaseImage(&t);*/
-    
-    
-    sensor_msgs::Image::Ptr left_image, right_image;
-    //left_image = sensor_msgs::CvBridge::cvToImgMsg(left_ipl_, "bgr8");
-    //right_image = sensor_msgs::CvBridge::cvToImgMsg(right_ipl_, "bgr8");
-    left_image = sensor_msgs::CvBridge::cvToImgMsg(left_ipl_);
-    right_image = sensor_msgs::CvBridge::cvToImgMsg(right_ipl_);
-    
-    left_info_.header.stamp = right_info_.header.stamp = msg->header.stamp;
-    left_info_.header.seq = right_info_.header.seq = msg->header.seq;
-    left_info_.height = right_info_.height = msg->left_image.height;
-    left_info_.width = right_info_.width = msg->left_image.width;
-    
+                        
+    // prepare image messages
+    sensor_msgs::ImagePtr left_image(new sensor_msgs::Image);
+    sensor_msgs::ImagePtr right_image(new sensor_msgs::Image);    
+    left_image->header.frame_id  = left_frame_id_;
+    right_image->header.frame_id = right_frame_id_;
+    left_image->header.stamp     = right_image->header.stamp = msg->header.stamp;
+    left_image->header.seq       = right_image->header.seq   = msg->header.seq;
+    left_image->encoding         = right_image->encoding     = sensor_msgs::image_encodings::RGB8;
+    left_image->height           = right_image->height       = msg->left_image.height;
+    left_image->width            = right_image->width        = msg->left_image.width;
+    left_image->step             = right_image->step         = 3 * msg->left_image.width;    
 
-    left_image->header.frame_id = left_info_.header.frame_id;
-    right_image->header.frame_id = right_info_.header.frame_id;
-    left_image->header.stamp = right_image->header.stamp = msg->header.stamp;
-    left_image->header.seq = right_image->header.seq = msg->header.seq;
-    //left_image->encoding = right_image->encoding = sensor_msgs::image_encodings::RGB8;
-    left_image->encoding = right_image->encoding = sensor_msgs::image_encodings::BGR8;
-    left_image->height = right_image->height = msg->left_image.height;
-    left_image->width = right_image->width = msg->left_image.width;
-    left_image->step = right_image->step = 3 * msg->left_image.width;    
-    
-    left_image_pub_.publish(left_image);
-    left_info_pub_.publish(left_info_);
-    
+    // process image messages
+	  left_image->data.resize(left_image->step * left_image->height);
+	  right_image->data.resize(right_image->step * right_image->height);
+    yuyv16_to_rgb24(msg->left_image.width, msg->left_image.height,
+                    &msg->left_image.data[0], &left_image->data[0]);        
+    yuyv16_to_rgb24(msg->right_image.width, msg->right_image.height,
+                    &msg->right_image.data[0], &right_image->data[0]); 
+
+    // publish image messages
+    left_image_pub_.publish(left_image);    
     right_image_pub_.publish(right_image);
-    right_info_pub_.publish(right_info_);
+    
+    // prepare info messages
+    sensor_msgs::CameraInfoPtr info_left(new sensor_msgs::CameraInfo(left_info_mgr_.getCameraInfo()));
+    sensor_msgs::CameraInfoPtr info_right(new sensor_msgs::CameraInfo(right_info_mgr_.getCameraInfo()));
+    info_left->header.stamp = info_right->header.stamp = msg->header.stamp;
+    info_left->header.frame_id = left_frame_id_;
+    info_right->header.frame_id = right_frame_id_;
+
+    // publish info messages
+    left_info_pub_.publish(info_left);
+    right_info_pub_.publish(info_right);
   }
 };
 
@@ -252,12 +184,7 @@ private:
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "republish_stereo");
-  //cvInitSystem(argc, argv);
-  //cvStartWindowThread();
-  
-  //cvNamedWindow("left");
-  //cvNamedWindow("right");
-  
+
   stereo_capture::RepublishStereo this_node;
   this_node.spin();
   

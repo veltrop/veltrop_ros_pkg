@@ -13,8 +13,6 @@
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="image_transport"/>
-  <depend package="opencv2"/>
-  <depend package="cv_bridge"/>
   <depend package="camera_info_manager"/>
 
   <export>

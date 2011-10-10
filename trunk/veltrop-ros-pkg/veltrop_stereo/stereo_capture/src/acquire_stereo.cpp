@@ -23,14 +23,14 @@ int main(int argc, char **argv)
 
   std::string left_device, right_device, stereo_name, standard_str;
   int width, height, fps, buffers;
-  n_private.param<std::string>("stereo_name", stereo_name, "stereo_yuyv");
+  n_private.param<std::string>("stereo_name", stereo_name, "yuyv_pair");
   n_private.param<std::string>("left_device", left_device, "/dev/video0");
   n_private.param<std::string>("right_device", right_device, "/dev/video1");
-  n_private.param<std::string>("standard_str", standard_str, "NTSC");
+  n_private.param<std::string>("standard_str", standard_str, "DEFAULT");
   n_private.param("width", width, 640);
   n_private.param("height", height, 480);
   n_private.param("fps", fps, 1);
-  n_private.param("buffers", buffers, 1);
+  n_private.param("buffers", buffers, 2);
 
   ros::Publisher pub = n.advertise<stereo_capture::PairYUYVImages>(stereo_name.c_str(), 1);   
 

@@ -1,0 +1,15 @@
+<launch>
+  
+  <node ns="stereo" output="screen" pkg="stereo_capture" type="acquire_stereo" name="acquire_stereo">    
+    <param name="stereo_name" value="yuyv_pair" />    
+    <param name="buffers" value="2" />
+    <param name="fps" value="4" />
+    <param name="width" value="320" />
+    <param name="height" value="240" />
+    <param name="left_device" value="/dev/video0" />
+    <param name="right_device" value="/dev/video1" />
+    <param name="standard_str" value="NTSC" />
+  </node>
+
+</launch>
+
