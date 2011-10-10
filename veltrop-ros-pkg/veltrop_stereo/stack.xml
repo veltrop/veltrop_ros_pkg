@@ -1,9 +1,15 @@
 <stack>
-  <description brief="veltrop_stereo">veltrop_stereo</description>
-  <author>Maintained by </author>
+  <description brief="veltrop_stereo"> Stuff for streo vision.</description>
+  <author>Maintained by Taylor Veltrop</author>
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/veltrop_stereo</url>
-  <depend stack="ros" />
+  <depend stack="common" /> <!-- tinyxml -->
+  <depend stack="common_msgs" /> <!-- sensor_msgs -->
+  <depend stack="image_common" /> <!-- image_transport -->
+  <depend stack="joystick_drivers" /> <!-- joy, ps3joy -->
+  <depend stack="robot_model" /> <!-- robot_state_publisher -->
+  <depend stack="ros" /> <!-- std_msgs, roscpp -->
+  <depend stack="vision_opencv" /> <!-- opencv2, cv_bridge -->
 
 </stack>
