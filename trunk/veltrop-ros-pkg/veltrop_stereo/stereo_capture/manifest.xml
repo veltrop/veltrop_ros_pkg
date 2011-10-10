@@ -1,13 +1,43 @@
 <package>
   <description brief="stereo_capture">
 
-     stereo_capture
+   Contains stereo video capture related nodes.
 
   </description>
-  <author></author>
+  <author>Taylor Veltrop</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/stereo_capture</url>
+
+ <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="image_transport"/>
+  <depend package="opencv2"/>
+  <depend package="cv_bridge"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include -I${prefix}/msg_gen/cpp" lflags="-L${prefix}/lib"/>
+  </export>
+
+  <!-- experimental -->
+  <!-- <depend package="uvc_cam"/>
+       <depend package="usb_cam"/> 
+       <rosdep name="libswscale"/>
+       <rosdep name="libavcodec"/> -->
+  
+  <!-- <depend package="planning_environment_msgs"/> -->
+  <!-- <depend package="kinematics_msgs"/> -->
+
+  <!--<depend package="actionlib_msgs"/>
+  <depend package="pr2_controllers_msgs"/>
+
+  <depend package="move_arm_msgs"/>
+  <depend package="planning_environment"/>
+  <depend package="motion_planning_msgs"/>
+
+  <depend package="pr2_arm_navigation_perception"/>
+  <depend package="mapping_rviz_plugin"/> -->
 
 </package>
 
