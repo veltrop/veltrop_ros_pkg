@@ -1,7 +1,7 @@
 <launch>
   
-  <node pkg="stereo_capture" type="acquire_stereo" name="acquire_stereo">    
-    <param name="stereo_name" value="stereo_yuyv" />    
+  <node ns="stereo" pkg="stereo_capture" type="acquire_stereo" name="acquire_stereo">    
+    <param name="stereo_name" value="yuyv_pair" />    
     <param name="buffers" value="2" />
     <param name="fps" value="4" />
     <param name="width" value="320" />
