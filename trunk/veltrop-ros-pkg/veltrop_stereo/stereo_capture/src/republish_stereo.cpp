@@ -170,16 +170,20 @@ private:
     doFps();
 
     int width, height;
-    if (rotate90ccw_)
+    if (rotate90ccw_ == true)
     {
       width  = msg->left_image.height;
       height = msg->left_image.width;
+      std::cout <<"rotate90ccw_ is true"<<std::endl;
     }
     else
     {
       height = msg->left_image.height;
       width  = msg->left_image.width;    
+      std::cout <<"rotate90ccw_ is false"<<std::endl;
     }
+    
+    std::cout <<"destination width: "<< width<<std::endl;
                         
     // prepare image messages
     sensor_msgs::ImagePtr left_image(new sensor_msgs::Image);
@@ -199,10 +203,10 @@ private:
 
     if (rotate90ccw_)
     {
-      unsigned char* tmp = new unsigned char(left_image->step * left_image->height);
+      unsigned char* tmp = new unsigned char[left_image->step * left_image->height];
       
 	    yuyv16_to_rgb24(tmp, &msg->left_image.data[0],
-                      msg->left_image.width, msg->left_image.height);                                
+                      msg->left_image.width, msg->left_image.height);  
       rotate90CCW(&left_image->data[0], tmp,
                   left_image->width, left_image->height);
 
