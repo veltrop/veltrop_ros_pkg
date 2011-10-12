@@ -9,6 +9,7 @@
     <param name="left_device" value="/dev/video1" />
     <param name="right_device" value="/dev/video0" />
     <param name="standard_str" value="DEFAULT" />
+  </node>
 
 </launch>
 
