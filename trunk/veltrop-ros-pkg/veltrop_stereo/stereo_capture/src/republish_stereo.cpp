@@ -204,12 +204,12 @@ private:
 	    yuyv16_to_rgb24(tmp, &msg->left_image.data[0],
                       msg->left_image.width, msg->left_image.height);                                
       rotate90CCW(&left_image->data[0], tmp,
-                  msg->left_image.width, msg->left_image.height);
+                  left_image->width, left_image->height);
 
       yuyv16_to_rgb24(tmp, &msg->right_image.data[0],
                       msg->right_image.width, msg->right_image.height);     
       rotate90CCW(&right_image->data[0], tmp,
-                  msg->right_image.width, msg->right_image.height);
+                  right_image->width, right_image->height);
       
       delete tmp;
     }
