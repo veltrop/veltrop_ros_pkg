@@ -12,13 +12,44 @@
 namespace stereo_capture
 {
 
+struct pixel_t {
+  unsigned char r, g, b;
+};
+
+/* Rotate an 8-bit, 3-channel image by 90 degrees CCW. */
+static inline void rotate90CCW(unsigned char *dst_chr, const unsigned char *src_chr, int dstWidth, int dstHeight) {
+
+  struct pixel_t *src = (pixel_t *) src_chr;
+
+  for (int i = 0; i < dstWidth; ++i) {
+    for (int j = dstHeight-1; j >= 0; --j) {
+      struct pixel_t *dst = &(((pixel_t *) dst_chr)[j * dstWidth + i]);
+      *dst = *src;
+      src++;
+    }
+  } 
+}
+
+/* Rotate an 8-bit, 3-channel image by 180 degrees. */
+/*static inline void rotate180(unsigned char *dst_chr, unsigned char *src_chr, int pixels) {
+
+  struct pixel_t *src = (pixel_t *) src_chr;
+  struct pixel_t *dst = &(((pixel_t *) dst_chr)[pixels - 1]);
+
+  for (int i = pixels; i != 0; --i) {
+    *dst = *src;
+    src++;
+    dst--;
+  }
+}*/
+
+// TODO: save CPU: integrate rotation in to yuyv -> rgb conversion to only step thru the image one time
 // YUYV to RGB conversion
 // There's many methods to this, and much ado about the color range...
 // The below method nice because its only integer.
 #define SAT(c) if (c & (~255)) { if (c < 0) c = 0; else c = 255; }
 static void
-//yuyv16_to_bgr24(int width, int height, const unsigned char *src, unsigned char *dst)
-yuyv16_to_rgb24(int width, int height, const unsigned char *src, unsigned char *dst)
+yuyv16_to_rgb24(unsigned char *dst, const unsigned char *src, int width, int height)
 {
    unsigned char *s;
    unsigned char *d;
@@ -47,9 +78,6 @@ yuyv16_to_rgb24(int width, int height, const unsigned char *src, unsigned char *
          SAT(g);
          SAT(b);
 
-         //*d++ = b;
-         //*d++ = g;
-         //*d++ = r;
          *d++ = r;
          *d++ = g;
          *d++ = b;
@@ -61,9 +89,6 @@ yuyv16_to_rgb24(int width, int height, const unsigned char *src, unsigned char *
          SAT(g);
          SAT(b);
 
-         //*d++ = b;
-         //*d++ = g;
-         //*d++ = r;
          *d++ = r;
          *d++ = g;
          *d++ = b;
@@ -86,6 +111,7 @@ public:
     n_private.param<std::string>("stereo_name", input_stereo_name, "yuyv_pair");
     n_private.param<std::string>("left_frame_id", left_frame_id_, "stereo_camera");
     n_private.param<std::string>("right_frame_id", right_frame_id_, "stereo_camera");
+    n_private.param<bool>("rotate90ccw", rotate90ccw_, false);
   
     std::string left_url, right_url;
     n_private.getParam("left_camera_info_url", left_url);
@@ -123,6 +149,7 @@ private:
   ros::Publisher left_info_pub_, right_info_pub_;
   CameraInfoManager left_info_mgr_, right_info_mgr_;
   std::string left_frame_id_, right_frame_id_;
+  bool rotate90ccw_;
     
   void doFps()
   {
@@ -141,6 +168,18 @@ private:
     ros::Duration d = ros::Time::now() - msg->header.stamp;
     ROS_INFO("Image pair receive delay: %f\n", d.toSec());
     doFps();
+
+    int width, height;
+    if (rotate90ccw_)
+    {
+      width  = msg->left_image.height;
+      height = msg->left_image.width;
+    }
+    else
+    {
+      height = msg->left_image.height;
+      width  = msg->left_image.width;    
+    }
                         
     // prepare image messages
     sensor_msgs::ImagePtr left_image(new sensor_msgs::Image);
@@ -150,17 +189,37 @@ private:
     left_image->header.stamp     = right_image->header.stamp = msg->header.stamp;
     left_image->header.seq       = right_image->header.seq   = msg->header.seq;
     left_image->encoding         = right_image->encoding     = sensor_msgs::image_encodings::RGB8;
-    left_image->height           = right_image->height       = msg->left_image.height;
-    left_image->width            = right_image->width        = msg->left_image.width;
-    left_image->step             = right_image->step         = 3 * msg->left_image.width;    
+    left_image->height           = right_image->height       = height;
+    left_image->width            = right_image->width        = width;
+    left_image->step             = right_image->step         = 3 * width;    
 
     // process image messages
-	  left_image->data.resize(left_image->step * left_image->height);
-	  right_image->data.resize(right_image->step * right_image->height);
-    yuyv16_to_rgb24(msg->left_image.width, msg->left_image.height,
-                    &msg->left_image.data[0], &left_image->data[0]);        
-    yuyv16_to_rgb24(msg->right_image.width, msg->right_image.height,
-                    &msg->right_image.data[0], &right_image->data[0]); 
+    left_image->data.resize(left_image->step * left_image->height);
+	  right_image->data.resize(right_image->step * right_image->height);                  
+
+    if (rotate90ccw_)
+    {
+      unsigned char* tmp = new unsigned char(left_image->step * left_image->height);
+      
+	    yuyv16_to_rgb24(tmp, &msg->left_image.data[0],
+                      msg->left_image.width, msg->left_image.height);                                
+      rotate90CCW(&left_image->data[0], tmp,
+                  msg->left_image.width, msg->left_image.height);
+
+      yuyv16_to_rgb24(tmp, &msg->right_image.data[0],
+                      msg->right_image.width, msg->right_image.height);     
+      rotate90CCW(&right_image->data[0], tmp,
+                  msg->right_image.width, msg->right_image.height);
+      
+      delete tmp;
+    }
+    else
+    {
+	    yuyv16_to_rgb24(&left_image->data[0], &msg->left_image.data[0],
+                      msg->left_image.width, msg->left_image.height);        
+      yuyv16_to_rgb24(&right_image->data[0], &msg->right_image.data[0],
+                      msg->right_image.width, msg->right_image.height);     
+    }
 
     // publish image messages
     left_image_pub_.publish(left_image);    

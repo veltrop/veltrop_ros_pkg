@@ -2,6 +2,9 @@
   <description brief="stereo_capture">
 
    Contains stereo video capture related nodes.
+   There is a modified version of uvc_cam that works with non-uvc cameras.  To work with standard capture devices it allows the user to set the video encoding standard (NTSC, PAL, DEFAULT)
+   The stereo capture also permits the incoming images to be rotated by 90 degrees.  This allows the user to set up stereo cameras in non standard orientations, or could be used to permit vertical stereo.
+   The included modified stereo_image_proc can also produce two disparity images, one based on the left image, and one based on the right image.  This is because low resolution images which are requesting a large maximum disparity can lose much of the incoming image data. (a 240px wide image with 128 max disparity has less than half left).  So for percieving things that are very close to the cameras this is no good.  The additional disparity image allows the full field of view to be used up close, but requires more cpu time.
 
   </description>
   <author>Taylor Veltrop</author>

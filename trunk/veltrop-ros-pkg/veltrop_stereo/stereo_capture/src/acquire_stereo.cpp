@@ -7,6 +7,8 @@
 // with code from stereo_sender.cpp of the sail-ros-pkg repository.
 // also inspired with code from stereo.cpp from uvc_camera of camera_umd repo.
 
+// TODO: separate parameter for transmit_fps and hardware_fps
+
 #include <cstdio>
 #include <ros/ros.h>
 #include <ros/time.h>
