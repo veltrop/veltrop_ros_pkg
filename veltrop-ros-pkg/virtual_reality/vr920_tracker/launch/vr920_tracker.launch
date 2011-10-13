@@ -1,0 +1,9 @@
+<launch>
+
+  <node pkg="tf" type="static_transform_publisher" name="left_camera_tf"
+   args="0 0 1 0 0 0 /world /head 100" /> 
+   
+  <node name="vr920_tracker_node" pkg="vr920_tracker" type="vr920_tracker_node" />
+
+</launch>
+
