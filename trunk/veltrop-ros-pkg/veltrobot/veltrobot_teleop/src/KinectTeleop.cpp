@@ -139,7 +139,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
 		
 		if (publish_kinect_tf_)
 		{
-			string frame_id("openni_depth");
+			string frame_id("openni_depth_frame");
 
 			publishTransform(kinect_controller, user, XN_SKEL_HEAD,           frame_id, "head");
 			publishTransform(kinect_controller, user, XN_SKEL_NECK,           frame_id, "neck");
