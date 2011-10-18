@@ -85,6 +85,11 @@ int createMulticastSocket()
 	return socket_descriptor;
 }
 
+static float toRad(float deg)
+{
+  return deg * 0.0174532925;
+}
+
 int main(int argc, char *argv[])
 {
 	ros::init(argc, argv, "vr920_tracker_node");
@@ -114,13 +119,12 @@ int main(int argc, char *argv[])
 		if (recvfrom(socket_descriptor, &trackingdata, sizeof(TrackingData), 0,
 				(struct sockaddr *) &sock_in, &sin_len) != -1)
 		{
-			//trackingdata.yaw
-			//trackingdata.roll
-			//trackingdata.pitch
 
-			KDL::Rotation rotation(trackingdata.viewmatrix[0], trackingdata.viewmatrix[1], trackingdata.viewmatrix[2],
-							               trackingdata.viewmatrix[4], trackingdata.viewmatrix[5], trackingdata.viewmatrix[6],
-							               trackingdata.viewmatrix[8], trackingdata.viewmatrix[9], trackingdata.viewmatrix[10]);
+//			KDL::Rotation rotation(trackingdata.viewmatrix[0], trackingdata.viewmatrix[1], trackingdata.viewmatrix[2],
+//							               trackingdata.viewmatrix[4], trackingdata.viewmatrix[5], trackingdata.viewmatrix[6],
+//							               trackingdata.viewmatrix[8], trackingdata.viewmatrix[9], trackingdata.viewmatrix[10]);
+
+      KDL::Rotation rotation = KDL::Rotation::RPY(toRad(trackingdata.roll), toRad(trackingdata.pitch), toRad(trackingdata.yaw));	    
 	    
 	    if (!got_calib_rotation)
 	    {
@@ -134,7 +138,7 @@ int main(int argc, char *argv[])
         tf::StampedTransform head_tf;
         try
         {
-          lr.lookupTransform("world", "head", ros::Time(0), head_tf);
+          lr.lookupTransform("world", "vr920_base", ros::Time(0), head_tf);
         }
         catch (tf::TransformException ex)
         {
@@ -146,12 +150,10 @@ int main(int argc, char *argv[])
 	      rotation.GetQuaternion(qx, qy, qz, qw);
 	
 			  tf::Transform transform;
-	      //transform.setOrigin(tf::Vector3(0, 0, 0));  // no translation from users "head"
 	      transform.setOrigin(head_tf.getOrigin());
 	      transform.setRotation(tf::Quaternion(qx, qy, qz, qw));
 			
 			  // send a transform from the users "head" to the vr920
-			  //br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "head", "vr920"));
 			  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "vr920"));
 			}
 		}
