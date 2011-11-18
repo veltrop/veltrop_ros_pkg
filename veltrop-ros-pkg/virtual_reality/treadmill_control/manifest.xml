@@ -13,6 +13,7 @@
   <depend package="joy"/>
   <depend package="wiimote"/>
   <depend package="tf"/>
+  <depend package="geometry_msgs"/>
 </package>
 
 
