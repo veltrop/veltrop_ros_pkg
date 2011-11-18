@@ -29,7 +29,7 @@ class NaoBehavior():
       self.behaviorProxy.runBehavior(data.data)
 
   def MotionNameCB(self, data):
-    print self.behaviorProxy.getInstalledBehaviors()
+    #print self.behaviorProxy.getInstalledBehaviors()
     #print self.behaviorProxy.getRunningBehaviors()
     if self.behaviorProxy.isBehaviorInstalled(data.data):
       #self.behaviorProxy.stopAllBehaviors()

@@ -1,8 +1,8 @@
 
 <launch>
-	<node respawn="true" pkg="wiimote" type="wiimote_node.py" name="wiimote" >
+	<!-- <node respawn="true" pkg="wiimote" type="wiimote_node.py" name="wiimote" >
 	  <remap from="wiijoy" to="joy" />
-  </node>
+  </node> -->
 
   <node pkg="treadmill_control" type="treadmill_control" name="treadmill_control">
   </node>

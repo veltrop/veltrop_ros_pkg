@@ -1,0 +1,17 @@
+<launch>
+
+  <env name="PYTHONPATH" value="$(env PYTHONPATH)" /> 
+  <param name="naoqi_ip" value="oni.local" />
+
+  <node respawn="true" pkg="veltrobot_nao" type="nao_behavior.py" name="nao_behavior" />
+  
+  <node respawn="true" pkg="nao_ctrl" type="nao_walker.py" name="nao_walker" 
+   args="--pip=oni.local --pport=9559" >
+   <param name="step_frequency" value="0.25" />
+  </node>
+
+  <include file="$(find treadmill_control)/launch/treadmill.launch" />  
+  <include file="$(find veltrobot_teleop)/launch/kinect_teleop_ikebana.launch" />     
+
+</launch>
+
