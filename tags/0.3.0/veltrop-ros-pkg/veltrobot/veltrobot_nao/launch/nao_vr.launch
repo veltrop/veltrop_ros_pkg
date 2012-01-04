@@ -1,0 +1,28 @@
+<launch>
+
+  <env name="PYTHONPATH" value="$(env PYTHONPATH)" /> 
+  <param name="naoqi_ip" value="oni.local" />
+
+  <node respawn="true" pkg="veltrobot_nao" type="nao_behavior.py" name="nao_behavior" />
+ 
+  <node pkg="veltrobot_movement" type="joint_state_processor.py" name="joint_state_processor">
+    <rosparam file="$(find veltrobot_nao)/conf/veltrobot_to_nao_joint_conversions.yaml" command="load"/>
+    <remap from="joint_states_in" to="joint_states" />
+  </node> 
+ 
+  <node respawn="true" pkg="veltrobot_nao" type="nao_joint_controller.py" name="nao_joint_controller"> 
+    <remap from="joint_states" to="joint_states_out" />
+  </node>
+  <node respawn="true" pkg="veltrobot_nao" type="nao_arm_controller.py" name="nao_arm_controller" /> 
+  
+  <node respawn="true" pkg="nao_driver" type="nao_walker.py" name="nao_walker" 
+   args="--pip=oni.local --pport=9559" >
+   <param name="step_frequency" value="0.25" />
+  </node>
+
+  <include file="$(find treadmill_control)/launch/treadmill.launch" />  
+  <include file="$(find veltrobot_teleop)/launch/kinect_teleop_ikebana.launch" />     
+  <include file="$(find veltrobot_teleop)/launch/dual_wiimote_teleop.launch" />
+  
+</launch>
+

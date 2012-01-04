@@ -1,0 +1,42 @@
+
+<launch>
+	<node respawn="true" ns="wiimote1" pkg="veltrobot_teleop" type="wiimote_node.py" name="wiimote1" >
+		<remap from="/wiimote/leds" to="/wiimote1/leds" />
+		<remap from="/wiimote/rumble" to="/wiimote1/rumble" />
+		<remap from="/wiimote/state" to="/wiimote1/state" />
+		<remap from="/imu/is_calibrated" to="/wiimote1/imu/is_calibrated" />
+	</node>
+	<node respawn="true" ns="wiimote2" pkg="veltrobot_teleop" type="wiimote_node.py" name="wiimote2" >
+		<remap from="/wiimote/leds" to="/wiimote2/leds" />
+		<remap from="/wiimote/rumble" to="/wiimote2/rumble" />
+		<remap from="/wiimote/state" to="/wiimote2/state" />
+		<remap from="/imu/is_calibrated" to="/wiimote2/imu/is_calibrated" />
+	</node>
+
+	<node pkg="veltrobot_teleop" type="wiimoteLeds.py" name="wiimote1leds" >
+		<remap from="/wiimote/leds" to="/wiimote1/leds" />
+		<param name="led0" value="true" />
+		<param name="led1" value="true" />
+	</node>
+	<node pkg="veltrobot_teleop" type="wiimoteLeds.py" name="wiimote2leds" >
+		<remap from="/wiimote/leds" to="/wiimote2/leds" />
+		<param name="led2" value="true" />
+		<param name="led3" value="true" />
+	</node>
+
+  <node pkg="veltrobot_teleop" type="teleop_dual_wii" name="teleop_dual_wii" />
+
+  <!-- remappings for old veltrobot joy teleop -->
+  <node pkg="joystick_remapper" type="joystick_remapper.py" name="dual_wii_to_veltrobot_joy">
+     <remap from="joy_source" to="joy" />
+     <remap from="joy_dest" to="joy_veltrobot" />
+     <param name="button_mapping" type="str" value="21 -1 -1 10 8 18 9 17 6 7 -1 -1 12 -1 11 -1 -1" /> 
+     <param name="axis_mapping" type="str" value="=" /> 
+  </node>
+  
+  <!-- remappings for old veltrobot joy teleop-->
+  <node pkg="veltrobot_teleop" type="teleop_joy" name="teleop_joy"> 
+    <remap from="joy" to="joy_veltrobot" />
+  </node>
+</launch>
+

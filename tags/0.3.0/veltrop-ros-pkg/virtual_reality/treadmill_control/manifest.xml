@@ -1,0 +1,19 @@
+<package>
+  <description brief="treadmill_control">
+
+     treadmill_control
+
+  </description>
+  <author></author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/treadmill_control</url>
+
+  <depend package="roscpp"/>
+  <depend package="joy"/>
+  <depend package="wiimote"/>
+  <depend package="tf"/>
+  <depend package="geometry_msgs"/>
+</package>
+
+

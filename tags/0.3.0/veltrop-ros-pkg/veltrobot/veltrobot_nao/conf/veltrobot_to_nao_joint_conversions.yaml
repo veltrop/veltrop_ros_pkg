@@ -1,0 +1,124 @@
+conversions:
+
+  - input_joint: ankle_left_pitch
+    output_joint: LAnklePitch
+    multiply: 1.0
+    add: 0.0
+
+  - input_joint: knee_left_pitch
+    output_joint: LKneePitch
+    multiply: -1.0
+    add: 0.0
+
+  - input_joint: hip_left_pitch
+    output_joint: LHipPitch
+    multiply: -1.0
+    add: 0.0
+
+  - input_joint: ankle_left_roll
+    output_joint: LAnkleRoll
+    multiply: -1.0
+    add: 0.0
+
+  - input_joint: hip_left_roll
+    output_joint: LHipRoll
+    multiply: 1.0
+    add: 0.0
+ 
+  - input_joint: ankle_right_pitch
+    output_joint: RAnklePitch
+    multiply: -1.0
+    add: 0.0
+
+  - input_joint: knee_right_pitch
+    output_joint: RKneePitch
+    multiply: 1.0
+    add: 0.0
+
+  - input_joint: hip_right_pitch
+    output_joint: RHipPitch
+    multiply: 1.0
+    add: 0.0
+
+  - input_joint: ankle_right_roll
+    output_joint: RAnkleRoll
+    multiply: -1.0
+    add: 0.0
+
+  - input_joint: hip_right_roll
+    output_joint: RHipRoll
+    multiply: 1.0
+    add: 0.0
+
+  - input_joint: neck_pitch
+    output_joint: HeadPitch
+    multiply: -0.9
+    add: 0.0
+
+  - input_joint: neck_yaw
+    output_joint: HeadYaw
+    multiply: -1.0
+    add: 0.0
+
+  - input_joint: shoulder_left_pitch
+    output_joint: LShoulderPitch
+    multiply: -1.0
+    add: 1.57079632679
+    
+  - input_joint: shoulder_left_roll
+    output_joint: LShoulderRoll
+    multiply: 1.0
+    add: 0.0
+
+  - input_joint: shoulder_left_yaw
+    output_joint: LElbowYaw
+    multiply: -1.0
+    add: 0.0
+
+  - input_joint: elbow_left_roll
+    output_joint: LElbowRoll
+    multiply: 1.0
+    add: 0.0
+
+  - input_joint: shoulder_right_pitch
+    output_joint: RShoulderPitch
+    multiply: 1.0
+    add: 1.57079632679
+
+  - input_joint: shoulder_right_roll
+    output_joint: RShoulderRoll
+    multiply: 1.0
+    add: 0.0
+
+  - input_joint: shoulder_right_yaw
+    output_joint: RElbowYaw
+    multiply: -1.0
+    add: 0.0
+
+  - input_joint: elbow_right_roll
+    output_joint: RElbowRoll
+    multiply: 1.0
+    add: 0.0
+
+  - input_joint: wrist_left_yaw
+    output_joint: LWristYaw
+    multiply: -1.0
+#    add: -1.57
+    add: 0.0
+
+  - input_joint: wrist_right_yaw
+    output_joint: RWristYaw
+    multiply: -1.0
+#    add: -1.57
+    add: 0.0
+
+  - input_joint: hand_right
+    output_joint: RHand
+    multiply: -1.9
+    add: 0.0
+
+  - input_joint: hand_left
+    output_joint: LHand
+    multiply: 1.9
+    add: 0.0
+

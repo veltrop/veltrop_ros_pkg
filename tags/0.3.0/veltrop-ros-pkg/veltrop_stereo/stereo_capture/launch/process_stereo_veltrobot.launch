@@ -1,0 +1,22 @@
+<launch>
+  <node pkg="tf" type="static_transform_publisher" name="left_camera_tf"
+   args="0 0 0 -1.57 0 -1.57 /world /stereo_camera 100" /> 
+
+  <node ns="stereo" pkg="stereo_capture" type="republish_stereo" name="republish_stereo">
+    <param name="stereo_name" value="yuyv_pair" />     
+    <param name="left_camera_info_url" type="string" value="file://$(find stereo_capture)/conf/veltrobot-left.yaml" />
+    <param name="right_camera_info_url" type="string" value="file://$(find stereo_capture)/conf/veltrobot-right.yaml" />
+    <param name="left_frame_id" value="/stereo_camera" />
+    <param name="right_frame_id" value="/stereo_camera" />
+  </node>
+
+  <node ns="stereo" name="stereo_image_proc" pkg="stereo_image_proc" type="stereo_image_proc" output="screen">
+    <!-- <param name="approximate_sync" type="bool" value="True" />
+    <param name="queue_size" type="int" value="4" /> --> 
+  </node>
+
+  <node name="dynamic_reconfigure_load" pkg="dynamic_reconfigure" type="dynparam" args="load /stereo/stereo_image_proc $(find stereo_capture)/conf/veltrobot.yaml" /> 
+
+
+</launch>
+

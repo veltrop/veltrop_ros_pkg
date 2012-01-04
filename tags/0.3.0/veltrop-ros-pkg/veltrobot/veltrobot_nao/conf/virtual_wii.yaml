@@ -1,0 +1,10 @@
+axis_x: 0
+axis_y: 1
+axis_turn: 3
+btn_crouch: -1
+btn_enable_control: 4
+btn_head_mod: -1
+btn_start_scan: -1
+btn_stop_scan: -1
+btn_init_pose: -1
+

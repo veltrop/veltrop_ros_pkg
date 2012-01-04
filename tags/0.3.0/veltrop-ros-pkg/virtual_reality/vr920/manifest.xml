@@ -1,0 +1,15 @@
+<package>
+  <description brief="vr920">
+
+     wrapper package for vusix vr920 drivers
+
+  </description>
+  <author>Jürgen, ROS inclusion by Taylor Veltrop</author>
+  <license>Attribution-NonCommercial-ShareAlike 3.0 Unported</license>
+  <review status="3rdparty unreviewed" notes=""/>
+  <url>http://www.mygnu.de/index.php/2011/03/vrtrack-1-0-headtracking-driver-for-the-vr920-hmd/</url>
+  <rosdoc external="http://www.mygnu.de/index.php/2011/03/vrtrack-1-0-headtracking-driver-for-the-vr920-hmd/"/>
+
+</package>
+
+

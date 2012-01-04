@@ -1,0 +1,13 @@
+<launch>
+  <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
+
+  <node output="screen" pkg="veltrobot_nao" type="nao_joint_controller.py" name="nao_joint_controller">
+    <remap from="joint_states" to="joint_states_out" />
+  </node>
+
+  <node output="screen" pkg="veltrobot_movement" type="joint_state_processor.py" name="joint_state_processor">
+    <rosparam file="$(find veltrobot_nao)/conf/veltrobot_to_nao_joint_conversions.yaml" command="load"/>
+    <remap from="joint_states_in" to="joint_states" />
+  </node>
+</launch> 
+

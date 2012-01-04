@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+
+<motion name="flip_back_to_belly" first_phase="stand_straight">
+    <phases>
+        <phase balancing_enabled="false" name="stand_straight" next_phase="f01" duration="200" abort_safe="false">
+            <pose name="stand_straight" />
+        </phase>
+        <phase balancing_enabled="false" name="f01" next_phase="f02" duration="500" abort_safe="false">
+            <pose name="f01" />
+        </phase>
+        <phase balancing_enabled="false" name="f02" next_phase="f02x" duration="10" abort_safe="false">
+            <pose name="f02" />
+        </phase>
+        <phase balancing_enabled="false" name="f02x" next_phase="f03" duration="500" abort_safe="false">
+            <pose name="f02" />
+        </phase>        
+        <phase balancing_enabled="false" name="f03" next_phase="f03x" duration="10" abort_safe="false">
+            <pose name="f03" />
+        </phase>
+        <phase balancing_enabled="false" name="f03x" next_phase="f04" duration="500" abort_safe="false">
+            <pose name="f03" />
+        </phase>        
+        <phase balancing_enabled="false" name="f04" next_phase="stand_straight2" duration="700" abort_safe="false">
+            <pose name="f04" />
+        </phase>
+        <phase balancing_enabled="false" name="stand_straight2" next_phase="" duration="200" abort_safe="true">
+            <pose name="stand_straight" />
+        </phase>         
+    </phases>
+</motion>  
+

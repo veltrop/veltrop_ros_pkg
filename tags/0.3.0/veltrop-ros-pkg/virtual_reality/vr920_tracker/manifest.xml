@@ -1,0 +1,19 @@
+<package>
+  <description brief="vr920_tracker">
+
+     This listens to the vr920 driver and publishes ros messages for the head positon.
+
+  </description>
+  <author>Taylor Veltrop</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/vr920_tracker</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="tf"/> 
+  <depend package="kdl"/>
+
+</package>
+
+

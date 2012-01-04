@@ -1,0 +1,138 @@
+## This file should be loaded under <robot description>_planning
+
+## the definition of each group
+groups:
+
+  - name: robot_body
+    joints:
+      torso
+      neck_yaw
+      neck_pitch
+      stereo_camera_fixed
+    links:
+      torso
+      neck_zy
+      head_y
+      stereo_camera
+
+  - name: left_arm
+    joints:
+      shoulder_left_pitch
+      shoulder_left_roll
+      shoulder_left_yaw
+      elbow_left_roll
+    links:
+      shoulder_left_yx
+      arm_left_upper_xz
+      arm_left_elbow_zx
+      arm_left_lower_x
+ 
+  - name: right_arm
+    joints:
+      shoulder_right_pitch
+      shoulder_right_roll
+      shoulder_right_yaw
+      elbow_right_roll
+    links: 
+      shoulder_right_yx
+      arm_right_upper_xz
+      arm_right_elbow_zx
+      arm_right_lower_x
+      
+  - name: arms
+    joints: 
+      shoulder_left_pitch
+      shoulder_left_roll
+      shoulder_left_yaw
+      elbow_left_roll
+      shoulder_right_pitch
+      shoulder_right_roll
+      shoulder_right_yaw
+      elbow_right_roll      
+    links:
+      shoulder_left_yx
+      arm_left_upper_xz
+      arm_left_elbow_zx
+      arm_left_lower_x
+      shoulder_right_yx
+      arm_right_upper_xz
+      arm_right_elbow_zx
+      arm_right_lower_x      
+    planner_configs:
+      RRTkConfig2 SBLkConfig2 
+			
+  - name: legs
+    joints:
+      hip_left_yaw
+      hip_left_roll
+      hip_left_pitch
+      knee_left_pitch
+      ankle_left_pitch
+      ankle_left_roll
+      hip_right_yaw
+      hip_right_roll
+      hip_right_pitch
+      knee_right_pitch
+      ankle_right_pitch
+      ankle_right_roll
+    links:
+      hip_left_upper_zx
+      hip_left_lower_xy
+      leg_left_upper_yy
+      leg_left_lower_yy
+      ankle_left_yx
+      foot_left_x
+      hip_right_upper_zx
+      hip_right_lower_xy
+      leg_right_upper_yy
+      leg_right_lower_yy
+      ankle_right_yx
+      foot_right_x
+      
+  - name: left_leg
+    joints:
+      hip_left_yaw
+      hip_left_roll
+      hip_left_pitch
+      knee_left_pitch
+      ankle_left_pitch
+      ankle_left_roll
+    links:
+      hip_left_upper_zx
+      hip_left_lower_xy
+      leg_left_upper_yy
+      leg_left_lower_yy
+      ankle_left_yx
+      foot_left_x   
+      
+  - name: right_leg
+    joints:
+      hip_right_yaw
+      hip_right_roll
+      hip_right_pitch
+      knee_right_pitch
+      ankle_right_pitch
+      ankle_right_roll
+    links:
+      hip_right_upper_zx
+      hip_right_lower_xy
+      leg_right_upper_yy
+      leg_right_lower_yy
+      ankle_right_yx
+      foot_right_x            
+
+#  - name: l_end_effector
+#    links: 
+#      l_gripper_palm_link
+#      l_gripper_l_finger_link
+#      l_gripper_r_finger_link
+#      l_gripper_l_finger_tip_link
+#      l_gripper_r_finger_tip_link
+
+#  - name: r_end_effector
+#    links: 
+#      r_gripper_palm_link
+#      r_gripper_l_finger_link
+#      r_gripper_r_finger_link
+#      r_gripper_l_finger_tip_link
+#      r_gripper_r_finger_tip_link
