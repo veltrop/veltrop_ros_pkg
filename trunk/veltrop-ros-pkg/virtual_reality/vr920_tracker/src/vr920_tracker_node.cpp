@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
 	//multicastAddress
 	//port
 
+  ros::Rate r(40);
 	while (ros::ok())
 	{
 		if (!connected)
@@ -142,8 +143,9 @@ int main(int argc, char *argv[])
         }
         catch (tf::TransformException ex)
         {
-          ROS_ERROR("%s", ex.what());
-          // continue;
+          //ROS_ERROR("%s", ex.what());
+          r.sleep();
+          continue;
         }
 	      
 	      double qx, qy, qz, qw;
@@ -158,7 +160,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		usleep(10000); // 100 hz
+		r.sleep();
 	}
 
 	//cleanup socket
@@ -167,5 +169,7 @@ int main(int argc, char *argv[])
 		perror("setsockopt:IP_DROP_MEMBERSHIP");
 	}
 	close(socket_descriptor);
+	
+	return 0;
 }
 

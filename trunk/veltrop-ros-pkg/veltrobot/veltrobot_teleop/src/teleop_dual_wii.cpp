@@ -190,13 +190,16 @@ private:
 
 		if (prev_A)
 		{
+		  static float prev_pos = 0;
 			// input range is -10~+10 over -halfpi~+halfpi
 			// but the robot has 1.15pi range available
 		  float pos = -joy->axes[0] * HALFPI / 10.0f;
       //pos *= 1.15;
 	   	js.name.push_back("wrist_left_yaw");
-     	js.position.push_back(pos);
+     	js.position.push_back((pos+prev_pos)*0.5f);
      	js.velocity.push_back(10);
+     	
+     	prev_pos = pos;
 		}
 
     //if (mot.data != "")
@@ -217,8 +220,19 @@ private:
     sensor_msgs::JointState js; 
     std_msgs::String mot;
     mot.data = "";
+  
    
     // these are triggered when depressed
+    static bool prev_up = false;
+    if (joy->buttons[8] && prev_up == false)
+      mot.data = "top_camera";
+    prev_up = joy->buttons[0];
+    
+    static bool prev_down = false;
+    if (joy->buttons[9] && prev_down == false)
+      mot.data = "bottom_camera";
+    prev_down = joy->buttons[0];          
+    
     static bool prev_1 = false;
     if (joy->buttons[0] && prev_1 == false)
       mot.data = "sit";
@@ -265,13 +279,15 @@ private:
 
 		if (prev_A)
 		{
+		  static float prev_pos = 0;
 			// input range is -10~+10 over -halfpi~+halfpi
 			// but the robot has 1.15pi range available
 		  float pos = -joy->axes[0] * HALFPI / 10.0f;
       //pos *= 1.15;
 	   	js.name.push_back("wrist_right_yaw");
-     	js.position.push_back(pos);
+     	js.position.push_back((pos+prev_pos)*0.5f);
      	js.velocity.push_back(10);
+     	prev_pos = pos;
 		}
 
 	  if (mot.data != "")

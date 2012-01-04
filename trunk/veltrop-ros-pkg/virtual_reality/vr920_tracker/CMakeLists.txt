@@ -22,4 +22,5 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 rosbuild_add_executable(vr920_tracker_node src/vr920_tracker_node.cpp)
+rosbuild_add_executable(head_mover_node src/head_mover_node.cpp)
 

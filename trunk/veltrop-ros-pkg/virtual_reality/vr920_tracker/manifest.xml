@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/vr920_tracker</url>
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
   <depend package="tf"/> 
   <depend package="kdl"/>
 

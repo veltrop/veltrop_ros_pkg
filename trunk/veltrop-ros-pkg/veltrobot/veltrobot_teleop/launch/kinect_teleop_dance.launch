@@ -1,7 +1,7 @@
 <launch>
   <node required="true" pkg="veltrobot_teleop" type="teleop_kinect" name="teleop_kinect" output="screen" >
     <param name="load_filepath" value="$(find veltrobot_teleop)/conf/NiConfig.xml" />
-    <param name="publish_kinect_tf" value="false" />
+    <param name="publish_kinect_tf" value="true" />
     <param name="load_recording" value="false" />
     <param name="force_left_arm_enabled" value="false" /> 
     <param name="force_right_arm_enabled" value="false" />
@@ -13,3 +13,4 @@
   <include file="$(find openni_camera)/launch/kinect_frames.launch"/>
   <!-- <node pkg="tf" type="static_transform_publisher" name="base" args="0 0 0 0 0 0  /world /torso 100" /> -->
 </launch>
+

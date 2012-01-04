@@ -14,8 +14,8 @@ namespace treadmill
 {
 
 #define KINECT_DIST 2.7    // distance from kinect camera to center of treadmil
-#define DEAD_ZONE   0.2    // forward distance * 2 from center of treadmill to start motion.
-                           // sideways discance from center of treadmil to kill it.
+//#define DEAD_ZONE   0.25    // forward distance * 2 from center of treadmill to start motion.
+#define DEAD_ZONE   0.27                           // sideways discance from center of treadmil to kill it.
 
 class TreadmillController
 {
@@ -129,14 +129,23 @@ public:
   }
  
   // returns true on successful transmission 
-  bool setVelocity(double meter_per_sec)
+/*  bool setVelocity(double meter_per_sec)
   {
     if (!setSpeed(meter_per_sec))
       return false;
     
     // seems to work more smoothly if we set direction after speed
     return setDirection(meter_per_sec >= 0.0 ? FORWARD : BACKWARD);
-  }
+  }*/
+  
+  bool setVelocity(double meter_per_sec)
+  {
+    if (fabs(meter_per_sec) > 0.01)
+      if (!setDirection(meter_per_sec >= 0.0 ? FORWARD : BACKWARD))
+        return false;
+    
+    return setSpeed(meter_per_sec);
+  }  
   
   // returns true on successful transmission 
   bool setSpeed(double meter_per_sec)
@@ -212,11 +221,13 @@ public:
   void spin()
   {
     //ros::Rate rate(30);
-    ros::Rate rate(20);
+    //ros::Rate rate(20);
+    ros::Rate rate(10);
     
     ros::Time time_prev = ros::Time::now();
     //ros::Time prev_stand_sit = ros::Time::now();
     bool robotStanding = false;
+    double prev_treadmill_velocity = 0.0;
     while (n_.ok())
     {
       ros::spinOnce();
@@ -259,12 +270,18 @@ public:
       double treadmill_velocity = -torso_dist + KINECT_DIST; // offset from goal
       
       // linear speed factor until 0.3 cm displacement, then curved speed factor.
-      treadmill_velocity /= 0.3;
+      treadmill_velocity /= 0.4;
       if (treadmill_velocity > 1.0)
         treadmill_velocity *= treadmill_velocity;
       else if (treadmill_velocity < -1.0)
         treadmill_velocity *= -treadmill_velocity;
       treadmill_velocity *= 7.5; // baseline meters per second
+      
+      if (prev_treadmill_velocity < 0.0 && treadmill_velocity > 0.0)
+        treadmill_velocity = 0.01;
+      else if (prev_treadmill_velocity > 0.0 && treadmill_velocity < 0.0)
+        treadmill_velocity = -0.01;
+      //prev_treadmill_velocity = treadmill_velocity;
 
       double torso_alignment = fabs(torso_tf.getOrigin().x());
       double torso_height = torso_tf.getOrigin().y();
@@ -284,7 +301,7 @@ public:
         setVelocity(treadmill_velocity);
         robotShouldntWalk = false;
       }
-      else if (treadmill_velocity < 0.0)
+      else if (prev_treadmill_velocity < 0.0)
       {
         setVelocity(-0.01);
         robotShouldntWalk = true;  
@@ -294,6 +311,8 @@ public:
         setVelocity(0.01); 
         robotShouldntWalk = true;
       }    
+      
+      prev_treadmill_velocity = treadmill_velocity;
         
       // next extract rotation of human for robot
       double roll, pitch, yaw;
@@ -301,25 +320,32 @@ public:
  
       // prepare robot movement data type
       geometry_msgs::Twist motion;
-      motion.linear.y = 0.0;
-      motion.angular.z = 0.0;
-      if (fabs(pitch) >= 0.05)
-      {
-        motion.angular.z = pitch / 1.57;
-        motion.angular.z = std::max(std::min(motion.angular.z, 1.0), -1.0);
-      }
+      motion.linear.x = motion.linear.y = motion.angular.z = 0.0;
        
-      // handle controlling the robot          
+      // handle controlling the robot       
+      // go straight   
       if (robotStanding && !robotShouldntWalk && withinSafeZone)
       {  
-        motion.linear.x = treadmill_velocity / 10.0;  // treat my going 10m/s as NAO's 1.0
+        motion.linear.x = treadmill_velocity * 0.1;  // treat my going 10m/s as NAO's 1.0
         motion.linear.x = std::max(std::min(motion.linear.x, 1.0), -1.0);
         robot_move_pub_.publish(motion); 
       }
-      else if (robotStanding && robotShouldntWalk && fabs(pitch) >= 0.2 && withinSafeZone)
+      // side step
+      else if (robotStanding && robotShouldntWalk && withinSafeZone && torso_alignment >= 0.11)
       {
+        motion.linear.y = -torso_tf.getOrigin().x() * 5.0;
+        motion.linear.y = std::max(std::min(motion.linear.y, 1.0), -1.0);
         robot_move_pub_.publish(motion); 
       }
+      // rotate
+      else if (robotStanding && robotShouldntWalk && withinSafeZone && fabs(pitch) >= 0.42)
+      {
+        //motion.angular.z = pitch / 1.57;
+        motion.angular.z = pitch / 1.85;
+        motion.angular.z = std::max(std::min(motion.angular.z, 1.0), -1.0);
+        robot_move_pub_.publish(motion); 
+      }
+      // stop
       else if (robotShouldntWalk || !withinSafeZone)
       {
         motion.linear.x = motion.linear.y = motion.angular.z = 0.0;
@@ -329,24 +355,32 @@ public:
       //ros::Duration stand_sit_delta = ros::Time::now() - prev_stand_sit;
       if (withinSafeZone && humanStanding && !robotStanding /*&& stand_sit_delta.toSec() > 5.0*/)
       {
+        (treadmill_velocity < 0.0) ? setVelocity(-0.01) : setVelocity(0.01); 
+      
+        motion.linear.x = motion.linear.y = motion.angular.z = 0.0;
+        robot_move_pub_.publish(motion); 
+        usleep(200000);
+        
         std_msgs::String behavior;
         behavior.data = "get_up_and_ready";
         behavior_pub_.publish(behavior);
-        usleep(10000000);
+        usleep(18000000);
         
         robotStanding = true;
         //prev_stand_sit = ros::Time::now();
       }
       else if (withinSafeZone && !humanStanding && robotStanding /*&& stand_sit_delta.toSec() > 5.0*/)
       {
+        (treadmill_velocity < 0.0) ? setVelocity(-0.01) : setVelocity(0.01); 
+        
         motion.linear.x = motion.linear.y = motion.angular.z = 0.0;
         robot_move_pub_.publish(motion); 
-        usleep(100000);
+        usleep(200000);
         
         std_msgs::String behavior;
         behavior.data = "sit_and_relax";
         behavior_pub_.publish(behavior);
-        usleep(10000000);
+        usleep(15000000);
         
         robotStanding = false;
         //prev_stand_sit = ros::Time::now();
