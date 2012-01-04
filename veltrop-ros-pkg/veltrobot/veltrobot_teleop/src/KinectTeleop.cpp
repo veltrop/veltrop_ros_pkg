@@ -784,7 +784,7 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.name.push_back("neck_pitch");
       js.position.push_back(head_angle_pitch);
       js.velocity.push_back(10);    
-    } */   
+    }*/
     
     if (legs_enabled_ && (left_arm_enabled_ || right_arm_enabled_)
         && (arm_control_method_ == DIRECT) )
@@ -820,16 +820,12 @@ void KinectTeleop::processKinect(KinectController& kinect_controller)
       js.position.push_back(right_hip_angle_pitch);
       js.velocity.push_back(10);      
       
-      // TODO: something static here or put that into the a special pose
       js.name.push_back("hip_left_yaw");
       js.position.push_back(0);
       js.velocity.push_back(10);
       js.name.push_back("hip_right_yaw");
       js.position.push_back(0);
       js.velocity.push_back(10);
-      
-      // TODO: head animation
-      // max angle = 0.6 (0.7 hit limit)
     }  
 		
     if (js.name.size()) 		

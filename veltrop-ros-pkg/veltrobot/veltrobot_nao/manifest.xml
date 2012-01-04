@@ -11,10 +11,8 @@
   <depend package="veltrobot_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="rospy"/>
-  <depend package="nao_ctrl"/>
-	<depend package="nao_remote"/>
-  <depend package="nao_msgs"/>
-  <depend package="humanoid_nav_msgs"/>
+	<depend package="nao_driver"/>
+
 </package>
 
 

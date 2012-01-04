@@ -1,7 +1,7 @@
 <launch>
   <env name="PYTHONPATH" value="$(env PYTHONPATH)" /> 
   <!-- <param name="naoqi_ip" value="localhost" /> -->
-  <param name="naoqi_ip" value="groq.local" />
+  <param name="naoqi_ip" value="oni.local" />
   <!-- <param name="naoqi_ip" value="192.168.2.103" /> -->
   
   <!-- <include file="$(find veltrobot_teleop)/launch/dual_wiimote_teleop.launch" />
@@ -19,9 +19,8 @@
 
 
   <node respawn="true" pkg="nao_ctrl" type="nao_walker.py" name="nao_walker" 
-    args="--pip=groq.local --pport=9559" /> 
-    <!--    args="pip=groq.local pport=9559" /> -->
-  
+    args="--pip=oni.local --pport=9559" /> 
+      
   <!-- <node respawn="true" pkg="nao_ctrl" type="nao_sensors.py" name="nao_sensors" args="pip=192.168.2.103 pport=9559">
     <remap from="joint_states" to="joint_states_nao_real" />
   </node>
@@ -38,7 +37,7 @@
 
   <!-- <node pkg="nao_remote" type="remap_odometry" name="remap_odometry" /> -->
 
-  <node output="screen" pkg="veltrobot_movement" type="joint_state_processor.py" name="joint_state_processor">
+  <node pkg="veltrobot_movement" type="joint_state_processor.py" name="joint_state_processor">
     <rosparam file="$(find veltrobot_nao)/conf/veltrobot_to_nao_joint_conversions.yaml" command="load"/>
     <remap from="joint_states_in" to="joint_states" />
   </node>
