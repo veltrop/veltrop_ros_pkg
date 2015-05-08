@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>JointWidget</class>
+ <widget class="QWidget" name="JointWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>370</width>
+    <height>26</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>0</y>
+     <width>26</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>X</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>0</y>
+     <width>241</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
+   </property>
+   <item>
+    <property name="text">
+     <string>Other...</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBox_position">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>0</y>
+     <width>81</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="decimals">
+    <number>4</number>
+   </property>
+   <property name="minimum">
+    <double>-7.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>7.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.010000000000000</double>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_capture">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>21</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

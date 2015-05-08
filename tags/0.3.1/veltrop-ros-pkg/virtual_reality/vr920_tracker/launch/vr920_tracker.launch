@@ -1,0 +1,13 @@
+<launch>
+
+  <!-- <node pkg="tf" type="static_transform_publisher" name="simulate_openni_skeleton"
+   args="0 0 0 -1.57 0 1.57  /world /head 100" /> -->
+   
+   <node pkg="tf" type="static_transform_publisher" name="vr920_base_transform"
+   args="0 0 0 1.57 1.57 0  /head /vr920_base 100" />
+      
+  <node name="vr920_tracker_node" pkg="vr920_tracker" type="vr920_tracker_node" />
+  <node output="screen" name="head_mover_node" pkg="vr920_tracker" type="head_mover_node" />
+
+</launch>
+

@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+
+<motion name="get_up_belly" first_phase="stand_straight">
+    <phases>
+        <phase balancing_enabled="false" name="stand_straight" next_phase="g1" duration="300" abort_safe="false">
+            <pose name="stand_straight" />
+        </phase>    
+        <phase balancing_enabled="false" name="g1" next_phase="g2" duration="300" abort_safe="false">
+            <pose name="g1" />
+        </phase>
+        <phase balancing_enabled="false" name="g2" next_phase="g3" duration="300" abort_safe="false">
+            <pose name="g2" />
+        </phase>
+        <phase balancing_enabled="false" name="g3" next_phase="g4" duration="300" abort_safe="false">
+            <pose name="g3" />
+        </phase>
+        <phase balancing_enabled="false" name="g4" next_phase="g5" duration="300" abort_safe="false">
+            <pose name="g4" />
+        </phase>
+        <phase balancing_enabled="false" name="g5" next_phase="g6" duration="300" abort_safe="false">
+            <pose name="g5" />
+        </phase>
+        <phase balancing_enabled="false" name="g6" next_phase="g7" duration="300" abort_safe="false">
+            <pose name="g6" />
+        </phase>
+        <phase balancing_enabled="false" name="g7" next_phase="g8" duration="300" abort_safe="false">
+            <pose name="g7" />
+        </phase>                                                
+        <phase balancing_enabled="false" name="g8" next_phase="g9" duration="300" abort_safe="false">
+            <pose name="g8" />
+        </phase>                                                
+        <phase balancing_enabled="false" name="g9" next_phase="g10" duration="300" abort_safe="false">
+            <pose name="g9" />
+        </phase>                                                
+        <phase balancing_enabled="false" name="g10" next_phase="g11" duration="300" abort_safe="false">
+            <pose name="g10" />
+        </phase>   
+        <phase balancing_enabled="false" name="g11" next_phase="g12" duration="300" abort_safe="false">
+            <pose name="g11" />
+        </phase>
+        <phase balancing_enabled="false" name="g12" next_phase="g13" duration="300" abort_safe="false">
+            <pose name="g12" />
+        </phase>                                                
+        <phase balancing_enabled="false" name="g13" next_phase="g14" duration="300" abort_safe="false">
+            <pose name="g13" />
+        </phase>                                                
+        <phase balancing_enabled="false" name="g14" next_phase="g16" duration="500" abort_safe="false">
+            <pose name="g14" />
+        </phase>                                                
+        <phase balancing_enabled="false" name="g16" next_phase="g17" duration="500" abort_safe="false">
+            <pose name="g16" />
+        </phase> 
+        <phase balancing_enabled="false" name="g17" next_phase="stand_squat" duration="400" abort_safe="false">
+            <pose name="g17" />
+        </phase>         
+        <phase balancing_enabled="true" name="stand_squat" next_phase="" duration="500" abort_safe="true">
+            <pose name="stand_squat" />
+        </phase>     
+    </phases>
+</motion>  
+

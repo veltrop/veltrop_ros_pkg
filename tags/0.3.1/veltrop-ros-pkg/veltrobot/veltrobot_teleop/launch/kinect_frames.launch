@@ -1,0 +1,5 @@
+<launch>
+<node pkg="tf" type="static_transform_publisher" name="kinect_base_link_0" args="0 0 0.5 0 0 0 /world /openni_camera 100" /> 
+  <node pkg="tf" type="static_transform_publisher" name="kinect_base_link_1" args="0 -0.02 0 -1.57 0 1.57 /openni_camera /openni_depth_frame 100" />  
+</launch>
+

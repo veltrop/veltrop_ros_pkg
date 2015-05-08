@@ -1,0 +1,5 @@
+cloud_sources:
+  - name: /stereo/points
+    frame_subsample: 1
+    point_subsample: 1
+    sensor_frame: /stereo_camera

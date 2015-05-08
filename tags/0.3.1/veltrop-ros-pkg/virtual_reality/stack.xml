@@ -1,0 +1,10 @@
+<stack>
+  <description brief="virtual_reality">Nodes to interact with virtual reality devices</description>
+  <author>Maintained by Taylor Veltrop</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/virtual_reality</url>
+  <depend stack="ros" />
+  <depend stack="joystick_drivers" /> <!-- joy, wiimote -->
+  <depend stack="geometry" /> <!-- tf -->
+</stack>

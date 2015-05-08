@@ -1,0 +1,6 @@
+<launch>
+
+  <include file="$(find stereo_capture)/launch/acquire_stereo_oni.launch" />
+  <include file="$(find stereo_capture)/launch/process_stereo_oni.launch" />
+
+</launch>

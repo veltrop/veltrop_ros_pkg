@@ -1,0 +1,18 @@
+<package>
+  <description brief="">
+
+
+  </description>
+  <author>Taylor Veltrop</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/veltrobot_nao</url>
+
+  <depend package="veltrobot_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="rospy"/>
+	<depend package="nao_driver"/>
+
+</package>
+
+

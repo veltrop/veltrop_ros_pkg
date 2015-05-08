@@ -1,0 +1,11 @@
+<launch>
+    <param name="robot_description" command="cat $(find veltrobot_data)/model/veltrobot_urdf.xml" />
+
+    <node pkg="robot_state_publisher" type="state_publisher"
+            name="veltrobot_state_publisher" >
+        <!-- <remap from="robot_description" to="different_robot_description" /> -->
+        <!-- <remap from="/joint_states" to="different_joint_states" /> -->
+    </node>
+    
+</launch>
+

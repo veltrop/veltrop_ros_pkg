@@ -1,0 +1,12 @@
+libfuse:
+  ubuntu: libfuse-dev
+
+libconfig:
+  ubuntu: libconfig8-dev
+
+libconfig++:
+  ubuntu: libconfig++8-dev
+
+java:
+  ubuntu: sun-java6-jdk
+

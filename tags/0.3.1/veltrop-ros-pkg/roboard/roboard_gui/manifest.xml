@@ -1,0 +1,16 @@
+<package>
+  <description brief="roboard_gui">
+
+     GUI programs for the roboard stack.
+
+  </description>
+  <author>Taylor Veltrop</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://taylor.veltrop.com/robotics/khrhumanoidv2.php?topic=veltrop-ros-pkg</url>
+  
+  <depend package="roboard_servos"/>
+
+</package>
+
+
