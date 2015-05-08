@@ -1,7 +1,7 @@
 # veltrop-ros-pkg
 Taylor Veltrop's ROS Packages.
 Was actively developed between early 2010 and late 2011.
-Not much out-of-the-box here for you, but plenty of stuff 
+Not much out-of-the-box here for you, but plenty of stuff to adapt for your own projects.
 
 ## roboard package
 RoBoard drivers and support package for ROS.
