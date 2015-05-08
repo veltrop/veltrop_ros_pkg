@@ -1,3 +1,6 @@
+To make my UVC cameras work:
+
+Add "options uvcvideo quirks=128" to /etc/modprobe.d/uvcvideo.conf
 
 To save:
 
