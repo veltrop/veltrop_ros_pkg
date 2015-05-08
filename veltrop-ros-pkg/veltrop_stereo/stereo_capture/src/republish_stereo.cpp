@@ -159,14 +159,14 @@ private:
       ros::Duration d = ros::Time::now() - t_prev_;
       t_prev_ = ros::Time::now();
       float fps = 10.0f / d.toSec();
-      ROS_INFO("Recent 10 image pairs received at %f fps\n", fps);
+      //ROS_INFO("Recent 10 image pairs received at %f fps\n", fps);
     }  
   }
   
   void getStereoCB(const stereo_capture::PairYUYVImagesConstPtr& msg)
   {
     ros::Duration d = ros::Time::now() - msg->header.stamp;
-    ROS_INFO("Image pair receive delay: %f\n", d.toSec());
+    //ROS_INFO("Image pair receive delay: %f\n", d.toSec());
     doFps();
 
     int width, height;
@@ -174,17 +174,17 @@ private:
     {
       width  = msg->left_image.height;
       height = msg->left_image.width;
-      std::cout <<"rotate90ccw_ is true"<<std::endl;
+      //std::cout <<"rotate90ccw_ is true"<<std::endl;
     }
     else
     {
       height = msg->left_image.height;
       width  = msg->left_image.width;    
-      std::cout <<"rotate90ccw_ is false"<<std::endl;
+      //std::cout <<"rotate90ccw_ is false"<<std::endl;
     }
     
-    std::cout <<"destination width: "<< width<<std::endl;
-                        
+    //std::cout <<"destination width: "<< width<<std::endl;
+          
     // prepare image messages
     sensor_msgs::ImagePtr left_image(new sensor_msgs::Image);
     sensor_msgs::ImagePtr right_image(new sensor_msgs::Image);    

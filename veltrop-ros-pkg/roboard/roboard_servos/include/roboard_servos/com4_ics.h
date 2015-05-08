@@ -3,6 +3,14 @@
 
 // Code here contains contributions from Kondo's KCB library and Chris Vo's libondo4
 
+// Note that though this was called "com4", it is actually now utilizing
+// the roboard com3 (/dev/ttyS2).
+// To get access to the com ports, add 8250.nr_uarts=4 to kernal boot params.
+// Then, do setserial /dev/ttyS2 irq 10 port 0x03e8 uart 16550A
+//  (match the memory addresses and irq to your BIOS settings)
+//  (bios should also say 115200 baud?)
+// Search for Setup RB-100&RB-110 COM3 & COM4 in Ubuntu.pdf on internet
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
